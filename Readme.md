@@ -16,19 +16,22 @@ SimpleCMDS provides built-in commands, command aliases, customizable prefixes, a
 - Anti-fling protection
 - Server rejoining
 - Server hopping
+- Player teleportation
 
 ## Commands
 
-| Command | Aliases | Description |
-|---|---|---|
-| `airwalk` | `aw` | Enables Airwalk. |
-| `unairwalk` | `unaw` | Disables Airwalk. |
-| `antifling` | `af` | Enables AntiFling protection. |
-| `unantifling` | `uaf` | Disables AntiFling protection. |
-| `jumppower` | `jp` | Changes your JumpPower. |
-| `rejoin` | `rj` | Rejoins the current server. |
-| `serverhop` | `shop` | Joins a different public server. |
-| `setprefix` | `sp` | Changes the command prefix. |
+| Command | Aliases | Usage | Description |
+|---|---|---|---|
+| `airwalk` | `aw` | `.airwalk` | Enables Airwalk. |
+| `unairwalk` | `unaw` | `.unairwalk` | Disables Airwalk. |
+| `antifling` | `af` | `.antifling` | Enables AntiFling protection. |
+| `unantifling` | `uaf` | `.unantifling` | Disables AntiFling protection. |
+| `jumppower <number>` | `jp` | `.jumppower <number>` | Changes your JumpPower. |
+| `walkspeed <number>` | `ws` | `.walkspeed <number>` | Changes your WalkSpeed. |
+| `teleport <player>` | `tp`, `to`, `goto` | `.teleport <player>` | Teleports you to the specified player. |
+| `rejoin` | `rj` | `.rejoin` | Rejoins the current server. |
+| `serverhop` | `shop` | `.serverhop` | Joins a different public server. |
+| `setprefix <prefix>` | `sp` | `.setprefix <prefix>` | Changes the command prefix. |
 
 ## Usage
 
@@ -42,33 +45,69 @@ Commands can be executed like this:
 
     .jumppower 100
 
+    .walkspeed 50
+
+    .teleport PlayerName
+
     .rejoin
 
     .serverhop
 
-## Command Aliases
+## Command Arguments
 
-Most commands have shorter aliases for convenience.
+Some commands require additional arguments.
 
-For example:
+### JumpPower
 
-    .serverhop
+Set your JumpPower using:
 
-can also be used as:
+    .jumppower <number>
 
-    .shop
-
-And:
+Example:
 
     .jumppower 100
 
-can also be used as:
+Or use the `jp` alias:
 
     .jp 100
 
-## Changing the Prefix
+### WalkSpeed
 
-You can change the command prefix using `setprefix` or its alias `sp`.
+Set your WalkSpeed using:
+
+    .walkspeed <number>
+
+Example:
+
+    .walkspeed 50
+
+Or use the `ws` alias:
+
+    .ws 50
+
+### Teleport
+
+Teleport to another player using:
+
+    .teleport <player>
+
+Example:
+
+    .teleport PlayerName
+
+You can also use any of the following aliases:
+
+    .tp PlayerName
+
+    .to PlayerName
+
+    .goto PlayerName
+
+### SetPrefix
+
+Change the command prefix using:
+
+    .setprefix <prefix>
 
 Example:
 
@@ -81,6 +120,22 @@ After changing the prefix, commands can be used with the new prefix:
     !serverhop
 
 The prefix must be a single character and cannot be a letter.
+
+## Command Aliases
+
+Commands can have multiple aliases.
+
+Example:
+
+    Cmd.Reg(Cmd.new({"serverhop", "shop"}, function()
+        -- Command code
+    end))
+
+Both commands will work:
+
+    .serverhop
+
+    .shop
 
 ## User Commands
 
@@ -107,22 +162,6 @@ This command can then be executed using either:
 or:
 
     .hi
-
-## Command Aliases
-
-Commands can have multiple aliases.
-
-Example:
-
-    Cmd.Reg(Cmd.new({"serverhop", "shop"}, function()
-        -- Command code
-    end))
-
-Both commands will work:
-
-    .serverhop
-
-    .shop
 
 ## License
 
