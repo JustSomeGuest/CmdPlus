@@ -51,22 +51,42 @@ local StarterGui = Services.StarterGui
 local Lighting = Services.Lighting
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
-local Notifs = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
-
-Notifs.Settings = {
-    Theme = {
-        Accent = Color3.fromRGB(255, 255, 255),
-        Secondary = Color3.fromRGB(0, 0, 0),
-        Text = Color3.fromRGB(255, 255, 255),
-    },
-    Fonts = {
-        Title = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-        Description = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+local NotifsLoadSuccess, Notifs = pcall(function()
+    local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
+    Lib.Settings = {
+        Theme = {
+            Accent = Color3.fromRGB(255, 255, 255),
+            Secondary = Color3.fromRGB(0, 0, 0),
+            Text = Color3.fromRGB(255, 255, 255),
+        },
+        Fonts = {
+            Title = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
+            Description = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+        }
     }
-}
+    return Lib
+end)
+
+if not NotifsLoadSuccess then
+    warn("[SimpleCMDS] Failed to load Notify library, falling back to StarterGui notifications")
+end
 
 local function DebugNotif(Text)
-    Notifs:Notify("SimpleCMDS", Text)
+    if NotifsLoadSuccess then
+        local success = pcall(function()
+            Notifs:Notify("SimpleCMDS", Text)
+        end)
+        if success then
+            return
+        end
+        warn("[SimpleCMDS] Notify library errored, falling back to StarterGui notification")
+    end
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "SimpleCMDS",
+        Text = Text,
+        Duration = 5,
+    })
 end
 
 local Commands = {}
@@ -93,7 +113,7 @@ if not IsFolder("SimpleCMDS/UserCommands") then
     MakeFolder("SimpleCMDS/UserCommands")
 end
 
-local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Commands/"
+local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Source/Commands/"
 
 local BuiltInCommands = {
     "Antifling.luau",
