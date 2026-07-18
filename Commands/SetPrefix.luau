@@ -17,5 +17,6 @@ Cmd.Reg(Cmd.new({"setprefix", "sp"}, function(Args)
     end
     
     Prefix = char
+    WriteFile("SimpleCMDS/Prefix.luau", char)
     DebugNotif("Prefix set to: " .. Prefix)
 end))
