@@ -100,36 +100,6 @@ local BuiltInCommands = {
     "Jumppower.luau",
 }
 
-local function LoadCommandFromURL(url)
-    local success, result = pcall(function()
-        return game:HttpGet(url)
-    end)
-    if success and result then
-        local func, err = loadstring(result)
-        if func then
-            local env = CreateCommandEnv()
-            setfenv(func, env)
-            local success, err = pcall(func)
-            if not success then
-                warn("[SimpleCMDS] Failed to execute command: " .. url .. " - " .. tostring(err))
-            end
-            return true
-        else
-            warn("[SimpleCMDS] Failed to compile command: " .. url .. " - " .. tostring(err))
-        end
-    else
-        warn("[SimpleCMDS] Failed to download command: " .. url)
-    end
-    return false
-end
-
-local function LoadBuiltInCommands()
-    for _, cmdFile in ipairs(BuiltInCommands) do
-        local url = CommandsURL .. cmdFile
-        LoadCommandFromURL(url)
-    end
-end
-
 local function CreateCommandEnv()
     return {
         Cmd = Cmd,
@@ -164,6 +134,36 @@ local function CreateCommandEnv()
         Prefix = Prefix,
         Commands = Commands,
     }
+end
+
+local function LoadCommandFromURL(url)
+    local success, result = pcall(function()
+        return game:HttpGet(url)
+    end)
+    if success and result then
+        local func, err = loadstring(result)
+        if func then
+            local env = CreateCommandEnv()
+            setfenv(func, env)
+            local success, err = pcall(func)
+            if not success then
+                warn("[SimpleCMDS] Failed to execute command: " .. url .. " - " .. tostring(err))
+            end
+            return true
+        else
+            warn("[SimpleCMDS] Failed to compile command: " .. url .. " - " .. tostring(err))
+        end
+    else
+        warn("[SimpleCMDS] Failed to download command: " .. url)
+    end
+    return false
+end
+
+local function LoadBuiltInCommands()
+    for _, cmdFile in ipairs(BuiltInCommands) do
+        local url = CommandsURL .. cmdFile
+        LoadCommandFromURL(url)
+    end
 end
 
 local function LoadUserCommands()
