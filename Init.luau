@@ -235,6 +235,15 @@ local function LoadAutoConfig()
     end
 end
 
+local function CreateAutoExecuteTemplate()
+    if not IsFile("SimpleCMDS/Autoexecute.luau") then
+        local template = [[return {
+    -- "Example",
+}]]
+        WriteFile("SimpleCMDS/Autoexecute.luau", template)
+    end
+end
+
 local function LoadAutoExecute()
     if IsFile("SimpleCMDS/Autoexecute.luau") then
         local success, content = pcall(function()
@@ -287,6 +296,7 @@ DownloadAllCommands()
 LoadBuiltInCommands()
 LoadUserCommands()
 LoadAutoConfig()
+CreateAutoExecuteTemplate()
 LoadPrefix()
 LoadAutoExecute()
 
