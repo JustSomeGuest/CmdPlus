@@ -102,6 +102,10 @@ local BuiltInCommands = {
 
 local Prefix = "."
 
+local function SetGlobalPrefix(NewPrefix)
+    Prefix = NewPrefix
+end
+
 local function CreateCommandEnv()
     local Env = {
         Cmd = Cmd,
