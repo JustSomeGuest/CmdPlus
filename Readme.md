@@ -2,18 +2,38 @@
 
 A simple and lightweight command system for Roblox.
 
-SimpleCMDS provides built-in commands, command aliases, customizable prefixes, and support for adding your own user commands.
+SimpleCMDS provides built-in commands, command aliases, customizable prefixes, and support for creating your own commands.
+
+## Loading
+
+Execute SimpleCMDS with:
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Init.luau"))()
+```
+
+Or, if you want errors prefixed with `[SimpleCMDS]`:
+
+```lua
+local Success, Result = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Init.luau"))()
+end)
+
+if not Success then
+    error("[SimpleCMDS]: " .. tostring(Result))
+end
+```
 
 ## Features
 
-- Simple command system
+- Lightweight
 - Built-in commands
 - Command aliases
 - Customizable command prefix
-- User command support
-- Lightweight and easy to extend
+- User commands
+- Easy to extend
 - Player utilities
-- Anti-fling protection
+- AntiFling protection
 - Server rejoining
 - Server hopping
 - Player teleportation
@@ -21,165 +41,158 @@ SimpleCMDS provides built-in commands, command aliases, customizable prefixes, a
 ## Commands
 
 | Command | Aliases | Usage | Description |
-|---|---|---|---|
-| `airwalk` | `aw` | `.airwalk` | Enables Airwalk. |
-| `unairwalk` | `unaw` | `.unairwalk` | Disables Airwalk. |
-| `antifling` | `af` | `.antifling` | Enables AntiFling protection. |
-| `unantifling` | `uaf` | `.unantifling` | Disables AntiFling protection. |
-| `jumppower` | `jp` | `.jumppower <number>` | Changes your JumpPower. |
-| `walkspeed` | `ws` | `.walkspeed <number>` | Changes your WalkSpeed. |
-| `teleport` | `tp`, `to`, `goto` | `.teleport <player>` | Teleports you to the specified player. |
-| `rejoin` | `rj` | `.rejoin` | Rejoins the current server. |
-| `serverhop` | `shop` | `.serverhop` | Joins a different public server. |
-| `setprefix` | `sp` | `.setprefix <prefix>` | Changes the command prefix. |
+|----------|---------|-------|-------------|
+| `Airwalk` | `aw` | `.airwalk` | Enables Airwalk. |
+| `UnAirwalk` | `unaw` | `.unairwalk` | Disables Airwalk. |
+| `AntiFling` | `af` | `.antifling` | Enables AntiFling protection. |
+| `UnAntiFling` | `uaf` | `.unantifling` | Disables AntiFling protection. |
+| `WalkSpeed` | `ws` | `.walkspeed <number>` | Sets your WalkSpeed. |
+| `JumpPower` | `jp` | `.jumppower <number>` | Sets your JumpPower. |
+| `Teleport` | `tp`, `to`, `goto` | `.teleport <player>` | Teleports you to the specified player. |
+| `Rejoin` | `rj` | `.rejoin` | Rejoins the current server. |
+| `ServerHop` | `shop` | `.serverhop` | Joins another public server. |
+| `SetPrefix` | `sp` | `.setprefix <prefix>` | Changes the command prefix. |
 
-## Usage
+## Examples
 
-The default command prefix is `.`
+Enable Airwalk:
 
-Commands can be executed like this:
+```text
+.airwalk
+```
 
-    .airwalk
+Disable Airwalk:
 
-    .antifling
+```text
+.unairwalk
+```
 
-    .jumppower 100
+Enable AntiFling:
 
-    .walkspeed 50
+```text
+.antifling
+```
 
-    .teleport PlayerName
+Disable AntiFling:
 
-    .rejoin
+```text
+.unantifling
+```
 
-    .serverhop
+Set your WalkSpeed:
 
-## Command Arguments
+```text
+.walkspeed 50
+```
 
-Some commands require additional arguments.
+or
 
-### JumpPower
+```text
+.ws 50
+```
 
-Set your JumpPower using:
+Set your JumpPower:
 
-    .jumppower <number>
+```text
+.jumppower 100
+```
 
-Example:
+or
 
-    .jumppower 100
+```text
+.jp 100
+```
 
-Or use the `jp` alias:
+Teleport to a player:
 
-    .jp 100
+```text
+.teleport Builderman
+```
 
-### WalkSpeed
+or
 
-Set your WalkSpeed using:
+```text
+.tp Builderman
+.to Builderman
+.goto Builderman
+```
 
-    .walkspeed <number>
+Rejoin the current server:
 
-Example:
+```text
+.rejoin
+```
 
-    .walkspeed 50
+Join another server:
 
-Or use the `ws` alias:
+```text
+.serverhop
+```
 
-    .ws 50
+Change the command prefix:
 
-### Teleport
+```text
+.setprefix !
+```
 
-Teleport to another player using:
+Commands will then use the new prefix:
 
-    .teleport <player>
-
-Example:
-
-    .teleport PlayerName
-
-You can also use any of the following aliases:
-
-    .tp PlayerName
-
-    .to PlayerName
-
-    .goto PlayerName
-
-### SetPrefix
-
-Change the command prefix using:
-
-    .setprefix <prefix>
-
-Example:
-
-    .setprefix !
-
-After changing the prefix, commands can be used with the new prefix:
-
-    !airwalk
-
-    !serverhop
-
-The prefix must be a single character and cannot be a letter.
-
-## Command Aliases
-
-Commands can have multiple aliases.
-
-Example:
-
-    Cmd.Reg(Cmd.new({"serverhop", "shop"}, function()
-        -- Command code
-    end))
-
-Both commands will work:
-
-    .serverhop
-
-    .shop
+```text
+!airwalk
+!serverhop
+```
 
 ## User Commands
 
-SimpleCMDS supports custom user commands.
+SimpleCMDS supports loading your own custom commands.
 
-User commands can be created as `.luau` files inside the SimpleCMDS user commands directory.
+Create a `.luau` file inside:
 
-Example file structure:
+```text
+SimpleCMDS/
+└── UserCommands/
+    └── MyCommand.luau
+```
 
-    SimpleCMDS/
-    └── UserCommands/
-        └── MyCommand.luau
+Register your command:
 
-A custom command can be registered using `Cmd.Reg` and `Cmd.new`:
+```lua
+Cmd.Reg(Cmd.new({"hello", "hi"}, function()
+    DebugNotif("Hello!")
+end))
+```
 
-    Cmd.Reg(Cmd.new({"hello", "hi"}, function()
-        DebugNotif("Hello!")
-    end))
+You can now execute:
 
-This command can then be executed using either:
+```text
+.hello
+```
 
-    .hello
+or
 
-or:
-
-    .hi
+```text
+.hi
+```
 
 ## License
 
-©️ 2026 SimpleCMDS. All Rights Reserved.
+**© 2026 JustSomeGuest. All Rights Reserved.**
 
-This project and its source code are proprietary and copyright protected.
+SimpleCMDS and all associated source code are proprietary software protected by copyright law.
 
 You may **not**:
 
-- Copy, reproduce, or redistribute this project or any part of its source code.
-- Modify, alter, or create derivative works from this project.
-- Re-upload or publish the source code, modified or unmodified.
-- Claim ownership or authorship of this project.
-- Use this project or its source code in another project without explicit written permission from the author.
-- Sell, sublicense, or commercially distribute this project or any part of it.
+- Copy or redistribute this project.
+- Modify or create derivative works.
+- Re-upload the source code, modified or unmodified.
+- Claim ownership of this project or any part of it.
+- Use any portion of the source code in another project without explicit written permission from the author.
+- Sell, sublicense, lease, or commercially distribute this project.
 
-Any unauthorized copying, modification, redistribution, or republishing of this project is prohibited.
+Unauthorized copying, modification, redistribution, or republication of any part of this project is strictly prohibited.
 
 Permission to use, modify, or redistribute this project may only be granted by the copyright holder.
 
-All rights reserved.
+---
+
+Made with ❤️ by **JustSomeGuest**.
