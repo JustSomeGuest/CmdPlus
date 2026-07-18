@@ -83,9 +83,6 @@ end
 if not IsFolder("SimpleCMDS") then
     MakeFolder("SimpleCMDS")
 end
-if not IsFolder("SimpleCMDS/Commands") then
-    MakeFolder("SimpleCMDS/Commands")
-end
 if not IsFolder("SimpleCMDS/UserCommands") then
     MakeFolder("SimpleCMDS/UserCommands")
 end
@@ -103,61 +100,33 @@ local BuiltInCommands = {
     "Jumppower.luau",
 }
 
-local function DownloadCommandToFile(cmdFile)
-    local filePath = "SimpleCMDS/Commands/" .. cmdFile
-    local url = CommandsURL .. cmdFile
-    
+local function LoadCommandFromURL(url)
     local success, result = pcall(function()
         return game:HttpGet(url)
     end)
-    
-    if not success or not result then
-        warn("[SimpleCMDS] Failed to download command: " .. cmdFile)
-        return false
-    end
-    
-    if IsFile(filePath) then
-        local oldContent = ReadFile(filePath)
-        if oldContent ~= result then
-            DelFile(filePath)
-            WriteFile(filePath, result)
-        end
-    else
-        WriteFile(filePath, result)
-    end
-    return true
-end
-
-local function DownloadAllCommands()
-    for _, cmdFile in ipairs(BuiltInCommands) do
-        DownloadCommandToFile(cmdFile)
-    end
-end
-
-local function LoadCommandFromFile(filePath)
-    if IsFile(filePath) then
-        local success, chunk = pcall(function()
-            local content = ReadFile(filePath)
-            local func = loadstring(content)
-            if func then
-                local env = CreateCommandEnv()
-                setfenv(func, env)
-                return func()
+    if success and result then
+        local func, err = loadstring(result)
+        if func then
+            local env = CreateCommandEnv()
+            setfenv(func, env)
+            local success, err = pcall(func)
+            if not success then
+                warn("[SimpleCMDS] Failed to execute command: " .. url .. " - " .. tostring(err))
             end
-        end)
-        if success then
             return true
         else
-            warn("[SimpleCMDS] Failed to load command: " .. filePath)
+            warn("[SimpleCMDS] Failed to compile command: " .. url .. " - " .. tostring(err))
         end
+    else
+        warn("[SimpleCMDS] Failed to download command: " .. url)
     end
     return false
 end
 
 local function LoadBuiltInCommands()
     for _, cmdFile in ipairs(BuiltInCommands) do
-        local filePath = "SimpleCMDS/Commands/" .. cmdFile
-        LoadCommandFromFile(filePath)
+        local url = CommandsURL .. cmdFile
+        LoadCommandFromURL(url)
     end
 end
 
@@ -193,8 +162,7 @@ local function CreateCommandEnv()
         Instance = Instance,
         Terrain = Terrain,
         Prefix = Prefix,
-        DownloadCommandToFile = DownloadCommandToFile,
-        DownloadAllCommands = DownloadAllCommands,
+        Commands = Commands,
     }
 end
 
@@ -299,7 +267,6 @@ end
 local Prefix = "."
 local Plr = Players.LocalPlayer
 
-DownloadAllCommands()
 LoadBuiltInCommands()
 LoadUserCommands()
 LoadAutoConfig()
