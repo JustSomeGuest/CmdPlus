@@ -235,10 +235,60 @@ local function LoadAutoConfig()
     end
 end
 
+local function LoadAutoExecute()
+    if IsFile("SimpleCMDS/Autoexecute.luau") then
+        local success, content = pcall(function()
+            return ReadFile("SimpleCMDS/Autoexecute.luau")
+        end)
+        if success and content then
+            local func, err = loadstring(content)
+            if func then
+                local env = CreateCommandEnv()
+                setfenv(func, env)
+                local success, result = pcall(func)
+                if success and type(result) == "table" then
+                    for _, cmd in ipairs(result) do
+                        local args = {}
+                        for word in cmd:gmatch("%S+") do
+                            table.insert(args, word)
+                        end
+                        local cmdName = args[1] and args[1]:lower()
+                        local cmdFunc = Commands[cmdName]
+                        if cmdFunc then
+                            local success, err = pcall(cmdFunc, args)
+                            if not success then
+                                warn("[SimpleCMDS] Failed to autoexecute command: " .. cmd .. " - " .. tostring(err))
+                            end
+                        else
+                            warn("[SimpleCMDS] Unknown command in autoexecute: " .. cmd)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function LoadPrefix()
+    if IsFile("SimpleCMDS/Prefix.luau") then
+        local success, content = pcall(function()
+            return ReadFile("SimpleCMDS/Prefix.luau")
+        end)
+        if success and content then
+            local prefix = content:gsub("%s+", "")
+            if prefix ~= "" and #prefix == 1 then
+                Prefix = prefix
+            end
+        end
+    end
+end
+
 DownloadAllCommands()
 LoadBuiltInCommands()
 LoadUserCommands()
 LoadAutoConfig()
+LoadPrefix()
+LoadAutoExecute()
 
 local Prefix = "."
 local Plr = Players.LocalPlayer
