@@ -104,6 +104,7 @@ local BuiltInCommands = {
     "Airwalk.luau",
     "Walkspeed.luau",
     "Jumppower.luau",
+    "Teleport.luau",
 }
 
 local Prefix = "."
