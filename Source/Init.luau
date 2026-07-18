@@ -51,7 +51,9 @@ local StarterGui = Services.StarterGui
 local Lighting = Services.Lighting
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
-local NotifsSuccess, Notifs = pcall(function()
+local Hui = (gethui and gethui()) or Services.CoreGui
+
+local NotifsLoadSuccess, Notifs = pcall(function()
     local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
     Lib.Settings = {
         Theme = {
@@ -67,12 +69,12 @@ local NotifsSuccess, Notifs = pcall(function()
     return Lib
 end)
 
-if not NotifsSuccess then
+if not NotifsLoadSuccess then
     warn("[SimpleCMDS] Failed to load Notify library, falling back to StarterGui notifications")
 end
 
 local function DebugNotif(Text)
-    if NotifsSuccess then
+    if NotifsLoadSuccess then
         local success = pcall(function()
             Notifs:Notify("SimpleCMDS", Text)
         end)
@@ -113,7 +115,7 @@ if not IsFolder("SimpleCMDS/UserCommands") then
     MakeFolder("SimpleCMDS/UserCommands")
 end
 
-local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Source/Commands/"
+local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Commands/"
 
 local BuiltInCommands = {
     "Antifling.luau",
@@ -140,13 +142,29 @@ local function CreateCommandEnv()
         Commands = Commands,
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
+
         Workspace = Workspace,
         Players = Players,
         ReplicatedStorage = ReplicatedStorage,
         RunService = RunService,
         StarterGui = StarterGui,
+        CoreGui = Services.CoreGui,
+        Hui = Hui,
+        SoundService = Services.SoundService,
+        TweenService = Services.TweenService,
+        UserInputService = Services.UserInputService,
+        GuiService = Services.GuiService,
+        TextService = Services.TextService,
+        HttpService = Services.HttpService,
+        MarketplaceService = Services.MarketplaceService,
+        TeleportService = Services.TeleportService,
+        TextChatService = Services.TextChatService,
+        VoiceChatService = Services.VoiceChatService,
+        Stats = Services.Stats,
+        Debris = Services.Debris,
         Lighting = Lighting,
         Terrain = Terrain,
+
         WriteFile = WriteFile,
         ReadFile = ReadFile,
         IsFile = IsFile,
@@ -156,8 +174,82 @@ local function CreateCommandEnv()
         DelFolder = DelFolder,
         ListFiles = ListFiles,
         DebugNotif = DebugNotif,
+
         print = print,
         warn = warn,
+        error = error,
+        assert = assert,
+        pcall = pcall,
+        xpcall = xpcall,
+        select = select,
+        type = type,
+        typeof = typeof,
+        tostring = tostring,
+        tonumber = tonumber,
+        rawset = rawset,
+        rawget = rawget,
+        rawequal = rawequal,
+        rawlen = rawlen,
+        setmetatable = setmetatable,
+        getmetatable = getmetatable,
+        unpack = unpack or table.unpack,
+        require = require,
+        collectgarbage = collectgarbage,
+        loadstring = loadstring,
+        newproxy = newproxy,
+
+        pairs = pairs,
+        ipairs = ipairs,
+        next = next,
+        table = table,
+        string = string,
+        math = math,
+        os = os,
+        coroutine = coroutine,
+        utf8 = utf8,
+        bit32 = bit32,
+        debug = debug,
+
+        game = game,
+        workspace = workspace,
+        script = script,
+        task = task,
+        delay = delay,
+        spawn = spawn,
+        wait = wait,
+        tick = tick,
+        time = time,
+        elapsedTime = elapsedTime,
+
+        Vector2 = Vector2,
+        Vector3 = Vector3,
+        Vector2int16 = Vector2int16,
+        Vector3int16 = Vector3int16,
+        CFrame = CFrame,
+        Color3 = Color3,
+        ColorSequence = ColorSequence,
+        ColorSequenceKeypoint = ColorSequenceKeypoint,
+        NumberSequence = NumberSequence,
+        NumberSequenceKeypoint = NumberSequenceKeypoint,
+        NumberRange = NumberRange,
+        UDim = UDim,
+        UDim2 = UDim2,
+        Rect = Rect,
+        Region3 = Region3,
+        Region3int16 = Region3int16,
+        BrickColor = BrickColor,
+        Enum = Enum,
+        Instance = Instance,
+        Ray = Ray,
+        Axes = Axes,
+        Faces = Faces,
+        PhysicalProperties = PhysicalProperties,
+        TweenInfo = TweenInfo,
+        DateTime = DateTime,
+        Random = Random,
+        Font = Font,
+        OverlapParams = OverlapParams,
+        RaycastParams = RaycastParams,
     }
 
     local RealEnv = getfenv()
