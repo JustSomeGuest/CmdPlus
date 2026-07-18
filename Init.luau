@@ -112,6 +112,7 @@ local function CreateCommandEnv()
         Services = Services,
         Commands = Commands,
         Prefix = Prefix,
+        SetPrefix = SetGlobalPrefix,
         Workspace = Workspace,
         Players = Players,
         ReplicatedStorage = ReplicatedStorage,
