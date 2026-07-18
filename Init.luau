@@ -91,26 +91,30 @@ local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/
 
 local BuiltInCommands = {
     "Antifling.luau",
-    "Airwalk.luau",
     "Rejoin.luau",
     "ServerHop.luau",
     "SetShader.luau",
     "SetPrefix.luau",
+    "Airwalk.luau",
     "Walkspeed.luau",
     "Jumppower.luau",
 }
 
+local Prefix = "."
+
 local function CreateCommandEnv()
-    return {
+    local Env = {
         Cmd = Cmd,
         Services = Services,
+        Commands = Commands,
+        Prefix = Prefix,
         Workspace = Workspace,
         Players = Players,
         ReplicatedStorage = ReplicatedStorage,
         RunService = RunService,
         StarterGui = StarterGui,
         Lighting = Lighting,
-        DebugNotif = DebugNotif,
+        Terrain = Terrain,
         WriteFile = WriteFile,
         ReadFile = ReadFile,
         IsFile = IsFile,
@@ -119,21 +123,16 @@ local function CreateCommandEnv()
         MakeFolder = MakeFolder,
         DelFolder = DelFolder,
         ListFiles = ListFiles,
-        loadstring = loadstring,
-        game = game,
-        warn = warn,
+        DebugNotif = DebugNotif,
         print = print,
-        pcall = pcall,
-        task = task,
-        Vector3 = Vector3,
-        Color3 = Color3,
-        CFrame = CFrame,
-        Enum = Enum,
-        Instance = Instance,
-        Terrain = Terrain,
-        Prefix = Prefix,
-        Commands = Commands,
+        warn = warn,
     }
+
+    local RealEnv = getfenv()
+    return setmetatable(Env, {
+        __index = RealEnv,
+        __newindex = RealEnv,
+    })
 end
 
 local function LoadCommandFromURL(url)
@@ -169,13 +168,13 @@ end
 local function LoadUserCommands()
     if IsFolder("SimpleCMDS/UserCommands") then
         local files = ListFiles("SimpleCMDS/UserCommands")
-        local env = CreateCommandEnv()
         for _, file in ipairs(files) do
             if file:match("%.luau$") or file:match("%.lua$") then
                 local success, chunk = pcall(function()
                     local content = ReadFile(file)
                     local func = loadstring(content)
                     if func then
+                        local env = CreateCommandEnv()
                         setfenv(func, env)
                         return func()
                     end
@@ -264,7 +263,6 @@ local function LoadPrefix()
     end
 end
 
-local Prefix = "."
 local Plr = Players.LocalPlayer
 
 LoadBuiltInCommands()
