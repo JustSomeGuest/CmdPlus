@@ -60,7 +60,7 @@ Notifs.Theme = {
 }
 
 local function DebugNotif(Text)
-    Notifs:Notify("◈◈◈ SimpleCMDS ◈◈◈", Text)
+    Notifs:Notify("SimpleCMDS", Text)
 end
 
 local Commands = {}
