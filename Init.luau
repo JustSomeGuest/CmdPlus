@@ -140,6 +140,8 @@ local function LoadCommandFromFile(filePath)
             local content = ReadFile(filePath)
             local func = loadstring(content)
             if func then
+                local env = CreateCommandEnv()
+                setfenv(func, env)
                 return func()
             end
         end)
@@ -257,19 +259,21 @@ local function LoadAutoExecute()
                 local success, result = pcall(func)
                 if success and type(result) == "table" then
                     for _, cmd in ipairs(result) do
-                        local args = {}
-                        for word in cmd:gmatch("%S+") do
-                            table.insert(args, word)
-                        end
-                        local cmdName = args[1] and args[1]:lower()
-                        local cmdFunc = Commands[cmdName]
-                        if cmdFunc then
-                            local success, err = pcall(cmdFunc, args)
-                            if not success then
-                                warn("[SimpleCMDS] Failed to autoexecute command: " .. cmd .. " - " .. tostring(err))
+                        if not cmd:match("^%-%-") then
+                            local args = {}
+                            for word in cmd:gmatch("%S+") do
+                                table.insert(args, word)
                             end
-                        else
-                            warn("[SimpleCMDS] Unknown command in autoexecute: " .. cmd)
+                            local cmdName = args[1] and args[1]:lower()
+                            local cmdFunc = Commands[cmdName]
+                            if cmdFunc then
+                                local success, err = pcall(cmdFunc, args)
+                                if not success then
+                                    warn("[SimpleCMDS] Failed to autoexecute command: " .. cmd .. " - " .. tostring(err))
+                                end
+                            else
+                                warn("[SimpleCMDS] Unknown command in autoexecute: " .. cmd)
+                            end
                         end
                     end
                 end
@@ -292,6 +296,9 @@ local function LoadPrefix()
     end
 end
 
+local Prefix = "."
+local Plr = Players.LocalPlayer
+
 DownloadAllCommands()
 LoadBuiltInCommands()
 LoadUserCommands()
@@ -299,9 +306,6 @@ LoadAutoConfig()
 CreateAutoExecuteTemplate()
 LoadPrefix()
 LoadAutoExecute()
-
-local Prefix = "."
-local Plr = Players.LocalPlayer
 
 Plr.Chatted:Connect(function(Message)
     if Message:sub(1, #Prefix) ~= Prefix then
