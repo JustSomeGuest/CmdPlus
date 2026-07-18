@@ -4,19 +4,19 @@ Cmd.Reg(Cmd.new({"setprefix", "sp"}, function(Args)
         DebugNotif("Usage: .setprefix <prefix>")
         return
     end
-    
+
     if #newPrefix ~= 1 then
         DebugNotif("Prefix must be a single character")
         return
     end
-    
+
     local char = string.sub(newPrefix, 1, 1)
     if char:match("%a") then
         DebugNotif("Prefix cannot be a letter")
         return
     end
-    
-    Prefix = char
+
+    SetPrefix(char)
     WriteFile("SimpleCMDS/Prefix.luau", char)
-    DebugNotif("Prefix set to: " .. Prefix)
+    DebugNotif("Prefix set to: " .. char)
 end))
