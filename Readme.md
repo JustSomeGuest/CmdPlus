@@ -26,16 +26,16 @@ SimpleCMDS provides built-in commands, command aliases, customizable prefixes, a
 | `unairwalk` | `unaw` | `.unairwalk` | Disables Airwalk. |
 | `antifling` | `af` | `.antifling` | Enables AntiFling protection. |
 | `unantifling` | `uaf` | `.unantifling` | Disables AntiFling protection. |
-| `jumppower <number>` | `jp` | `.jumppower <number>` | Changes your JumpPower. |
-| `walkspeed <number>` | `ws` | `.walkspeed <number>` | Changes your WalkSpeed. |
-| `teleport <player>` | `tp`, `to`, `goto` | `.teleport <player>` | Teleports you to the specified player. |
+| `jumppower` | `jp` | `.jumppower <number>` | Changes your JumpPower. |
+| `walkspeed` | `ws` | `.walkspeed <number>` | Changes your WalkSpeed. |
+| `teleport` | `tp`, `to`, `goto` | `.teleport <player>` | Teleports you to the specified player. |
 | `rejoin` | `rj` | `.rejoin` | Rejoins the current server. |
 | `serverhop` | `shop` | `.serverhop` | Joins a different public server. |
-| `setprefix <prefix>` | `sp` | `.setprefix <prefix>` | Changes the command prefix. |
+| `setprefix` | `sp` | `.setprefix <prefix>` | Changes the command prefix. |
 
 ## Usage
 
-The default command prefix is `.`.
+The default command prefix is `.`
 
 Commands can be executed like this:
 
