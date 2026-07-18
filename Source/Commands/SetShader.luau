@@ -19,6 +19,63 @@ SunRays.Parent = Lighting
 local DOF = Instance.new("DepthOfFieldEffect")
 DOF.Parent = Lighting
 
+local Player = Players.LocalPlayer
+local CurrentLightConfig = nil
+
+local function SetupLight(Character)
+    local Root = Character:WaitForChild("HumanoidRootPart")
+
+    local Light = Root:FindFirstChild("TorchLight")
+    if not Light then
+        Light = Instance.new("PointLight")
+        Light.Name = "TorchLight"
+        Light.Parent = Root
+    end
+
+    if CurrentLightConfig then
+        Light.Enabled = CurrentLightConfig.Brightness > 0.05
+        Light.Brightness = CurrentLightConfig.Brightness
+        Light.Range = CurrentLightConfig.Range
+        Light.Color = CurrentLightConfig.Color
+        Light.Shadows = true
+    else
+        Light.Enabled = false
+    end
+end
+
+if Player.Character then
+    SetupLight(Player.Character)
+end
+
+Player.CharacterAdded:Connect(SetupLight)
+
+local function ApplyCharacterLight(LightConfig)
+    CurrentLightConfig = LightConfig
+
+    local Character = Player.Character
+    if not Character then
+        return
+    end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then
+        return
+    end
+
+    local Light = Root:FindFirstChild("TorchLight")
+    if not Light then
+        Light = Instance.new("PointLight")
+        Light.Name = "TorchLight"
+        Light.Parent = Root
+    end
+
+    Light.Enabled = LightConfig.Brightness > 0.05
+    Light.Brightness = LightConfig.Brightness
+    Light.Range = LightConfig.Range
+    Light.Color = LightConfig.Color
+    Light.Shadows = true
+end
+
 local Shaders = {
     Night = {
         Lighting = {
@@ -48,7 +105,8 @@ local Shaders = {
         Bloom = { Intensity = 0.07, Size = 30, Threshold = 1 },
         SunRays = { Intensity = 0, Spread = 1 },
         DOF = { FocusDistance = 120, InFocusRadius = 120, NearIntensity = 0, FarIntensity = 0.09 },
-        Water = { Color = Color3.fromRGB(20, 38, 72), Transparency = 0.25, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 }
+        Water = { Color = Color3.fromRGB(20, 38, 72), Transparency = 0.25, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 },
+        Light = { Brightness = 1.3, Range = 13, Color = Color3.fromRGB(255, 235, 200) }
     },
     Sunrise = {
         Lighting = {
@@ -78,7 +136,8 @@ local Shaders = {
         Bloom = { Intensity = 0.26, Size = 42, Threshold = 0.92 },
         SunRays = { Intensity = 0.18, Spread = 0.97 },
         DOF = { FocusDistance = 120, InFocusRadius = 120, NearIntensity = 0, FarIntensity = 0.035 },
-        Water = { Color = Color3.fromRGB(110, 155, 220), Transparency = 0.2, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 }
+        Water = { Color = Color3.fromRGB(110, 155, 220), Transparency = 0.2, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 },
+        Light = { Brightness = 0.3, Range = 10, Color = Color3.fromRGB(255, 225, 190) }
     },
     Morning = {
         Lighting = {
@@ -108,7 +167,8 @@ local Shaders = {
         Bloom = { Intensity = 0.14, Size = 34, Threshold = 0.97 },
         SunRays = { Intensity = 0.08, Spread = 0.88 },
         DOF = { FocusDistance = 130, InFocusRadius = 130, NearIntensity = 0, FarIntensity = 0.02 },
-        Water = { Color = Color3.fromRGB(70, 145, 230), Transparency = 0.2, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 }
+        Water = { Color = Color3.fromRGB(70, 145, 230), Transparency = 0.2, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 },
+        Light = { Brightness = 0, Range = 10, Color = Color3.fromRGB(255, 250, 244) }
     },
     Afternoon = {
         Lighting = {
@@ -138,7 +198,8 @@ local Shaders = {
         Bloom = { Intensity = 0.2, Size = 36, Threshold = 0.95 },
         SunRays = { Intensity = 0.1, Spread = 0.9 },
         DOF = { FocusDistance = 110, InFocusRadius = 130, NearIntensity = 0, FarIntensity = 0.025 },
-        Water = { Color = Color3.fromRGB(30, 130, 255), Transparency = 0.18, Reflectance = 0.12, WaveSize = 0.15, WaveSpeed = 10 }
+        Water = { Color = Color3.fromRGB(30, 130, 255), Transparency = 0.18, Reflectance = 0.12, WaveSize = 0.15, WaveSpeed = 10 },
+        Light = { Brightness = 0, Range = 10, Color = Color3.fromRGB(255, 253, 250) }
     },
     Evening = {
         Lighting = {
@@ -168,7 +229,8 @@ local Shaders = {
         Bloom = { Intensity = 0.24, Size = 40, Threshold = 0.93 },
         SunRays = { Intensity = 0.17, Spread = 0.97 },
         DOF = { FocusDistance = 100, InFocusRadius = 120, NearIntensity = 0, FarIntensity = 0.05 },
-        Water = { Color = Color3.fromRGB(190, 120, 80), Transparency = 0.2, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 }
+        Water = { Color = Color3.fromRGB(190, 120, 80), Transparency = 0.2, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 },
+        Light = { Brightness = 0.5, Range = 11, Color = Color3.fromRGB(255, 200, 150) }
     },
     Sunset = {
         Lighting = {
@@ -198,7 +260,8 @@ local Shaders = {
         Bloom = { Intensity = 0.32, Size = 46, Threshold = 0.88 },
         SunRays = { Intensity = 0.22, Spread = 1 },
         DOF = { FocusDistance = 95, InFocusRadius = 115, NearIntensity = 0, FarIntensity = 0.07 },
-        Water = { Color = Color3.fromRGB(160, 90, 58), Transparency = 0.22, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 }
+        Water = { Color = Color3.fromRGB(160, 90, 58), Transparency = 0.22, Reflectance = 0.1, WaveSize = 0.15, WaveSpeed = 10 },
+        Light = { Brightness = 0.9, Range = 12, Color = Color3.fromRGB(255, 180, 130) }
     },
 }
 
@@ -243,6 +306,8 @@ local function ApplyPreset(P)
         Terrain.WaterWaveSize = P.Water.WaveSize
         Terrain.WaterWaveSpeed = P.Water.WaveSpeed
     end
+
+    ApplyCharacterLight(P.Light)
 end
 
 local function SetShader(Name)
@@ -276,6 +341,14 @@ local function lerpSection(a, b, t)
     return out
 end
 
+local function lerpLight(a, b, t)
+    return {
+        Brightness = lerp(a.Brightness, b.Brightness, t),
+        Range = lerp(a.Range, b.Range, t),
+        Color = lerpColor(a.Color, b.Color, t),
+    }
+end
+
 local function BlendPresets(A, B, t)
     return {
         Lighting = lerpSection(A.Lighting, B.Lighting, t),
@@ -285,6 +358,7 @@ local function BlendPresets(A, B, t)
         SunRays = lerpSection(A.SunRays, B.SunRays, t),
         DOF = lerpSection(A.DOF, B.DOF, t),
         Water = lerpSection(A.Water, B.Water, t),
+        Light = lerpLight(A.Light, B.Light, t),
     }
 end
 
