@@ -53,10 +53,16 @@ local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
 local Notifs = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
 
-Notifs.Theme = {
-    Accent = Color3.fromRGB(255, 255, 255),
-    Secondary = Color3.fromRGB(0, 0, 0),
-    Text = Color3.fromRGB(255, 255, 255),
+Notifs.Settings = {
+    Theme = {
+        Accent = Color3.fromRGB(255, 255, 255),
+        Secondary = Color3.fromRGB(0, 0, 0),
+        Text = Color3.fromRGB(255, 255, 255),
+    },
+    Fonts = {
+        Title = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
+        Description = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+    }
 }
 
 local function DebugNotif(Text)
