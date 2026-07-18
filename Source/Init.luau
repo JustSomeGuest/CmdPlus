@@ -51,7 +51,9 @@ local StarterGui = Services.StarterGui
 local Lighting = Services.Lighting
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
-local NotifsLoadSuccess, Notifs = pcall(function()
+local Hui = (gethui and gethui()) or Services.CoreGui
+
+local NotifsSuccess, Notifs = pcall(function()
     local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
     Lib.Settings = {
         Theme = {
@@ -67,12 +69,12 @@ local NotifsLoadSuccess, Notifs = pcall(function()
     return Lib
 end)
 
-if not NotifsLoadSuccess then
+if not NotifsSuccess then
     warn("[SimpleCMDS] Failed to load Notify library, falling back to StarterGui notifications")
 end
 
 local function DebugNotif(Text)
-    if NotifsLoadSuccess then
+    if NotifsSuccess then
         local success = pcall(function()
             Notifs:Notify("SimpleCMDS", Text)
         end)
@@ -147,7 +149,7 @@ local function CreateCommandEnv()
         RunService = RunService,
         StarterGui = StarterGui,
         CoreGui = Services.CoreGui,
-        local Hui = (gethui and gethui()) or Services.CoreGui,  
+        Hui = Hui,
         SoundService = Services.SoundService,
         TweenService = Services.TweenService,
         UserInputService = Services.UserInputService,
