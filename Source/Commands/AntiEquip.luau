@@ -13,22 +13,11 @@ local function BlockTool(Tool, Character)
 end
 
 local function HookCharacter(Character)
-    local Humanoid = Character:WaitForChild("Humanoid", 5)
-
     AntiEquipConns[#AntiEquipConns + 1] = Character.ChildAdded:Connect(function(Child)
         if AntiEquipActive and Child:IsA("Tool") then
             BlockTool(Child, Character)
         end
     end)
-
-    if Humanoid then
-        AntiEquipConns[#AntiEquipConns + 1] = Humanoid.Equipped:Connect(function(Tool)
-            if AntiEquipActive then
-                BlockTool(Tool, Character)
-            end
-        end)
-        Humanoid:UnequipTools()
-    end
 
     for _, Child in ipairs(Character:GetChildren()) do
         if Child:IsA("Tool") then
