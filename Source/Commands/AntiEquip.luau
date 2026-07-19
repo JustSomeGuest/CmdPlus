@@ -70,8 +70,6 @@ local function UnAntiEquip()
     DebugNotif("AntiEquip: Disabled")
 end
 
-AntiEquip(false)
-
 Cmd.Reg(Cmd.new({"antiequip", "preventtools", "prevtools"}, function()
     AntiEquip(true)
 end))
