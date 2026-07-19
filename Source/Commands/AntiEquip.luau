@@ -1,17 +1,39 @@
+local Player = Players.LocalPlayer
+
 local AntiEquipConns = {}
 local AntiEquipActive = false
 
-local function HookHumanoid(Humanoid)
-    AntiEquipConns[#AntiEquipConns + 1] = Humanoid.Equipped:Connect(function()
-        Humanoid:UnequipTools()
-    end)
+local function BlockTool(Tool, Character)
+    local Backpack = Player:FindFirstChild("Backpack")
+    if Backpack then
+        Tool.Parent = Backpack
+    else
+        Tool.Parent = nil
+    end
 end
 
-local function SeedCharacter(Character)
+local function HookCharacter(Character)
     local Humanoid = Character:WaitForChild("Humanoid", 5)
+
+    AntiEquipConns[#AntiEquipConns + 1] = Character.ChildAdded:Connect(function(Child)
+        if AntiEquipActive and Child:IsA("Tool") then
+            BlockTool(Child, Character)
+        end
+    end)
+
     if Humanoid then
-        HookHumanoid(Humanoid)
+        AntiEquipConns[#AntiEquipConns + 1] = Humanoid.Equipped:Connect(function(Tool)
+            if AntiEquipActive then
+                BlockTool(Tool, Character)
+            end
+        end)
         Humanoid:UnequipTools()
+    end
+
+    for _, Child in ipairs(Character:GetChildren()) do
+        if Child:IsA("Tool") then
+            BlockTool(Child, Character)
+        end
     end
 end
 
@@ -24,12 +46,12 @@ local function AntiEquip(Notify)
 
     local Character = Player.Character
     if Character then
-        SeedCharacter(Character)
+        HookCharacter(Character)
     end
 
     AntiEquipConns[#AntiEquipConns + 1] = Player.CharacterAdded:Connect(function(Char)
         if AntiEquipActive then
-            SeedCharacter(Char)
+            HookCharacter(Char)
         end
     end)
 
