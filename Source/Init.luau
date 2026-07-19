@@ -28,6 +28,7 @@ local MakeFolder = expect("function", makefolder, function() return end)
 local DelFolder = expect("function", delfolder, function() return end)
 local ReadFile = expect("function", readfile, function() return "" end)
 local ListFiles = expect("function", listfiles, function() return {} end)
+local LoadAsset = expect("function", getcustomasset, expect("function", getsynasset, nil))
 
 local Services = setmetatable({}, {
     __index = function(self, name)
@@ -114,8 +115,12 @@ end
 if not IsFolder("SimpleCMDS/UserCommands") then
     MakeFolder("SimpleCMDS/UserCommands")
 end
+if not IsFolder("SimpleCMDS/Assets") then
+    MakeFolder("SimpleCMDS/Assets")
+end
 
 local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Commands/"
+local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Assets/"
 
 local BuiltInCommands = {
     "AntiFling.luau",
@@ -130,6 +135,75 @@ local BuiltInCommands = {
     "Teleport.luau",
 }
 
+local Assets = {
+    ["SimpleCMDS/Assets/Rain.mp3"] = AssetsURL .. "Rain.mp3",
+    ["SimpleCMDS/Assets/Thunder.mp3"] = AssetsURL .. "Thunder.mp3",
+}
+
+local function AssetHttpGet(url)
+    local RequestFunc = expect("function", syn and syn.request,
+        expect("function", request,
+            expect("function", http_request, nil)))
+
+    if not RequestFunc then
+        local success, result = pcall(function()
+            return game:HttpGet(url)
+        end)
+        if success then
+            return { Success = true, Body = result }
+        end
+        return nil
+    end
+
+    local success, result = pcall(function()
+        return RequestFunc({
+            Url = url,
+            Method = "GET"
+        })
+    end)
+
+    return success and result or nil
+end
+
+local function GetAsset(Path)
+    if not LoadAsset then
+        warn("[SimpleCMDS] getcustomasset/getsynasset not supported by this executor")
+        return nil
+    end
+
+    local RemoteURL = Assets[Path]
+    if not RemoteURL then
+        warn("[SimpleCMDS] No asset registered for path: " .. Path)
+        return nil
+    end
+
+    if RemoteURL:match("^rbxassetid://") then
+        return RemoteURL
+    end
+
+    if not IsFile(Path) then
+        local Response = AssetHttpGet(RemoteURL)
+
+        if not Response or not Response.Success or not Response.Body then
+            warn("[SimpleCMDS] Failed to download asset: " .. Path)
+            return nil
+        end
+
+        WriteFile(Path, Response.Body)
+    end
+
+    local success, result = pcall(function()
+        return LoadAsset(Path)
+    end)
+
+    if success then
+        return result
+    end
+
+    warn("[SimpleCMDS] Failed to load local asset: " .. Path)
+    return nil
+end
+
 local Prefix = "."
 
 local function SetGlobalPrefix(NewPrefix)
@@ -143,6 +217,7 @@ local function CreateCommandEnv()
         Commands = Commands,
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
+        GetAsset = GetAsset,
 
         Workspace = Workspace,
         Players = Players,
