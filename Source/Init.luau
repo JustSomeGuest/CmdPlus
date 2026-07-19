@@ -118,7 +118,7 @@ end
 local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Commands/"
 
 local BuiltInCommands = {
-    "Antifling.luau",
+    "AntiFling.luau",
     "Rejoin.luau",
     "ServerHop.luau",
     "SetShader.luau",
@@ -126,7 +126,7 @@ local BuiltInCommands = {
     "AntiEquip.luau",
     "Airwalk.luau",
     "Walkspeed.luau",
-    "Jumppower.luau",
+    "JumpPower.luau",
     "Teleport.luau",
 }
 
