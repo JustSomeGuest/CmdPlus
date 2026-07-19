@@ -26,6 +26,24 @@ if Terrain then
     }
 end
 
+local OriginalSky = Lighting:FindFirstChildOfClass("Sky")
+
+local StormSky = Instance.new("Sky")
+StormSky.Name = "WeatherStormSky"
+StormSky.SkyboxBk = "rbxassetid://4495864450"
+StormSky.SkyboxDn = "rbxassetid://4495864887"
+StormSky.SkyboxFt = "rbxassetid://4495865458"
+StormSky.SkyboxLf = "rbxassetid://4495866035"
+StormSky.SkyboxRt = "rbxassetid://4495866584"
+StormSky.SkyboxUp = "rbxassetid://4495867486"
+StormSky.SunTextureId = ""
+StormSky.MoonTextureId = ""
+StormSky.SunAngularSize = 1
+StormSky.MoonAngularSize = 1
+StormSky.StarCount = 3000
+StormSky.CelestialBodiesShown = true
+StormSky.SkyboxOrientation = Vector3.new(0, 0, 0)
+
 local Atmosphere = Instance.new("Atmosphere")
 Atmosphere.Parent = Lighting
 
@@ -498,6 +516,22 @@ local function UpdateWeatherSound(WeatherName)
     end
 end
 
+local function UpdateWeatherSky(WeatherName)
+    local W = Weather[WeatherName]
+
+    if W.Sound == "Rain" or W.Sound == "Thunderstorm" then
+        if OriginalSky then
+            OriginalSky.Parent = nil
+        end
+        StormSky.Parent = Lighting
+    else
+        StormSky.Parent = nil
+        if OriginalSky then
+            OriginalSky.Parent = Lighting
+        end
+    end
+end
+
 local function ApplyCombined(TimeName, WeatherName)
     local T = TimeOfDay[TimeName]
     local W = Weather[WeatherName]
@@ -546,6 +580,7 @@ local function ApplyCombined(TimeName, WeatherName)
 
     ApplyCharacterLight(T.Light)
     UpdateWeatherSound(WeatherName)
+    UpdateWeatherSky(WeatherName)
 end
 
 local function lerp(a, b, t)
@@ -718,6 +753,11 @@ local function ResetShader()
         Terrain.WaterWaveSpeed = OriginalWater.WaveSpeed
     end
 
+    StormSky.Parent = nil
+    if OriginalSky then
+        OriginalSky.Parent = Lighting
+    end
+
     Atmosphere:Destroy()
     ColorCorrection:Destroy()
     Bloom:Destroy()
@@ -725,6 +765,7 @@ local function ResetShader()
     DOF:Destroy()
     RainSound:Destroy()
     ThunderSound:Destroy()
+    StormSky:Destroy()
 
     ApplyCharacterLight({ Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 255, 255) })
 end
