@@ -123,6 +123,8 @@ local BuiltInCommands = {
     "ServerHop.luau",
     "SetShader.luau",
     "SetPrefix.luau",
+    "AntiEquip.luau",
+    "ToolKill.luau",
     "Airwalk.luau",
     "Walkspeed.luau",
     "Jumppower.luau",
