@@ -40,94 +40,11 @@ end
 
 ## Commands
 
-| Command | Aliases | Usage | Description |
-|----------|---------|-------|-------------|
-| `Airwalk` | `aw` | `.airwalk` | Enables Airwalk. |
-| `UnAirwalk` | `unaw` | `.unairwalk` | Disables Airwalk. |
-| `AntiFling` | `af` | `.antifling` | Enables AntiFling protection. |
-| `UnAntiFling` | `uaf` | `.unantifling` | Disables AntiFling protection. |
-| `WalkSpeed` | `ws` | `.walkspeed <number>` | Sets your WalkSpeed. |
-| `JumpPower` | `jp` | `.jumppower <number>` | Sets your JumpPower. |
-| `Teleport` | `tp`, `to`, `goto` | `.teleport <player>` | Teleports you to the specified player. |
-| `Rejoin` | `rj` | `.rejoin` | Rejoins the current server. |
-| `ServerHop` | `shop` | `.serverhop` | Joins another public server. |
-| `SetPrefix` | `sp` | `.setprefix <prefix>` | Changes the command prefix. |
+SimpleCMDS ships with a growing set of built-in commands (movement utilities, anti-exploit protections, server tools, and more), each with short aliases for faster typing. Commands are loaded automatically on startup — no need to memorize a fixed list here, since new ones get added over time.
 
-## Examples
+The default prefix is `.` (change it anytime with `setprefix`, see below).
 
-Enable Airwalk:
-
-```text
-.airwalk
-```
-
-Disable Airwalk:
-
-```text
-.unairwalk
-```
-
-Enable AntiFling:
-
-```text
-.antifling
-```
-
-Disable AntiFling:
-
-```text
-.unantifling
-```
-
-Set your WalkSpeed:
-
-```text
-.walkspeed 50
-```
-
-or
-
-```text
-.ws 50
-```
-
-Set your JumpPower:
-
-```text
-.jumppower 100
-```
-
-or
-
-```text
-.jp 100
-```
-
-Teleport to a player:
-
-```text
-.teleport Builderman
-```
-
-or
-
-```text
-.tp Builderman
-.to Builderman
-.goto Builderman
-```
-
-Rejoin the current server:
-
-```text
-.rejoin
-```
-
-Join another server:
-
-```text
-.serverhop
-```
+## Setting the Prefix
 
 Change the command prefix:
 
