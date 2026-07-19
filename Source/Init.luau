@@ -124,7 +124,7 @@ local BuiltInCommands = {
     "SetShader.luau",
     "SetPrefix.luau",
     "AntiEquip.luau",
-    "Airwalk.luau",
+    "AirWalk.luau",
     "Walkspeed.luau",
     "JumpPower.luau",
     "Teleport.luau",
