@@ -782,5 +782,3 @@ Cmd.Reg(Cmd.new({"setshader", "ss"}, function(Args)
     local WeatherEmoji = Weather[CurrentWeatherName].Emoji
     DebugNotif(WeatherEmoji .. " " .. TimeEmoji .. " Shader set to " .. CurrentWeatherName .. " " .. CurrentTimeName)
 end))
-
-ApplyCombined(CurrentTimeName, CurrentWeatherName)
