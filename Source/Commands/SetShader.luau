@@ -76,6 +76,149 @@ ThunderSound.Parent = SoundService
 local Player = Players.LocalPlayer
 local CurrentLightConfig = nil
 
+local RainPart = Instance.new("Part")
+RainPart.Name = "WeatherRainEmitter"
+RainPart.Size = Vector3.new(120, 1, 120)
+RainPart.Anchored = true
+RainPart.CanCollide = false
+RainPart.CanQuery = false
+RainPart.CanTouch = false
+RainPart.Transparency = 1
+RainPart.Parent = Workspace
+
+local RainEmitter = Instance.new("ParticleEmitter")
+RainEmitter.Name = "RainEmitter"
+RainEmitter.Texture = "rbxassetid://546873760"
+RainEmitter.Color = ColorSequence.new(Color3.fromRGB(174, 194, 224))
+RainEmitter.Size = NumberSequence.new(0.15)
+RainEmitter.Transparency = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 0.25),
+    NumberSequenceKeypoint.new(1, 0.55),
+})
+RainEmitter.Lifetime = NumberRange.new(1.1, 1.4)
+RainEmitter.Rate = 0
+RainEmitter.Speed = NumberRange.new(60, 60)
+RainEmitter.SpreadAngle = Vector2.new(0, 0)
+RainEmitter.Acceleration = Vector3.new(0, -50, 0)
+RainEmitter.RotSpeed = NumberRange.new(0, 0)
+RainEmitter.Rotation = NumberRange.new(0, 0)
+RainEmitter.LightEmission = 0
+RainEmitter.EmissionDirection = Enum.NormalId.Bottom
+RainEmitter.Parent = RainPart
+
+local RainRaycastFilter = RaycastParams.new()
+RainRaycastFilter.FilterType = Enum.RaycastFilterType.Exclude
+RainRaycastFilter.FilterDescendantsInstances = { RainPart }
+
+local RainIntensityConfig = {
+    Rain = { Rate = 300, Speed = 60, PuddleInterval = 0.2, PuddleChance = 0.5, PuddleRadius = 30 },
+    Thunderstorm = { Rate = 550, Speed = 80, PuddleInterval = 0.12, PuddleChance = 0.75, PuddleRadius = 35 },
+}
+
+local RainEffectActive = false
+local RainLoopConn = nil
+local PuddleLoopThread = nil
+local ActivePuddles = {}
+
+local function CreatePuddle(Position, Normal)
+    local Puddle = Instance.new("Part")
+    Puddle.Name = "WeatherPuddle"
+    Puddle.Shape = Enum.PartType.Cylinder
+    Puddle.Material = Enum.Material.SmoothPlastic
+    Puddle.Color = Color3.fromRGB(35, 40, 55)
+    Puddle.Anchored = true
+    Puddle.CanCollide = false
+    Puddle.CanQuery = false
+    Puddle.CanTouch = false
+    Puddle.Transparency = 1
+
+    local Size = math.random(3, 6)
+    Puddle.Size = Vector3.new(0.05, Size, Size)
+    Puddle.CFrame = CFrame.new(Position, Position + Normal) * CFrame.Angles(0, 0, math.rad(90))
+    Puddle.Parent = Workspace
+
+    ActivePuddles[Puddle] = true
+
+    local FadeIn = TweenService:Create(Puddle, TweenInfo.new(0.4), { Transparency = 0.35 })
+    FadeIn:Play()
+
+    task.delay(math.random(4, 8), function()
+        if not Puddle.Parent then
+            ActivePuddles[Puddle] = nil
+            return
+        end
+        local FadeOut = TweenService:Create(Puddle, TweenInfo.new(1.2), { Transparency = 1 })
+        FadeOut:Play()
+        FadeOut.Completed:Wait()
+        ActivePuddles[Puddle] = nil
+        Puddle:Destroy()
+    end)
+end
+
+local function SpawnPuddleNearPlayer(Radius)
+    local Character = Player.Character
+    if not Character then return end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return end
+
+    local OffsetX = math.random(-Radius, Radius)
+    local OffsetZ = math.random(-Radius, Radius)
+    local Origin = Root.Position + Vector3.new(OffsetX, 20, OffsetZ)
+    local Result = Workspace:Raycast(Origin, Vector3.new(0, -60, 0), RainRaycastFilter)
+
+    if Result and Result.Instance then
+        CreatePuddle(Result.Position, Result.Normal)
+    end
+end
+
+local function StartRainEffects(Intensity)
+    RainEffectActive = true
+    RainEmitter.Rate = Intensity.Rate
+    RainEmitter.Speed = NumberRange.new(Intensity.Speed, Intensity.Speed)
+
+    if not RainLoopConn then
+        RainLoopConn = RunService.Heartbeat:Connect(function()
+            local Character = Player.Character
+            local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+            if Root then
+                RainPart.CFrame = CFrame.new(Root.Position + Vector3.new(0, 45, 0))
+            end
+        end)
+    end
+
+    if not PuddleLoopThread then
+        PuddleLoopThread = task.spawn(function()
+            while RainEffectActive do
+                task.wait(Intensity.PuddleInterval)
+                if math.random() <= Intensity.PuddleChance then
+                    SpawnPuddleNearPlayer(Intensity.PuddleRadius)
+                end
+            end
+            PuddleLoopThread = nil
+        end)
+    end
+end
+
+local function StopRainEffects()
+    RainEffectActive = false
+    RainEmitter.Rate = 0
+
+    if RainLoopConn then
+        RainLoopConn:Disconnect()
+        RainLoopConn = nil
+    end
+end
+
+local function UpdateWeatherParticles(WeatherName)
+    local Intensity = RainIntensityConfig[WeatherName]
+    if Intensity then
+        StartRainEffects(Intensity)
+    else
+        StopRainEffects()
+    end
+end
+
 local function SetupLight(Character)
     local Root = Character:WaitForChild("HumanoidRootPart")
 
@@ -581,6 +724,7 @@ local function ApplyCombined(TimeName, WeatherName)
     ApplyCharacterLight(T.Light)
     UpdateWeatherSound(WeatherName)
     UpdateWeatherSky(WeatherName)
+    UpdateWeatherParticles(WeatherName)
 end
 
 local function lerp(a, b, t)
@@ -757,6 +901,16 @@ local function ResetShader()
     if OriginalSky then
         OriginalSky.Parent = Lighting
     end
+
+    StopRainEffects()
+    RainPart:Destroy()
+
+    for Puddle in pairs(ActivePuddles) do
+        if Puddle.Parent then
+            Puddle:Destroy()
+        end
+    end
+    ActivePuddles = {}
 
     Atmosphere:Destroy()
     ColorCorrection:Destroy()
