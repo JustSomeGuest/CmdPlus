@@ -88,12 +88,15 @@ RainPart.Parent = Workspace
 
 local RainEmitter = Instance.new("ParticleEmitter")
 RainEmitter.Name = "RainEmitter"
-RainEmitter.Texture = "rbxassetid://546873760"
+RainEmitter.Texture = "rbxasset://textures/particles/fire_main.dds"
 RainEmitter.Color = ColorSequence.new(Color3.fromRGB(174, 194, 224))
-RainEmitter.Size = NumberSequence.new(0.15)
+RainEmitter.Size = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 0.05),
+    NumberSequenceKeypoint.new(1, 0.05),
+})
 RainEmitter.Transparency = NumberSequence.new({
-    NumberSequenceKeypoint.new(0, 0.25),
-    NumberSequenceKeypoint.new(1, 0.55),
+    NumberSequenceKeypoint.new(0, 0.2),
+    NumberSequenceKeypoint.new(1, 0.5),
 })
 RainEmitter.Lifetime = NumberRange.new(1.1, 1.4)
 RainEmitter.Rate = 0
@@ -104,6 +107,7 @@ RainEmitter.RotSpeed = NumberRange.new(0, 0)
 RainEmitter.Rotation = NumberRange.new(0, 0)
 RainEmitter.LightEmission = 0
 RainEmitter.EmissionDirection = Enum.NormalId.Bottom
+RainEmitter.Orientation = Enum.ParticleOrientation.VelocityParallel
 RainEmitter.Parent = RainPart
 
 local RainRaycastFilter = RaycastParams.new()
@@ -134,7 +138,13 @@ local function CreatePuddle(Position, Normal)
 
     local Size = math.random(3, 6)
     Puddle.Size = Vector3.new(0.05, Size, Size)
-    Puddle.CFrame = CFrame.new(Position, Position + Normal) * CFrame.Angles(0, 0, math.rad(90))
+
+    local XAxis = Normal
+    local Reference = (math.abs(XAxis.Y) < 0.99) and Vector3.new(0, 1, 0) or Vector3.new(1, 0, 0)
+    local ZAxis = XAxis:Cross(Reference).Unit
+    local YAxis = ZAxis:Cross(XAxis).Unit
+    Puddle.CFrame = CFrame.fromMatrix(Position, XAxis, YAxis, ZAxis)
+
     Puddle.Parent = Workspace
 
     ActivePuddles[Puddle] = true
