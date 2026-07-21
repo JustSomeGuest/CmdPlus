@@ -219,6 +219,7 @@ local function CreateCommandEnv()
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
         GetAsset = GetAsset,
+        expect = expect,
 
         Workspace = Workspace,
         Players = Players,
