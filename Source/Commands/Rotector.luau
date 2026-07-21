@@ -1,4 +1,4 @@
-local RotectorBaseURL = "https://api.rotector.com"
+local RotectorBaseURL = "https://roscoe.rotector.com"
 
 local RotectorFlagNames = {
     [0] = "Unflagged",
@@ -89,8 +89,16 @@ local function LookupRotector(UserId)
     local Url = RotectorBaseURL .. "/v1/lookup/roblox/user/" .. tostring(UserId)
     local Response = RotectorHttpGet(Url)
 
-    if not Response or not Response.Body then
-        return nil, "Request failed"
+    if not Response then
+        return nil, "HTTP request threw an error"
+    end
+
+    if not Response.Body then
+        return nil, "No response body, status " .. tostring(Response.StatusCode)
+    end
+
+    if Response.StatusCode and Response.StatusCode ~= 200 then
+        return nil, "HTTP " .. tostring(Response.StatusCode) .. ": " .. Response.Body:sub(1, 150)
     end
 
     local success, decoded = pcall(function()
@@ -98,11 +106,11 @@ local function LookupRotector(UserId)
     end)
 
     if not success or not decoded then
-        return nil, "Failed to parse response"
+        return nil, "Failed to parse response: " .. Response.Body:sub(1, 150)
     end
 
     if not decoded.success or not decoded.data then
-        return nil, "Rotector returned an error"
+        return nil, "Rotector returned an error: " .. Response.Body:sub(1, 150)
     end
 
     return decoded.data, nil
