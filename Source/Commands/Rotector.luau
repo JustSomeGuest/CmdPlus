@@ -35,9 +35,9 @@ local RotectorScanMaxPlayers = 25
 local RotectorScanDelay = 0.15
 
 local function RotectorHttpGet(Url)
-    local RequestFunc = expect("function", syn and syn.request,
+    local RequestFunc = expect("function", http_request,
         expect("function", request,
-            expect("function", http_request, nil)))
+            expect("function", syn and syn.request, nil)))
 
     if not RequestFunc then
         local success, result = pcall(function()
