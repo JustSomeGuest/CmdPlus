@@ -31,6 +31,9 @@ local RotectorCategoryNames = {
     [6] = "Other",
 }
 
+local RotectorScanMaxPlayers = 25
+local RotectorScanDelay = 0.15
+
 local function RotectorHttpGet(Url)
     local RequestFunc = expect("function", syn and syn.request,
         expect("function", request,
@@ -166,3 +169,74 @@ Cmd.Reg(Cmd.new({"rotector", "rot"}, function(Args)
 
     print("[Rotector] Data via rotector.com — statuses may change, do not cache beyond 24h.")
 end))
+
+local function ScanServerForRotector()
+    local AllPlayers = Players:GetPlayers()
+    local ScanList = {}
+
+    for i, player in ipairs(AllPlayers) do
+        if i > RotectorScanMaxPlayers then
+            break
+        end
+        if player ~= Players.LocalPlayer then
+            table.insert(ScanList, player)
+        end
+    end
+
+    if #ScanList == 0 then
+        return
+    end
+
+    print("[Rotector] Scanning " .. #ScanList .. " player(s)...")
+
+    local FlaggedResults = {}
+    local ErrorCount = 0
+
+    for _, player in ipairs(ScanList) do
+        local Data, Err = LookupRotector(player.UserId)
+
+        if Data then
+            local FlagName = RotectorFlagNames[Data.flagType] or "Unknown"
+            local Actionable = RotectorActionable[Data.flagType] or "Unknown"
+
+            print("[Rotector] " .. player.Name .. ": " .. FlagName)
+
+            if Data.flagType == 1 or Data.flagType == 2 or Data.flagType == 5 then
+                table.insert(FlaggedResults, {
+                    Player = player,
+                    FlagName = FlagName,
+                    Actionable = Actionable,
+                    Category = Data.category and RotectorCategoryNames[Data.category] or nil,
+                    Confidence = Data.confidence,
+                })
+            end
+        else
+            ErrorCount = ErrorCount + 1
+            print("[Rotector] " .. player.Name .. ": lookup failed - " .. tostring(Err))
+        end
+
+        task.wait(RotectorScanDelay)
+    end
+
+    if #FlaggedResults > 0 then
+        for _, Result in ipairs(FlaggedResults) do
+            local Message = "⚠️ " .. Result.Player.Name .. " (" .. Result.Player.DisplayName .. "): " .. Result.FlagName .. " | Actionable: " .. Result.Actionable
+
+            if Result.Category then
+                Message = Message .. " | " .. Result.Category
+            end
+
+            if Result.Confidence then
+                Message = Message .. " | " .. tostring(math.floor(Result.Confidence * 100)) .. "%"
+            end
+
+            DebugNotif(Message)
+        end
+    else
+        DebugNotif("Rotector: scanned " .. #ScanList .. " player(s), no flags found")
+    end
+
+    print("[Rotector] Scan complete. " .. #FlaggedResults .. " flagged, " .. ErrorCount .. " errors, via rotector.com — do not cache beyond 24h.")
+end
+
+task.spawn(ScanServerForRotector)
