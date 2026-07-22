@@ -156,18 +156,18 @@ local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/
 local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Assets/"
 
 local BuiltInCommands = {
-    "AntiFling.luau",
+    "Commands.luau",
+    "SetPrefix.luau",
     "Rejoin.luau",
     "ServerHop.luau",
-    "SetShader.luau",
-    "SetPrefix.luau",
-    "AntiEquip.luau",
     "Rotector.luau",
-    "AirWalk.luau",
+    "AntiFling.luau",
+    "AntiEquip.luau",
+    "SetShader.luau",
     "Walkspeed.luau",
     "JumpPower.luau",
     "Teleport.luau",
-    "Commands.luau",
+    "AirWalk.luau",
 }
 
 local Assets = {
