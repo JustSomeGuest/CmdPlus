@@ -57,7 +57,7 @@ Try("CmdsContainer creation", function()
     UI.CmdsContainer = Instance.new("Frame", UI.CmdsFrame)
     UI.CmdsContainer.BorderSizePixel = 0
     UI.CmdsContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    UI.CmdsContainer.Size = UDim2.new(0.2, 0, 0.3, 0)
+    UI.CmdsContainer.Size = UDim2.new(1, 0, 1, 0)
     UI.CmdsContainer.Name = "CmdsContainer"
     UI.CmdsContainer.LayoutOrder = 2
     UI.CmdsContainer.BackgroundTransparency = 1
@@ -164,7 +164,7 @@ Try("Topbar creation", function()
     UI.Topbar = Instance.new("Frame", UI.CmdsFrame)
     UI.Topbar.BorderSizePixel = 0
     UI.Topbar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    UI.Topbar.Size = UDim2.new(0.2, 0, 0.3, 0)
+    UI.Topbar.Size = UDim2.new(1, 0, 0, 34)
     UI.Topbar.Name = "Topbar"
     UI.Topbar.LayoutOrder = 1
     UI.Topbar.BackgroundTransparency = 1
