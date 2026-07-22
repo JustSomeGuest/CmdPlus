@@ -366,23 +366,26 @@ local function ShowCommands()
     end
     IsOpen = true
 
-    PopulateCommands()
-
     UI.CmdsUI.Visible = true
     UI.CmdsFrame.GroupTransparency = 1
     UI.CmdsFrame.Size = UDim2.new(0.9, 0, 0.9, 0)
     UI.CmdsShadow.ImageTransparency = 1
     UI.CmdsShadow.Size = ShadowSmallSize
 
-    Tween(UI.CmdsFrame, 0.35, {
+    pcall(PopulateCommands)
+
+    local T1 = Tween(UI.CmdsFrame, 0.35, {
         GroupTransparency = 0,
         Size = UDim2.new(1, 0, 1, 0)
-    }, "Back", "Out"):Play()
+    }, "Back", "Out")
 
-    Tween(UI.CmdsShadow, 0.35, {
+    local T2 = Tween(UI.CmdsShadow, 0.35, {
         ImageTransparency = 0,
         Size = ShadowFullSize
-    }, "Back", "Out"):Play()
+    }, "Back", "Out")
+
+    if T1 then T1:Play() end
+    if T2 then T2:Play() end
 end
 
 local function HideCommands()
