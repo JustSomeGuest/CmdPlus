@@ -162,6 +162,7 @@ UI.Topbar.Size = UDim2.new(0.2, 0, 0.3, 0)
 UI.Topbar.Name = "Topbar"
 UI.Topbar.LayoutOrder = 1
 UI.Topbar.BackgroundTransparency = 1
+UI.Topbar.Active = true
 
 
 UI.TopbarLayout = Instance.new("UIListLayout", UI.Topbar)
@@ -260,7 +261,57 @@ local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
     return TweenService:Create(Object, TweenInformation, Properties)
 end
 
+local ShadowFullSize = UDim2.new(1.059, 0, 1.088, 0)
+local ShadowSmallSize = UDim2.new(1.059 * 0.9, 0, 1.088 * 0.9, 0)
+
 local IsOpen = false
+
+local Dragging = false
+local DragStart = nil
+local StartPos = nil
+
+local function ClampPosition(TargetPosition)
+    local ScreenSize = UI.ScreenGui.AbsoluteSize
+    local ElementSize = UI.CmdsUI.AbsoluteSize
+
+    local MaxX = math.max(0, ScreenSize.X - ElementSize.X)
+    local MaxY = math.max(0, ScreenSize.Y - ElementSize.Y)
+
+    local ClampedX = math.clamp(TargetPosition.X.Offset, 0, MaxX)
+    local ClampedY = math.clamp(TargetPosition.Y.Offset, 0, MaxY)
+
+    return UDim2.new(0, ClampedX, 0, ClampedY)
+end
+
+UI.Topbar.InputBegan:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+        Dragging = true
+        DragStart = Input.Position
+        StartPos = UI.CmdsUI.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(Input)
+    if not Dragging then
+        return
+    end
+
+    if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+        local Delta = Input.Position - DragStart
+        local TargetPosition = UDim2.new(
+            StartPos.X.Scale, StartPos.X.Offset + Delta.X,
+            StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y
+        )
+
+        UI.CmdsUI.Position = ClampPosition(TargetPosition)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+        Dragging = false
+    end
+end)
 
 local function ClearCommandEntries()
     for _, Child in ipairs(UI.CmdsList:GetChildren()) do
@@ -270,8 +321,24 @@ local function ClearCommandEntries()
     end
 end
 
+local function FormatCommandTitle(Command, CurrentPrefix)
+    local Primary = CurrentPrefix .. Command.Aliases[1]
+
+    if #Command.Aliases > 1 then
+        local Extra = {}
+        for i = 2, #Command.Aliases do
+            table.insert(Extra, CurrentPrefix .. Command.Aliases[i])
+        end
+        return Primary .. " (" .. table.concat(Extra, ", ") .. ")"
+    end
+
+    return Primary
+end
+
 local function PopulateCommands()
     ClearCommandEntries()
+
+    local CurrentPrefix = GetPrefix()
 
     local SortedCommands = {}
     for _, Command in ipairs(CommandRegistry) do
@@ -285,13 +352,8 @@ local function PopulateCommands()
     for Index, Command in ipairs(SortedCommands) do
         local Entry = UI.CmdTemplate:Clone()
 
-        local AliasText = {}
-        for _, Alias in ipairs(Command.Aliases) do
-            table.insert(AliasText, "." .. Alias)
-        end
-
-        Entry.CmdTitle.Text = table.concat(AliasText, ", ")
-        Entry.CmdDescription.Text = Command.Description .. "\nUsage: " .. Command.Usage
+        Entry.CmdTitle.Text = FormatCommandTitle(Command, CurrentPrefix)
+        Entry.CmdDescription.Text = Command.Description .. "\nUsage: " .. CurrentPrefix .. Command.Usage
         Entry.LayoutOrder = Index
         Entry.Visible = true
         Entry.Parent = UI.CmdsList
@@ -309,10 +371,17 @@ local function ShowCommands()
     UI.CmdsUI.Visible = true
     UI.CmdsFrame.GroupTransparency = 1
     UI.CmdsFrame.Size = UDim2.new(0.9, 0, 0.9, 0)
+    UI.CmdsShadow.ImageTransparency = 1
+    UI.CmdsShadow.Size = ShadowSmallSize
 
     Tween(UI.CmdsFrame, 0.35, {
         GroupTransparency = 0,
         Size = UDim2.new(1, 0, 1, 0)
+    }, "Back", "Out"):Play()
+
+    Tween(UI.CmdsShadow, 0.35, {
+        ImageTransparency = 0,
+        Size = ShadowFullSize
     }, "Back", "Out"):Play()
 end
 
@@ -327,6 +396,11 @@ local function HideCommands()
         Size = UDim2.new(0.9, 0, 0.9, 0)
     }, "Quad", "In")
 
+    Tween(UI.CmdsShadow, 0.25, {
+        ImageTransparency = 1,
+        Size = ShadowSmallSize
+    }, "Quad", "In"):Play()
+
     HideTween:Play()
 
     task.spawn(function()
@@ -337,7 +411,7 @@ end
 
 UI.Close.MouseButton1Click:Connect(HideCommands)
 
-Cmd.Reg(Cmd.new({"commands", "cmds"}, "Opens a scrollable list of all available commands.", ".commands", function(Args)
+Cmd.Reg(Cmd.new({"commands", "cmds"}, "Opens a scrollable list of all available commands.", "commands", function(Args)
     if IsOpen then
         HideCommands()
     else
