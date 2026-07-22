@@ -116,7 +116,7 @@ local function LookupRotector(UserId)
     return decoded.data, nil
 end
 
-Cmd.Reg(Cmd.new({"rotector", "rot"}, function(Args)
+Cmd.Reg(Cmd.new({"rotector", "rot"}, "Checks a player against Rotector for flags, actionability, category, and confidence.", ".rotector <player>", function(Args)
     local searchTerm = Args[2]
     if not searchTerm then
         DebugNotif("Usage: .rotector <player>")
