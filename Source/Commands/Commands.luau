@@ -8,6 +8,12 @@ UI.ScreenGui.ResetOnSpawn = false
 UI.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 UI.ScreenGui.Parent = Hui
 
+UI.ScreenGui:GetPropertyChangedSignal("Enabled"):Connect(function()
+    if not UI.ScreenGui.Enabled then
+        UI.ScreenGui.Enabled = true
+    end
+end)
+
 UI.CmdsUI = Instance.new("Frame")
 UI.CmdsUI.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.CmdsUI.BackgroundTransparency = 1
