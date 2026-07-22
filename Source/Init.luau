@@ -245,6 +245,10 @@ local function SetGlobalPrefix(NewPrefix)
     Prefix = NewPrefix
 end
 
+local function GetGlobalPrefix()
+    return Prefix
+end
+
 local function CreateCommandEnv()
     local Env = {
         Cmd = Cmd,
@@ -254,6 +258,7 @@ local function CreateCommandEnv()
         GetCommandList = GetCommandList,
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
+        GetPrefix = GetGlobalPrefix,
         GetAsset = GetAsset,
         expect = expect,
 
