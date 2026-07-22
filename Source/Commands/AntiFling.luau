@@ -197,8 +197,6 @@ local function Unantifling()
     DebugNotif("AntiFling: Disabled")
 end
 
-Antifling(false)
-
 Cmd.Reg(Cmd.new({"antifling", "af"}, "Prevents your character from being flung.", ".antifling", function()
     Antifling(true)
 end))
