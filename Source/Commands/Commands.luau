@@ -11,6 +11,7 @@ end
 Try("ScreenGui creation", function()
     UI.ScreenGui = Instance.new("ScreenGui", Hui)
     UI.ScreenGui.DisplayOrder = 100
+    UI.ScreenGui.Enabled = true
     UI.ScreenGui.Name = "SimpleCMDS"
     UI.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     UI.ScreenGui.ResetOnSpawn = false
