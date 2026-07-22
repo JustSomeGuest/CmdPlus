@@ -234,11 +234,10 @@ Try("CmdsFrame layout/stroke creation", function()
     UI.CmdsFrameStroke.Color = Color3.fromRGB(255, 255, 255)
 
     UI.CmdsFrameLayout = Instance.new("UIListLayout", UI.CmdsFrame)
-    UI.CmdsFrameLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
-    UI.CmdsFrameLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
     UI.CmdsFrameLayout.Padding = UDim.new(0, 2)
     UI.CmdsFrameLayout.SortOrder = Enum.SortOrder.LayoutOrder
     UI.CmdsFrameLayout.Name = "CmdsFrameLayout"
+    UI.CmdsFrameLayout.FillDirection = Enum.FillDirection.Vertical
 end)
 
 local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
