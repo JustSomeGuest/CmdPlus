@@ -51,9 +51,12 @@ UI.CmdsFrameCorner.Parent = UI.CmdsFrame
 
 UI.CmdsFrameLayout = Instance.new("UIListLayout")
 UI.CmdsFrameLayout.FillDirection = Enum.FillDirection.Vertical
+UI.CmdsFrameLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
+UI.CmdsFrameLayout.ItemLineAlignment = Enum.ItemLineAlignment.Automatic
 UI.CmdsFrameLayout.Name = "CmdsFrameLayout"
 UI.CmdsFrameLayout.Padding = UDim.new(0, 2)
 UI.CmdsFrameLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UI.CmdsFrameLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
 UI.CmdsFrameLayout.Parent = UI.CmdsFrame
 
 UI.CmdsFrameStroke = Instance.new("UIStroke")
