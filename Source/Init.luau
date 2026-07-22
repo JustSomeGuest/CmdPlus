@@ -2,6 +2,11 @@ if not game:IsLoaded() then
     game.Loaded:Wait() 
 end
 
+local Shared = (function()
+    local Success, Env = pcall(getgenv)
+    return (Success and Env) or _G or (warn("[Shared]: Failed to access a usable global environment.") or {})
+end)()
+
 local function expect(expected, value, fallback)
     if type(value) == expected then
         return value
@@ -92,13 +97,28 @@ local function DebugNotif(Text)
     })
 end
 
-local Commands = {}
+Shared.SimpleCMDS = Shared.SimpleCMDS or {}
+Shared.SimpleCMDS.Cmds = Shared.SimpleCMDS.Cmds or {}
+
+local Commands = Shared.SimpleCMDS.Cmds
+local CommandRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
 
-function Cmd.new(Aliases, Callback)
+function Cmd.new(Aliases, Description, Usage, Callback)
+    if type(Description) == "function" then
+        Callback = Description
+        Description = "No description provided."
+        Usage = Aliases[1] or ""
+    elseif type(Usage) == "function" then
+        Callback = Usage
+        Usage = Aliases[1] or ""
+    end
+
     local Command = setmetatable({}, Cmd)
     Command.Aliases = Aliases
+    Command.Description = Description or "No description provided."
+    Command.Usage = Usage or (Aliases[1] or "")
     Command.Callback = Callback
     return Command
 end
@@ -107,6 +127,19 @@ function Cmd.Reg(Command)
     for _, Alias in ipairs(Command.Aliases) do
         Commands[Alias:lower()] = Command.Callback
     end
+    table.insert(CommandRegistry, Command)
+end
+
+local function GetCommandList()
+    local List = {}
+    for _, Command in ipairs(CommandRegistry) do
+        table.insert(List, {
+            Aliases = Command.Aliases,
+            Description = Command.Description,
+            Usage = Command.Usage,
+        })
+    end
+    return List
 end
 
 if not IsFolder("SimpleCMDS") then
@@ -134,6 +167,7 @@ local BuiltInCommands = {
     "Walkspeed.luau",
     "JumpPower.luau",
     "Teleport.luau",
+    "Commands.luau",
 }
 
 local Assets = {
@@ -216,6 +250,8 @@ local function CreateCommandEnv()
         Cmd = Cmd,
         Services = Services,
         Commands = Commands,
+        CommandRegistry = CommandRegistry,
+        GetCommandList = GetCommandList,
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
         GetAsset = GetAsset,
