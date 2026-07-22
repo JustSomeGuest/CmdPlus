@@ -72,16 +72,16 @@ local function StopAirwalk()
     Airwalk.Active = false
 end
 
-Cmd.Reg(Cmd.new({"airwalk", "aw"}, function()
+Cmd.Reg(Cmd.new({"airwalk", "aw"}, "Enables airwalk.", ".airwalk", function()
     if Airwalk.Active then
-        StopAirwalk()
-        DebugNotif("Airwalk disabled")
+        DebugNotif("Airwalk is already active")
     else
         local char = Players.LocalPlayer.Character
         if not char then
             DebugNotif("You need a character to start airwalk.")
             return
         end
+
         StartAirwalk(char)
         Airwalk.Active = true
         DebugNotif("Airwalk enabled")
@@ -96,7 +96,7 @@ Cmd.Reg(Cmd.new({"airwalk", "aw"}, function()
     end
 end))
 
-Cmd.Reg(Cmd.new({"unairwalk", "unaw"}, function()
+Cmd.Reg(Cmd.new({"unairwalk", "unaw"}, "Disables airwalk.", ".unairwalk", function()
     if Airwalk.Active then
         StopAirwalk()
         DebugNotif("Airwalk disabled")
