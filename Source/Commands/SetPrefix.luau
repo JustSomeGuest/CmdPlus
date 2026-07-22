@@ -1,4 +1,4 @@
-Cmd.Reg(Cmd.new({"setprefix", "sp"}, "Changes the command prefix to a single non-letter character.", ".setprefix <prefix>", function(Args)
+Cmd.Reg(Cmd.new({"setprefix", "sp"}, "Changes the command prefix to a single non-letter character.", "setprefix <prefix>", function(Args)
     local newPrefix = Args[2]
     if not newPrefix then
         DebugNotif("Usage: .setprefix <prefix>")
