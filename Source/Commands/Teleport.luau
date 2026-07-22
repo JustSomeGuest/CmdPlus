@@ -16,7 +16,7 @@ local function FindPlayers(searchTerm)
     return matches
 end
 
-Cmd.Reg(Cmd.new({"teleport", "tp", "to", "goto"}, function(Args)
+Cmd.Reg(Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another player. Accepts usernames, display names, and partial names.", ".teleport <player>", function(Args)
     local targetName = Args[2]
     if not targetName then
         DebugNotif("Usage: .teleport <player>")
