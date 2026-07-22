@@ -246,6 +246,21 @@ local function SetGlobalPrefix(NewPrefix)
 end
 
 local function GetGlobalPrefix()
+    if not IsFile("SimpleCMDS/Prefix.luau") then
+        return Prefix
+    end
+
+    local Success, Content = pcall(ReadFile, "SimpleCMDS/Prefix.luau")
+
+    if Success and type(Content) == "string" then
+        Content = Content:gsub("%s+", "")
+
+        if #Content == 1 then
+            Prefix = Content
+            return Content
+        end
+    end
+
     return Prefix
 end
 
