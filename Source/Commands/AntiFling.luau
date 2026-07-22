@@ -199,10 +199,10 @@ end
 
 Antifling(false)
 
-Cmd.Reg(Cmd.new({"antifling", "af"}, function()
+Cmd.Reg(Cmd.new({"antifling", "af"}, "Prevents your character from being flung.", ".antifling", function()
     Antifling(true)
 end))
 
-Cmd.Reg(Cmd.new({"unantifling", "uaf"}, function()
+Cmd.Reg(Cmd.new({"unantifling", "uaf"}, "Disables anti-fling.", ".unantifling", function()
     Unantifling()
 end))
