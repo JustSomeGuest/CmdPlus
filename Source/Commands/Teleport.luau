@@ -1,4 +1,20 @@
-
+local function FindPlayers(searchTerm)
+    local matches = {}
+    local searchLower = searchTerm:lower()
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        local nameLower = player.Name:lower()
+        local displayLower = player.DisplayName:lower()
+        
+        if nameLower == searchLower or displayLower == searchLower then
+            table.insert(matches, player)
+        elseif nameLower:match(searchLower) or displayLower:match(searchLower) then
+            table.insert(matches, player)
+        end
+    end
+    
+    return matches
+end
 
 Cmd.Reg(Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another player. Accepts usernames, display names, and partial names.", "teleport <player>", function(Args)
     local targetName = Args[2]
