@@ -168,6 +168,8 @@ local BuiltInCommands = {
     "JumpPower.luau",
     "Teleport.luau",
     "AirWalk.luau",
+    "Noclip.luau",
+    "Esp.luau"
 }
 
 local Assets = {
