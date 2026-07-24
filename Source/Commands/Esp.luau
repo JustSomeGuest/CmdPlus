@@ -5,10 +5,14 @@ local EspPlayerConn = nil
 local LocHighlights = {}
 local LocCharConns = {}
 
-local function MakeHighlight(char, fill, outline)
+local function MakeHighlight(char, fill)
     local hl = Instance.new("Highlight")
     hl.FillColor = fill
-    hl.OutlineColor = outline
+    hl.OutlineColor = Color3.new(
+        fill.R * 0.65,
+        fill.G * 0.65,
+        fill.B * 0.65
+    )
     hl.FillTransparency = 0.5
     hl.OutlineTransparency = 0
     hl.Parent = char
