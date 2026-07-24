@@ -15,20 +15,43 @@ local function MakeHighlight(char, fill, outline)
     return hl
 end
 
-local function FindPlayer(query)
-    if not query or query == "" then return nil end
-    query = query:lower()
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p.Name:lower() == query or p.DisplayName:lower() == query then
-            return p
+local function FindPlayers(searchTerm)
+    local matches = {}
+    local searchLower = searchTerm:lower()
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        local nameLower = player.Name:lower()
+        local displayLower = player.DisplayName:lower()
+
+        if nameLower == searchLower or displayLower == searchLower then
+            table.insert(matches, player)
+        elseif nameLower:match(searchLower) or displayLower:match(searchLower) then
+            table.insert(matches, player)
         end
     end
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p.Name:lower():find(query, 1, true) or p.DisplayName:lower():find(query, 1, true) then
-            return p
-        end
+
+    return matches
+end
+
+local function ResolvePlayer(args)
+    if not args[1] or args[1] == "" then
+        DebugNotif("ESP: No player specified")
+        return nil
     end
-    return nil
+    local matches = FindPlayers(args[1])
+    if #matches == 0 then
+        DebugNotif("ESP: Player not found")
+        return nil
+    end
+    if #matches > 1 then
+        local playerNames = {}
+        for _, p in ipairs(matches) do
+            table.insert(playerNames, p.Name)
+        end
+        DebugNotif("ESP: Multiple players found: " .. table.concat(playerNames, ", "))
+        return nil
+    end
+    return matches[1]
 end
 
 local function AddEsp(player)
@@ -124,21 +147,15 @@ Cmd.Reg(Cmd.new({"unesp"}, "Removes all ESP highlights.", "unesp", function()
 end))
 
 Cmd.Reg(Cmd.new({"locate"}, "Highlights a specific player.", "locate <player>", function(args)
-    local player = FindPlayer(args[1])
-    if not player then
-        DebugNotif("ESP: Player not found")
-        return
-    end
+    local player = ResolvePlayer(args)
+    if not player then return end
     AddLocate(player)
     DebugNotif("ESP: Locating " .. player.Name)
 end))
 
 Cmd.Reg(Cmd.new({"unlocate"}, "Removes locate highlight from a player.", "unlocate <player>", function(args)
-    local player = FindPlayer(args[1])
-    if not player then
-        DebugNotif("ESP: Player not found")
-        return
-    end
+    local player = ResolvePlayer(args)
+    if not player then return end
     RemoveLocate(player)
     DebugNotif("ESP: Unlocated " .. player.Name)
 end))
