@@ -150,10 +150,10 @@ local function CreateBillboard(Player, Data)
     UI["Billboard_" .. Suffix] = Instance.new("BillboardGui")
     UI["Billboard_" .. Suffix]["Active"] = true
     UI["Billboard_" .. Suffix]["Adornee"] = Head
-    UI["Billboard_" .. Suffix]["AlwaysOnTop"] = true
+    UI["Billboard_" .. Suffix]["AlwaysOnTop"] = false
     UI["Billboard_" .. Suffix]["LightInfluence"] = 0
     UI["Billboard_" .. Suffix]["MaxDistance"] = 100
-    UI["Billboard_" .. Suffix]["Size"] = UDim2.new(0, 158, 0, 46)
+    UI["Billboard_" .. Suffix]["Size"] = UDim2.new(0, 158, 0, 42)
     UI["Billboard_" .. Suffix]["StudsOffset"] = Vector3.new(0, 2.5, 0)
     UI["Billboard_" .. Suffix]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
     UI["Billboard_" .. Suffix]["Parent"] = Hui
@@ -192,7 +192,7 @@ local function CreateBillboard(Player, Data)
     UI["Name_" .. Suffix]["FontFace"] = Font.new("rbxasset://fonts/families/Sarpanch.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
     UI["Name_" .. Suffix]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
     UI["Name_" .. Suffix]["Size"] = UDim2.new(1, 0, 1, 0)
-    UI["Name_" .. Suffix]["Text"] = DisplayName
+    UI["Name_" .. Suffix]["Text"] = Tag
     UI["Name_" .. Suffix]["TextColor3"] = TagColor
     UI["Name_" .. Suffix]["TextScaled"] = true
     UI["Name_" .. Suffix]["TextTransparency"] = 1
@@ -212,7 +212,7 @@ local function CreateBillboard(Player, Data)
     UI["Tag_" .. Suffix]["FontFace"] = Font.new("rbxasset://fonts/families/Sarpanch.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
     UI["Tag_" .. Suffix]["Position"] = UDim2.new(0.5, 0, 0, 2)
     UI["Tag_" .. Suffix]["Size"] = UDim2.new(0.6, 0, 0.6, 0)
-    UI["Tag_" .. Suffix]["Text"] = Tag
+    UI["Tag_" .. Suffix]["Text"] = DisplayName
     UI["Tag_" .. Suffix]["TextColor3"] = TagColor
     UI["Tag_" .. Suffix]["TextScaled"] = true
     UI["Tag_" .. Suffix]["TextTransparency"] = 1
@@ -317,14 +317,25 @@ Players.PlayerRemoving:Connect(OnPlayerRemoving)
 
 Players.PlayerAdded:Connect(function(Player)
     Player.CharacterAdded:Connect(function(Character)
-        if ActiveBillboards[Player] then
-            RemoveBillboard(Player)
+        local HasTag = false
+        local UserData = nil
+        
+        for UserId, Data in pairs(Users) do
+            if Player.Name == UserId or Player.UserId == tonumber(UserId) then
+                HasTag = true
+                UserData = Data
+                break
+            end
+        end
+        
+        if HasTag and UserData then
+            if ActiveBillboards[Player] then
+                RemoveBillboard(Player)
+            end
             
-            local Head = Character:WaitForChild("Head")
-            for UserId, Data in pairs(Users) do
-                if Player.Name == UserId or Player.UserId == tonumber(UserId) then
-                    CreateBillboard(Player, Data)
-                end
+            local Head = Character:WaitForChild("Head", 5)
+            if Head then
+                CreateBillboard(Player, UserData)
             end
         end
     end)
