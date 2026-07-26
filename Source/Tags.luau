@@ -164,7 +164,7 @@ local function CreateBillboard(Player, Data)
     UI["Tag_" .. Suffix]["AnchorPoint"] = Vector2.new(0.5, 0.5)
     UI["Tag_" .. Suffix]["AutomaticSize"] = Enum.AutomaticSize.X
     UI["Tag_" .. Suffix]["BackgroundColor3"] = Color3.fromRGB(0, 0, 0)
-    UI["Tag_" .. Suffix]["BackgroundTransparency"] = 1
+    UI["Tag_" .. Suffix]["BackgroundTransparency"] = 0
     UI["Tag_" .. Suffix]["BorderSizePixel"] = 0
     UI["Tag_" .. Suffix]["FontFace"] = Font.new("rbxasset://fonts/families/Sarpanch.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
     UI["Tag_" .. Suffix]["Name"] = "Tag"
