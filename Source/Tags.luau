@@ -116,7 +116,7 @@ local Users = {
         TagColor = Color3.fromRGB(255, 0, 0)
     },
 
-    ["imcherry511"] = {
+    ["imCherry511"] = {
         Name = "mxsynry",
         Tag = "Slyvie",
         TagColor = Color3.fromRGB(174, 0, 255)
