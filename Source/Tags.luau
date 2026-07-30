@@ -246,28 +246,7 @@ local function RemoveBillboard(Player)
     ActiveBillboards[Player] = nil
 end
 
-local function OnPlayerAdded(Player)
-    for UserId, Data in pairs(Users) do
-        if Player.Name == UserId or Player.UserId == tonumber(UserId) then
-            CreateBillboard(Player, Data)
-        end
-    end
-end
-
-local function OnPlayerRemoving(Player)
-    RemoveBillboard(Player)
-end
-
-for _, Player in pairs(Players:GetPlayers()) do
-    OnPlayerAdded(Player)
-end
-
-InitialSpawn = false
-
-Players.PlayerAdded:Connect(OnPlayerAdded)
-Players.PlayerRemoving:Connect(OnPlayerRemoving)
-
-Players.PlayerAdded:Connect(function(Player)
+local function ConnectCharacterAdded(Player)
     Player.CharacterAdded:Connect(function(Character)
         local HasTag = false
         local UserData = nil
@@ -291,6 +270,29 @@ Players.PlayerAdded:Connect(function(Player)
             end
         end
     end)
-end)
+end
+
+local function OnPlayerAdded(Player)
+    for UserId, Data in pairs(Users) do
+        if Player.Name == UserId or Player.UserId == tonumber(UserId) then
+            CreateBillboard(Player, Data)
+        end
+    end
+
+    ConnectCharacterAdded(Player)
+end
+
+local function OnPlayerRemoving(Player)
+    RemoveBillboard(Player)
+end
+
+for _, Player in pairs(Players:GetPlayers()) do
+    OnPlayerAdded(Player)
+end
+
+InitialSpawn = false
+
+Players.PlayerAdded:Connect(OnPlayerAdded)
+Players.PlayerRemoving:Connect(OnPlayerRemoving)
 
 return UI
