@@ -349,11 +349,15 @@ local function ShowCommands()
 
     UI.CmdsUI.Visible = true
     UI.CmdsUI.GroupTransparency = 1
-    UI.CmdsUI.Size = UDim2.new(0.9, 0, 0.9, 0)
+    UI.CmdsUI.Size = UDim2.new(0, 0, 0, 0)
 
     PopulateCommands()
 
-    local T1 = Tween(UI.CmdsUI, 0.35, { GroupTransparency = 0, Size = UDim2.new(1, 0, 1, 0) }, "Back", "Out")
+    local T1 = Tween(UI.CmdsUI, 0.35, {
+        GroupTransparency = 0,
+        Size = UDim2.new(0.5, 0, 0.8, 0)
+    }, "Back", "Out")
+
     T1:Play()
 end
 
@@ -361,7 +365,11 @@ local function HideCommands()
     if not IsOpen then return end
     IsOpen = false
 
-    local HideTween = Tween(UI.CmdsUI, 0.25, { GroupTransparency = 1, Size = UDim2.new(0.9, 0, 0.9, 0) }, "Quad", "In")
+    local HideTween = Tween(UI.CmdsUI, 0.25, {
+        GroupTransparency = 1,
+        Size = UDim2.new(0, 0, 0, 0)
+    }, "Quad", "In")
+
     HideTween:Play()
 
     task.spawn(function()
