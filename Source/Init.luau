@@ -108,7 +108,6 @@ local NotifsSuccess, Notifs = pcall(function()
             Description = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
         }
     }
-    Lib:SetLogo(GetAsset("CmdPlus/Assets/CmdPlus_Logo.png"))
     return Lib
 end)
 
