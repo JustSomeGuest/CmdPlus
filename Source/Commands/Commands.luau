@@ -325,7 +325,7 @@ local function PopulateCommands()
     local CurrentPrefix = GetPrefix()
 
     local SortedCommands = {}
-    for _, Command in ipairs(CommandRegistry) do
+    for _, Command in ipairs(CmdRegistry) do
         table.insert(SortedCommands, Command)
     end
 
