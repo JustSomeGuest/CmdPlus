@@ -87,15 +87,13 @@ CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
     end
 end)
 
-local function RandomizeChildName(Child)
+for _, Child in ipairs(CmdPlusUI:GetChildren()) do
     Child.Name = UID(32)
 end
 
-for _, Child in ipairs(CmdPlusUI:GetChildren()) do
-    RandomizeChildName(Child)
-end
-
-CmdPlusUI.ChildAdded:Connect(RandomizeChildName)
+CmdPlusUI.ChildAdded:Connect(function(Child)
+    Child.Name = UID(32)
+end)
 
 local NotifsSuccess, Notifs = pcall(function()
     local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
@@ -110,6 +108,7 @@ local NotifsSuccess, Notifs = pcall(function()
             Description = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
         }
     }
+    Lib:SetLogo(GetAsset("CmdPlus/Assets/CmdPlus_Logo.png"))
     return Lib
 end)
 
