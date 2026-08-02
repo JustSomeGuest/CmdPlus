@@ -1,21 +1,3 @@
-local function FindPlayers(searchTerm)
-    local matches = {}
-    local searchLower = searchTerm:lower()
-    
-    for _, player in ipairs(Players:GetPlayers()) do
-        local nameLower = player.Name:lower()
-        local displayLower = player.DisplayName:lower()
-        
-        if nameLower == searchLower or displayLower == searchLower then
-            table.insert(matches, player)
-        elseif nameLower:match(searchLower) or displayLower:match(searchLower) then
-            table.insert(matches, player)
-        end
-    end
-    
-    return matches
-end
-
 Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another player. Accepts usernames, display names, and partial names.", "teleport <player>", function(Args)
     local targetName = Args[2]
     if not targetName then
@@ -35,7 +17,7 @@ Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another player. Acce
         return
     end
     
-    local matches = FindPlayers(targetName)
+    local matches = FindPlr(targetName)
     
     if #matches == 0 then
         DebugNotif("TP: Player not found: " .. targetName)
