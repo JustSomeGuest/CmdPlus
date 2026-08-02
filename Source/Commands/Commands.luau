@@ -1,16 +1,8 @@
 local UI = {}
 
-UI.ScreenGui = Instance.new("ScreenGui")
-UI.ScreenGui.DisplayOrder = 100
-UI.ScreenGui.Enabled = true
-UI.ScreenGui.Name = UID(32)
-UI.ScreenGui.ResetOnSpawn = false
-UI.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-UI.ScreenGui.Parent = Hui
-
-UI.ScreenGui:GetPropertyChangedSignal("Enabled"):Connect(function()
-    if not UI.ScreenGui.Enabled then
-        UI.ScreenGui.Enabled = true
+CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
+    if not CmdPlusUI.Enabled then
+        CmdPlusUI.Enabled = true
     end
 end)
 
@@ -22,7 +14,7 @@ UI.CmdsUI.Name = UID(32)
 UI.CmdsUI.Position = UDim2.new(0, 16, 0, 6)
 UI.CmdsUI.Size = UDim2.new(0.5, 0, 0.8, 0)
 UI.CmdsUI.Visible = false
-UI.CmdsUI.Parent = UI.ScreenGui
+UI.CmdsUI.Parent = CmdPlusUI
 
 UI.CmdsUICorner = Instance.new("UICorner")
 UI.CmdsUICorner.CornerRadius = UDim.new(0, 4)
