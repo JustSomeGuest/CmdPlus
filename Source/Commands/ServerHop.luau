@@ -1,4 +1,4 @@
-Cmd.Reg(Cmd.new({"serverhop", "shop"}, "Teleports you to a random available server without joining the current server.", "serverhop", function()
+Cmd.new({"serverhop", "shop"}, "Teleports you to a random available server without joining the current server.", "serverhop", function()
     local TeleportService = Services.TeleportService
     local HttpService = Services.HttpService
 
@@ -30,4 +30,4 @@ Cmd.Reg(Cmd.new({"serverhop", "shop"}, "Teleports you to a random available serv
         local ServerId = Servers[math.random(1, #Servers)]
         TeleportService:TeleportToPlaceInstance(PlaceId, ServerId)
     end
-end))
+end)
