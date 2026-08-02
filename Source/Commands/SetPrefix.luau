@@ -1,4 +1,4 @@
-Cmd.Reg(Cmd.new({"setprefix", "prefix"}, "Changes the command prefix to a single non-letter character.", "setprefix <prefix>", function(Args)
+Cmd.new({"setprefix", "prefix"}, "Changes the command prefix to a single non-letter character.", "setprefix <prefix>", function(Args)
     local newPrefix = Args[2]
     if not newPrefix then
         DebugNotif("Usage: .setprefix <prefix>")
@@ -19,4 +19,4 @@ Cmd.Reg(Cmd.new({"setprefix", "prefix"}, "Changes the command prefix to a single
     SetPrefix(char)
     WriteFile("SimpleCMDS/Prefix.luau", char)
     DebugNotif("Prefix set to: " .. char)
-end))
+end)
