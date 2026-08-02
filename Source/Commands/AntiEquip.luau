@@ -59,10 +59,10 @@ local function UnAntiEquip()
     DebugNotif("AntiEquip: Disabled")
 end
 
-Cmd.Reg(Cmd.new({"antiequip", "preventtools", "prevtools"}, "Prevents you from equipping tools.", "antiequip", function()
+Cmd.new({"antiequip", "preventtools", "prevtools"}, "Prevents you from equipping tools.", "antiequip", function()
     AntiEquip(true)
-end))
+end)
 
-Cmd.Reg(Cmd.new({"unantiequip", "unpreventtools", "unprevtools"}, "Allows you to equip tools again.", "unantiequip", function()
+Cmd.new({"unantiequip", "unpreventtools", "unprevtools"}, "Allows you to equip tools again.", "unantiequip", function()
     UnAntiEquip()
-end))
+end)
