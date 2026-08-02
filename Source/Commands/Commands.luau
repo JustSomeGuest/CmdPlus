@@ -195,14 +195,33 @@ UI.TopbarStroke.Color = Color3.fromRGB(255, 255, 255)
 UI.TopbarStroke.Name = UID(32)
 UI.TopbarStroke.Parent = UI.Topbar
 
+UI.LogoFrame = Instance.new("Frame")
+UI.LogoFrame.BackgroundTransparency = 1
+UI.LogoFrame.BorderSizePixel = 0
+UI.LogoFrame.LayoutOrder = 1
+UI.LogoFrame.Size = UDim2.new(1, 0, 1, 0)
+UI.LogoFrame.Parent = UI.Topbar
+
+UI.LogoFrameRatio = Instance.new("UIAspectRatioConstraint")
+UI.LogoFrameRatio.Parent = UI.LogoFrame
+
+UI.Logo = Instance.new("ImageLabel")
+UI.Logo.AnchorPoint = Vector2.new(0.5, 0.5)
+UI.Logo.BackgroundTransparency = 1
+UI.Logo.BorderSizePixel = 0
+UI.Logo.Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png")
+UI.Logo.Position = UDim2.new(0.5, 0, 0.5, 0)
+UI.Logo.Size = UDim2.new(1, 8, 1, 8)
+UI.Logo.Parent = UI.LogoFrame
+
 UI.TopbarTitle = Instance.new("TextLabel")
 UI.TopbarTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.TopbarTitle.BackgroundTransparency = 1
 UI.TopbarTitle.BorderSizePixel = 0
 UI.TopbarTitle.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-UI.TopbarTitle.LayoutOrder = 1
+UI.TopbarTitle.LayoutOrder = 2
 UI.TopbarTitle.Name = UID(32)
-UI.TopbarTitle.Size = UDim2.new(0.2, 0, 0.3, 0)
+UI.TopbarTitle.Size = UDim2.new(1,0,1,0)
 UI.TopbarTitle.Text = "CmdPlus • Commands"
 UI.TopbarTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 UI.TopbarTitle.TextScaled = true
@@ -214,9 +233,9 @@ UI.Close = Instance.new("TextButton")
 UI.Close.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.Close.BorderSizePixel = 0
 UI.Close.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-UI.Close.LayoutOrder = 2
+UI.Close.LayoutOrder = 3
 UI.Close.Name = UID(32)
-UI.Close.Size = UDim2.new(0.2, 0, 0.3, 0)
+UI.Close.Size = UDim2.new(1,0,1,0)
 UI.Close.Text = "×"
 UI.Close.TextColor3 = Color3.fromRGB(0, 0, 0)
 UI.Close.TextScaled = true
