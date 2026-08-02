@@ -66,7 +66,7 @@ CmdPlus/
 Register your command:
 
 ```lua
-Cmd.new({"hello", "hi"}, function()
+Cmd.new({"hello", "hi"}, "Sends a hello notification.", "hello", function(Args)
     DebugNotif("Hello!")
 end)
 ```
