@@ -1,4 +1,4 @@
-Cmd.Reg(Cmd.new({"jumppower", "jp"}, "Changes your character's jump power.", "jumppower <number>", function(Args)
+Cmd.new({"jumppower", "jp"}, "Changes your character's jump power.", "jumppower <number>", function(Args)
     local value = tonumber(Args[2])
     if not value then
         DebugNotif("Usage: .jumppower <number>")
@@ -16,4 +16,4 @@ Cmd.Reg(Cmd.new({"jumppower", "jp"}, "Changes your character's jump power.", "ju
         hum.JumpPower = value
         DebugNotif("Jumppower set to " .. value)
     end
-end))
+end)
