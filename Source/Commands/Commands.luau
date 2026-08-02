@@ -145,7 +145,7 @@ UI.Topbar.Size = UDim2.new(1, 0, 0, 34)
 UI.Topbar.Parent = UI.CmdsUI
 
 UI.TopbarConstraint = Instance.new("UISizeConstraint")
-UI.TopbarConstraint.MaxSize = Vector2.new(9999, 34)
+UI.TopbarConstraint.MaxSize = Vector2.new(math.huge, 34)
 UI.TopbarConstraint.Parent = UI.Topbar
 
 UI.TopbarLayout = Instance.new("UIListLayout")
@@ -154,13 +154,14 @@ UI.TopbarLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
 UI.TopbarLayout.Padding = UDim.new(0, 4)
 UI.TopbarLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UI.TopbarLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
+UI.TopbarLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 UI.TopbarLayout.Parent = UI.Topbar
 
 UI.TopbarPadding = Instance.new("UIPadding")
-UI.TopbarPadding.PaddingBottom = UDim.new(0, 4)
+UI.TopbarPadding.PaddingBottom = UDim.new(0, 2)
 UI.TopbarPadding.PaddingLeft = UDim.new(0, 4)
 UI.TopbarPadding.PaddingRight = UDim.new(0, 4)
-UI.TopbarPadding.PaddingTop = UDim.new(0, 4)
+UI.TopbarPadding.PaddingTop = UDim.new(0, 2)
 UI.TopbarPadding.Parent = UI.Topbar
 
 UI.TopbarStroke = Instance.new("UIStroke")
