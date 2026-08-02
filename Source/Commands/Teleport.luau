@@ -16,7 +16,7 @@ local function FindPlayers(searchTerm)
     return matches
 end
 
-Cmd.Reg(Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another player. Accepts usernames, display names, and partial names.", "teleport <player>", function(Args)
+Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another player. Accepts usernames, display names, and partial names.", "teleport <player>", function(Args)
     local targetName = Args[2]
     if not targetName then
         DebugNotif("Usage: .teleport <player>")
@@ -72,4 +72,4 @@ Cmd.Reg(Cmd.new({"teleport", "tp", "to", "goto"}, "Teleports you to another play
     
     rootPart.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0)
     DebugNotif("TP: Teleported to " .. targetPlayer.Name .. " (" .. targetPlayer.DisplayName .. ")")
-end))
+end)
