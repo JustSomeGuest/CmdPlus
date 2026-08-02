@@ -76,31 +76,31 @@ local NotifsSuccess, Notifs = pcall(function()
 end)
 
 if not NotifsSuccess then
-    warn("[SimpleCMDS] Failed to load Notify library, falling back to StarterGui notifications")
+    warn("[CmdPlus] Failed to load Notify library, falling back to StarterGui notifications")
 end
 
 local function DebugNotif(Text)
     if NotifsSuccess then
         local success = pcall(function()
-            Notifs:Notify("SimpleCMDS", Text)
+            Notifs:Notify("CmdPlus", Text)
         end)
         if success then
             return
         end
-        warn("[SimpleCMDS] Notify library errored, falling back to StarterGui notification")
+        warn("[CmdPlus] Notify library errored, falling back to StarterGui notification")
     end
 
     StarterGui:SetCore("SendNotification", {
-        Title = "SimpleCMDS",
+        Title = "CmdPlus",
         Text = Text,
         Duration = 5,
     })
 end
 
-Shared.SimpleCMDS = Shared.SimpleCMDS or {}
-Shared.SimpleCMDS.Cmds = Shared.SimpleCMDS.Cmds or {}
+Shared.CmdPlus = Shared.CmdPlus or {}
+Shared.CmdPlus.Cmds = Shared.CmdPlus.Cmds or {}
 
-local Commands = Shared.SimpleCMDS.Cmds
+local Commands = Shared.CmdPlus.Cmds
 local CommandRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
@@ -142,18 +142,18 @@ local function GetCommandList()
     return List
 end
 
-if not IsFolder("SimpleCMDS") then
-    MakeFolder("SimpleCMDS")
+if not IsFolder("CmdPlus") then
+    MakeFolder("CmdPlus")
 end
-if not IsFolder("SimpleCMDS/UserCommands") then
-    MakeFolder("SimpleCMDS/UserCommands")
+if not IsFolder("CmdPlus/UserCommands") then
+    MakeFolder("CmdPlus/UserCommands")
 end
-if not IsFolder("SimpleCMDS/Assets") then
-    MakeFolder("SimpleCMDS/Assets")
+if not IsFolder("CmdPlus/Assets") then
+    MakeFolder("CmdPlus/Assets")
 end
 
-local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Commands/"
-local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Assets/"
+local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Commands/"
+local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Assets/"
 
 local BuiltInCommands = {
     "Commands.luau",
@@ -173,8 +173,8 @@ local BuiltInCommands = {
 }
 
 local Assets = {
-    ["SimpleCMDS/Assets/Rain.mp3"] = AssetsURL .. "Rain.mp3",
-    ["SimpleCMDS/Assets/Thunder.mp3"] = AssetsURL .. "Thunder.mp3",
+    ["CmdPlus/Assets/Rain.mp3"] = AssetsURL .. "Rain.mp3",
+    ["CmdPlus/Assets/Thunder.mp3"] = AssetsURL .. "Thunder.mp3",
 }
 
 local function AssetHttpGet(url)
@@ -204,13 +204,13 @@ end
 
 local function GetAsset(Path)
     if not LoadAsset then
-        warn("[SimpleCMDS] getcustomasset/getsynasset not supported by this executor")
+        warn("[CmdPlus] getcustomasset/getsynasset not supported by this executor")
         return nil
     end
 
     local RemoteURL = Assets[Path]
     if not RemoteURL then
-        warn("[SimpleCMDS] No asset registered for path: " .. Path)
+        warn("[CmdPlus] No asset registered for path: " .. Path)
         return nil
     end
 
@@ -222,7 +222,7 @@ local function GetAsset(Path)
         local Response = AssetHttpGet(RemoteURL)
 
         if not Response or not Response.Success or not Response.Body then
-            warn("[SimpleCMDS] Failed to download asset: " .. Path)
+            warn("[CmdPlus] Failed to download asset: " .. Path)
             return nil
         end
 
@@ -237,7 +237,7 @@ local function GetAsset(Path)
         return result
     end
 
-    warn("[SimpleCMDS] Failed to load local asset: " .. Path)
+    warn("[CmdPlus] Failed to load local asset: " .. Path)
     return nil
 end
 
@@ -248,11 +248,11 @@ local function SetGlobalPrefix(NewPrefix)
 end
 
 local function GetGlobalPrefix()
-    if not IsFile("SimpleCMDS/Prefix.luau") then
+    if not IsFile("CmdPlus/Prefix.luau") then
         return Prefix
     end
 
-    local Success, Content = pcall(ReadFile, "SimpleCMDS/Prefix.luau")
+    local Success, Content = pcall(ReadFile, "CmdPlus/Prefix.luau")
 
     if Success and type(Content) == "string" then
         Content = Content:gsub("%s+", "")
@@ -406,14 +406,14 @@ local function LoadCommandFromURL(url)
             setfenv(func, env)
             local success, err = pcall(func)
             if not success then
-                warn("[SimpleCMDS] Failed to execute command: " .. url .. " - " .. tostring(err))
+                warn("[CmdPlus] Failed to execute command: " .. url .. " - " .. tostring(err))
             end
             return true
         else
-            warn("[SimpleCMDS] Failed to compile command: " .. url .. " - " .. tostring(err))
+            warn("[CmdPlus] Failed to compile command: " .. url .. " - " .. tostring(err))
         end
     else
-        warn("[SimpleCMDS] Failed to download command: " .. url)
+        warn("[CmdPlus] Failed to download command: " .. url)
     end
     return false
 end
@@ -426,8 +426,8 @@ local function LoadBuiltInCommands()
 end
 
 local function LoadUserCommands()
-    if IsFolder("SimpleCMDS/UserCommands") then
-        local files = ListFiles("SimpleCMDS/UserCommands")
+    if IsFolder("CmdPlus/UserCommands") then
+        local files = ListFiles("CmdPlus/UserCommands")
         for _, file in ipairs(files) do
             if file:match("%.luau$") or file:match("%.lua$") then
                 local success, chunk = pcall(function()
@@ -440,7 +440,7 @@ local function LoadUserCommands()
                     end
                 end)
                 if not success then
-                    warn("[SimpleCMDS] Failed to load user command: " .. file)
+                    warn("[CmdPlus] Failed to load user command: " .. file)
                 end
             end
         end
@@ -448,9 +448,9 @@ local function LoadUserCommands()
 end
 
 local function LoadAutoConfig()
-    if IsFile("SimpleCMDS/Autoload.luau") then
+    if IsFile("CmdPlus/Autoload.luau") then
         local success, chunk = pcall(function()
-            local content = ReadFile("SimpleCMDS/Autoload.luau")
+            local content = ReadFile("CmdPlus/Autoload.luau")
             local func = loadstring(content)
             if func then
                 local env = CreateCommandEnv()
@@ -459,24 +459,24 @@ local function LoadAutoConfig()
             end
         end)
         if not success then
-            warn("[SimpleCMDS] Failed to load autoload config")
+            warn("[CmdPlus] Failed to load autoload config")
         end
     end
 end
 
 local function CreateAutoExecuteTemplate()
-    if not IsFile("SimpleCMDS/Autoexecute.luau") then
+    if not IsFile("CmdPlus/Autoexecute.luau") then
         local template = [[return {
     -- "Example",
 }]]
-        WriteFile("SimpleCMDS/Autoexecute.luau", template)
+        WriteFile("CmdPlus/Autoexecute.luau", template)
     end
 end
 
 local function LoadAutoExecute()
-    if IsFile("SimpleCMDS/Autoexecute.luau") then
+    if IsFile("CmdPlus/Autoexecute.luau") then
         local success, content = pcall(function()
-            return ReadFile("SimpleCMDS/Autoexecute.luau")
+            return ReadFile("CmdPlus/Autoexecute.luau")
         end)
         if success and content then
             local func, err = loadstring(content)
@@ -496,10 +496,10 @@ local function LoadAutoExecute()
                             if cmdFunc then
                                 local success, err = pcall(cmdFunc, args)
                                 if not success then
-                                    warn("[SimpleCMDS] Failed to autoexecute command: " .. cmd .. " - " .. tostring(err))
+                                    warn("[CmdPlus] Failed to autoexecute command: " .. cmd .. " - " .. tostring(err))
                                 end
                             else
-                                warn("[SimpleCMDS] Unknown command in autoexecute: " .. cmd)
+                                warn("[CmdPlus] Unknown command in autoexecute: " .. cmd)
                             end
                         end
                     end
@@ -510,9 +510,9 @@ local function LoadAutoExecute()
 end
 
 local function LoadPrefix()
-    if IsFile("SimpleCMDS/Prefix.luau") then
+    if IsFile("CmdPlus/Prefix.luau") then
         local success, content = pcall(function()
-            return ReadFile("SimpleCMDS/Prefix.luau")
+            return ReadFile("CmdPlus/Prefix.luau")
         end)
         if success and content then
             local prefix = content:gsub("%s+", "")
@@ -533,7 +533,7 @@ LoadPrefix()
 LoadAutoExecute()
 
 pcall(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Tags.luau"))
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Tags.luau"))
 end)
 
 Plr.Chatted:Connect(function(Message)
