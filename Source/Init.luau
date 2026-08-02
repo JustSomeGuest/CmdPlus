@@ -139,7 +139,7 @@ Shared.CmdPlus = Shared.CmdPlus or {}
 Shared.CmdPlus.Cmds = Shared.CmdPlus.Cmds or {}
 
 local Cmds = Shared.CmdPlus.Cmds
-local CommandRegistry = {}
+local CmdRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
 
@@ -147,7 +147,7 @@ function Cmd.Reg(Command)
     for _, Alias in ipairs(Command.Aliases) do
         Cmds[Alias:lower()] = Command.Callback
     end
-    table.insert(CommandRegistry, Command)
+    table.insert(CmdRegistry, Command)
 end
 
 function Cmd.new(Aliases, Description, Usage, Callback)
@@ -173,7 +173,7 @@ end
 
 local function GetCommandList()
     local List = {}
-    for _, Command in ipairs(CommandRegistry) do
+    for _, Command in ipairs(CmdRegistry) do
         table.insert(List, {
             Aliases = Command.Aliases,
             Description = Command.Description,
@@ -348,7 +348,7 @@ local function CreateCommandEnv()
         GetService = GetService,
         Cmd = Cmd,
         Cmds = Cmds,
-        CommandRegistry = CommandRegistry,
+        CmdRegistry = CmdRegistry,
         GetCommandList = GetCommandList,
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
