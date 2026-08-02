@@ -167,12 +167,14 @@ local BuiltInCommands = {
     "AntiFling.luau",
     "Rotector.luau",
     "SetShader.luau",
-    "Walkspeed.luau",
+    "WalkSpeed.luau",
     "JumpPower.luau",
     "Teleport.luau",
     "AirWalk.luau",
     "Noclip.luau",
-    "Esp.luau"
+    "ESP.luau",
+    "Respawn.luau",
+    "Freeze.luau",
 }
 
 local Assets = {
