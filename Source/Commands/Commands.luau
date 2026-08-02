@@ -1,15 +1,3 @@
-local function UID(Length)
-  local Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-  local Id = table.create(Length)
-
-  for i = 1, Length do
-    local Index = math.random(#Chars)
-    Id[i] = Chars:sub(Index, Index)
-  end
-
-  return table.concat(Id)
-end
-
 local UI = {}
 
 UI.ScreenGui = Instance.new("ScreenGui")
