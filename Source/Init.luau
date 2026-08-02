@@ -105,6 +105,13 @@ local CommandRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
 
+function Cmd.Reg(Command)
+    for _, Alias in ipairs(Command.Aliases) do
+        Commands[Alias:lower()] = Command.Callback
+    end
+    table.insert(CommandRegistry, Command)
+end
+
 function Cmd.new(Aliases, Description, Usage, Callback)
     if type(Description) == "function" then
         Callback = Description
@@ -120,14 +127,10 @@ function Cmd.new(Aliases, Description, Usage, Callback)
     Command.Description = Description or "No description provided."
     Command.Usage = Usage or (Aliases[1] or "")
     Command.Callback = Callback
+    
+    Cmd.Reg(Command) 
+    
     return Command
-end
-
-function Cmd.Reg(Command)
-    for _, Alias in ipairs(Command.Aliases) do
-        Commands[Alias:lower()] = Command.Callback
-    end
-    table.insert(CommandRegistry, Command)
 end
 
 local function GetCommandList()
@@ -173,8 +176,9 @@ local BuiltInCommands = {
 }
 
 local Assets = {
-    ["CmdPlus/Assets/Rain.mp3"] = AssetsURL .. "Rain.mp3",
-    ["CmdPlus/Assets/Thunder.mp3"] = AssetsURL .. "Thunder.mp3",
+    ["CmdPlus/Assets/CmdPlus_Logo.png"] = AssetsURL .. "Logo.png",
+    ["CmdPlus/Assets/CmdPlus_Rain.mp3"] = AssetsURL .. "Rain.mp3",
+    ["CmdPlus/Assets/CmdPlus_Thunder.mp3"] = AssetsURL .. "Thunder.mp3",
 }
 
 local function AssetHttpGet(url)
