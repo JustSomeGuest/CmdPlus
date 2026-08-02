@@ -91,7 +91,7 @@ for _, Child in ipairs(CmdPlusUI:GetChildren()) do
     Child.Name = UID(32)
 end
 
-CmdPlusUI.ChildAdded:Connect(function(Child)
+CmdPlusUI.DescendantAdded:Connect(function(Child)
     Child.Name = UID(32)
 end)
 
