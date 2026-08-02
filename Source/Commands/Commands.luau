@@ -337,7 +337,8 @@ local function PopulateCommands()
             TitleLabel.Text = FormatCommandTitle(Command, CurrentPrefix)
         end
         if DescLabel then
-            DescLabel.Text = Command.Description .. "\nUsage: " .. CurrentPrefix .. Command.Usage
+            local Usage = Command.Usage:gsub("<", "&lt;"):gsub(">", "&gt;")
+            DescLabel.Text = Command.Description .. "\nUsage: " .. CurrentPrefix .. Usage
         end
         
         Entry.LayoutOrder = Index
