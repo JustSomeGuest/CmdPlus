@@ -23,6 +23,16 @@ local function expect(expected, value, fallback)
     return fallback
 end
 
+local function UID(Length)
+    local Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    local Id = table.create(Length)
+    for i = 1, Length do
+        local Index = math.random(#Chars)
+        Id[i] = Chars:sub(Index, Index)
+    end
+    return table.concat(Id)
+end
+
 local cloneref = expect("function", cloneref, function(...) return ... end)
 
 local WriteFile = expect("function", writefile, function() return end)
@@ -58,6 +68,30 @@ local Lighting = Services.Lighting
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
 local Hui = (gethui and gethui()) or Services.CoreGui
+
+local CmdPlusUI = Instance.new("ScreenGui")
+CmdPlusUI.DisplayOrder = 100
+CmdPlusUI.Enabled = true
+CmdPlusUI.Name = UID(32)
+CmdPlusUI.ResetOnSpawn = false
+CmdPlusUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+CmdPlusUI.Parent = Hui
+
+CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
+    if not CmdPlusUI.Enabled then
+        CmdPlusUI.Enabled = true
+    end
+end)
+
+local function RandomizeChildName(Child)
+    Child.Name = UID(32)
+end
+
+for _, Child in ipairs(CmdPlusUI:GetChildren()) do
+    RandomizeChildName(Child)
+end
+
+CmdPlusUI.ChildAdded:Connect(RandomizeChildName)
 
 local NotifsSuccess, Notifs = pcall(function()
     local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
@@ -305,6 +339,8 @@ end
 
 local function CreateCommandEnv()
     local Env = {
+        UID = UID,
+        CmdPlusUI = CmdPlusUI,
         Cmd = Cmd,
         Services = Services,
         Commands = Commands,
@@ -456,14 +492,14 @@ local function LoadCommandFromURL(url)
     return false
 end
 
-local function LoadBuiltInCommands()
+local function LoadCoreCmds()
     for _, cmdFile in ipairs(BuiltInCommands) do
         local url = CommandsURL .. cmdFile
         LoadCommandFromURL(url)
     end
 end
 
-local function LoadUserCommands()
+local function LoadUserCmds()
     if IsFolder("CmdPlus/UserCommands") then
         local files = ListFiles("CmdPlus/UserCommands")
         for _, file in ipairs(files) do
@@ -502,7 +538,7 @@ local function LoadAutoConfig()
     end
 end
 
-local function CreateAutoExecuteTemplate()
+local function CreateAutoExec()
     if not IsFile("CmdPlus/Autoexecute.luau") then
         local template = [[return {
     }]]
@@ -510,7 +546,7 @@ local function CreateAutoExecuteTemplate()
     end
 end
 
-local function LoadAutoExecute()
+local function LoadAutoExec()
     if IsFile("CmdPlus/Autoexecute.luau") then
         local success, content = pcall(function()
             return ReadFile("CmdPlus/Autoexecute.luau")
@@ -562,12 +598,12 @@ end
 
 local Plr = Players.LocalPlayer
 
-LoadBuiltInCommands()
-LoadUserCommands()
+LoadCoreCmds()
+LoadUserCmds()
 LoadAutoConfig()
-CreateAutoExecuteTemplate()
+CreateAutoExec()
 LoadPrefix()
-LoadAutoExecute()
+LoadAutoExec()
 
 pcall(function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Tags.luau"))()
