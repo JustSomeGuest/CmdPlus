@@ -385,10 +385,10 @@ UI.Close.MouseButton1Click:Connect(function()
     HideCommands()
 end)
 
-Cmd.Reg(Cmd.new({"commands", "cmds"}, "Opens a scrollable list of all available commands.", "commands", function(Args)
+Cmd.new({"commands", "cmds"}, "Opens a scrollable list of all available commands.", "commands", function(Args)
     if IsOpen then
         HideCommands()
     else
         ShowCommands()
     end
-end))
+end)
