@@ -274,6 +274,24 @@ local function GetGlobalPrefix()
     return Prefix
 end
 
+local function FindPlr(searchTerm)
+    local matches = {}
+    local searchLower = searchTerm:lower()
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        local nameLower = player.Name:lower()
+        local displayLower = player.DisplayName:lower()
+
+        if nameLower == searchLower or displayLower == searchLower then
+            table.insert(matches, player)
+        elseif nameLower:match(searchLower) or displayLower:match(searchLower) then
+            table.insert(matches, player)
+        end
+    end
+
+    return matches
+end
+
 local function CreateCommandEnv()
     local Env = {
         Cmd = Cmd,
@@ -318,6 +336,7 @@ local function CreateCommandEnv()
         DelFolder = DelFolder,
         ListFiles = ListFiles,
         DebugNotif = DebugNotif,
+        FindPlr = FindPlr,
 
         print = print,
         warn = warn,
@@ -475,8 +494,7 @@ end
 local function CreateAutoExecuteTemplate()
     if not IsFile("CmdPlus/Autoexecute.luau") then
         local template = [[return {
-    -- "Example",
-}]]
+    }]]
         WriteFile("CmdPlus/Autoexecute.luau", template)
     end
 end
