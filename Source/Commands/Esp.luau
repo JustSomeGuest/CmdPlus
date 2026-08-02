@@ -128,7 +128,7 @@ local function RemoveLocate(player)
     end
 end
 
-Cmd.Reg(Cmd.new({"esp"}, "Highlights all players.", "esp", function()
+Cmd.new({"esp"}, "Highlights all players.", "esp", function()
     if EspPlayerConn then return end
     for _, player in ipairs(Players:GetPlayers()) do
         AddEsp(player)
@@ -137,9 +137,9 @@ Cmd.Reg(Cmd.new({"esp"}, "Highlights all players.", "esp", function()
         AddEsp(player)
     end)
     DebugNotif("ESP: Enabled")
-end))
+end)
 
-Cmd.Reg(Cmd.new({"unesp"}, "Removes all ESP highlights.", "unesp", function()
+Cmd.new({"unesp"}, "Removes all ESP highlights.", "unesp", function()
     for _, player in ipairs(Players:GetPlayers()) do
         RemoveEsp(player)
     end
@@ -148,18 +148,18 @@ Cmd.Reg(Cmd.new({"unesp"}, "Removes all ESP highlights.", "unesp", function()
         EspPlayerConn = nil
     end
     DebugNotif("ESP: Disabled")
-end))
+end)
 
-Cmd.Reg(Cmd.new({"locate"}, "Highlights a specific player.", "locate <player>", function(args)
+Cmd.new({"locate"}, "Highlights a specific player.", "locate <player>", function(args)
     local player = ResolvePlayer(args)
     if not player then return end
     AddLocate(player)
     DebugNotif("ESP: Locating " .. player.Name)
-end))
+end)
 
-Cmd.Reg(Cmd.new({"unlocate"}, "Removes locate highlight from a player.", "unlocate <player>", function(args)
+Cmd.new({"unlocate"}, "Removes locate highlight from a player.", "unlocate <player>", function(args)
     local player = ResolvePlayer(args)
     if not player then return end
     RemoveLocate(player)
     DebugNotif("ESP: Unlocated " .. player.Name)
-end))
+end)
