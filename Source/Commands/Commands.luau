@@ -1,10 +1,10 @@
-local UI = {}
-
 CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
     if not CmdPlusUI.Enabled then
         CmdPlusUI.Enabled = true
     end
 end)
+
+local UI = {}
 
 UI.CmdsUI = Instance.new("CanvasGroup")
 UI.CmdsUI.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
