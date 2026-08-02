@@ -532,9 +532,7 @@ CreateAutoExecuteTemplate()
 LoadPrefix()
 LoadAutoExecute()
 
-pcall(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Tags.luau"))
-end)
+pcall(loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Tags.luau")))
 
 Plr.Chatted:Connect(function(Message)
     if Message:sub(1, #Prefix) ~= Prefix then
