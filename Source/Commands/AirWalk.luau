@@ -72,7 +72,7 @@ local function StopAirwalk()
     Airwalk.Active = false
 end
 
-Cmd.Reg(Cmd.new({"airwalk", "aw"}, "Enables airwalk.", "airwalk", function()
+Cmd.new({"airwalk", "aw"}, "Enables airwalk.", "airwalk", function()
     if Airwalk.Active then
         DebugNotif("Airwalk is already active")
     else
@@ -94,13 +94,13 @@ Cmd.Reg(Cmd.new({"airwalk", "aw"}, "Enables airwalk.", "airwalk", function()
             end
         end)
     end
-end))
+end)
 
-Cmd.Reg(Cmd.new({"unairwalk", "unaw"}, "Disables airwalk.", "unairwalk", function()
+Cmd.new({"unairwalk", "unaw"}, "Disables airwalk.", "unairwalk", function()
     if Airwalk.Active then
         StopAirwalk()
         DebugNotif("Airwalk disabled")
     else
         DebugNotif("Airwalk is not active")
     end
-end))
+end)
