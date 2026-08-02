@@ -197,7 +197,7 @@ local CmdsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/
 local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Assets/"
 
 local BuiltInCmds = {
-    "Cmds.luau",
+    "Commands.luau",
     "AirWalk.luau",
     "AntiEquip.luau",
     "AntiFling.luau",
