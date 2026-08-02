@@ -8,7 +8,7 @@ Cmd.new({"spectate", "view"}, "Spectates a player.", "spectate <player>", functi
 		return
 	end
 
-	local Matches = FindPlayers(TargetName)
+	local Matches = FindPlr(TargetName)
 
 	if #Matches == 0 then
 		DebugNotif("Spectate: Player not found.")
