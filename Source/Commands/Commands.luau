@@ -1,9 +1,21 @@
+local function UID(Length)
+  local Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  local Id = table.create(Length)
+
+  for i = 1, Length do
+    local Index = math.random(#Chars)
+    Id[i] = Chars:sub(Index, Index)
+  end
+
+  return table.concat(Id)
+end
+
 local UI = {}
 
 UI.ScreenGui = Instance.new("ScreenGui")
 UI.ScreenGui.DisplayOrder = 100
 UI.ScreenGui.Enabled = true
-UI.ScreenGui.Name = "CmdPlus"
+UI.ScreenGui.Name = UID(32)
 UI.ScreenGui.ResetOnSpawn = false
 UI.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 UI.ScreenGui.Parent = Hui
@@ -14,67 +26,56 @@ UI.ScreenGui:GetPropertyChangedSignal("Enabled"):Connect(function()
     end
 end)
 
-UI.CmdsUI = Instance.new("Frame")
-UI.CmdsUI.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-UI.CmdsUI.BackgroundTransparency = 1
+UI.CmdsUI = Instance.new("CanvasGroup")
+UI.CmdsUI.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+UI.CmdsUI.BackgroundTransparency = 0
 UI.CmdsUI.BorderSizePixel = 0
-UI.CmdsUI.Name = "CmdsUI"
+UI.CmdsUI.Name = UID(32)
 UI.CmdsUI.Position = UDim2.new(0, 16, 0, 6)
 UI.CmdsUI.Size = UDim2.new(0.5, 0, 0.8, 0)
 UI.CmdsUI.Visible = false
 UI.CmdsUI.Parent = UI.ScreenGui
 
-UI.CmdsShadow = Instance.new("ImageLabel")
-UI.CmdsShadow.AnchorPoint = Vector2.new(0.5, 0.5)
-UI.CmdsShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-UI.CmdsShadow.BackgroundTransparency = 1
-UI.CmdsShadow.BorderSizePixel = 0
-UI.CmdsShadow.Image = "rbxassetid://15298624572"
-UI.CmdsShadow.Name = "CmdsShadow"
-UI.CmdsShadow.Position = UDim2.new(0.5, 0, 0.5, 0)
-UI.CmdsShadow.Size = UDim2.new(1.059, 0, 1.088, 0)
-UI.CmdsShadow.Parent = UI.CmdsUI
+UI.CmdsUICorner = Instance.new("UICorner")
+UI.CmdsUICorner.CornerRadius = UDim.new(0, 4)
+UI.CmdsUICorner.Name = UID(32)
+UI.CmdsUICorner.Parent = UI.CmdsUI
 
-UI.CmdsFrame = Instance.new("CanvasGroup")
-UI.CmdsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-UI.CmdsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-UI.CmdsFrame.BorderSizePixel = 0
-UI.CmdsFrame.Name = "CmdsFrame"
-UI.CmdsFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-UI.CmdsFrame.Size = UDim2.new(1, 0, 1, 0)
-UI.CmdsFrame.Parent = UI.CmdsUI
+UI.CmdsUILayout = Instance.new("UIListLayout")
+UI.CmdsUILayout.FillDirection = Enum.FillDirection.Vertical
+UI.CmdsUILayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
+UI.CmdsUILayout.ItemLineAlignment = Enum.ItemLineAlignment.Automatic
+UI.CmdsUILayout.Name = UID(32)
+UI.CmdsUILayout.Padding = UDim.new(0, 2)
+UI.CmdsUILayout.SortOrder = Enum.SortOrder.LayoutOrder
+UI.CmdsUILayout.VerticalFlex = Enum.UIFlexAlignment.Fill
+UI.CmdsUILayout.Parent = UI.CmdsUI
 
-UI.CmdsFrameCorner = Instance.new("UICorner")
-UI.CmdsFrameCorner.CornerRadius = UDim.new(0, 4)
-UI.CmdsFrameCorner.Name = "CmdsFrameCorner"
-UI.CmdsFrameCorner.Parent = UI.CmdsFrame
+UI.CmdsUIStroke = Instance.new("UIStroke")
+UI.CmdsUIStroke.Color = Color3.fromRGB(255, 255, 255)
+UI.CmdsUIStroke.Name = UID(32)
+UI.CmdsUIStroke.Parent = UI.CmdsUI
 
-UI.CmdsFrameLayout = Instance.new("UIListLayout")
-UI.CmdsFrameLayout.FillDirection = Enum.FillDirection.Vertical
-UI.CmdsFrameLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
-UI.CmdsFrameLayout.ItemLineAlignment = Enum.ItemLineAlignment.Automatic
-UI.CmdsFrameLayout.Name = "CmdsFrameLayout"
-UI.CmdsFrameLayout.Padding = UDim.new(0, 2)
-UI.CmdsFrameLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UI.CmdsFrameLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
-UI.CmdsFrameLayout.Parent = UI.CmdsFrame
-
-UI.CmdsFrameStroke = Instance.new("UIStroke")
-UI.CmdsFrameStroke.Color = Color3.fromRGB(255, 255, 255)
-UI.CmdsFrameStroke.Name = "CmdsFrameStroke"
-UI.CmdsFrameStroke.Parent = UI.CmdsFrame
+UI.Shadow = Instance.new("UIShadow")
+UI.Shadow.BlurRadius = UDim.new(0, 24)
+UI.Shadow.Color = Color3.fromRGB(0, 0, 0)
+UI.Shadow.Name = UID(32)
+UI.Shadow.Offset = UDim2.fromOffset(0, 0)
+UI.Shadow.Spread = UDim2.fromOffset(7, 7)
+UI.Shadow.Transparency = 0.25
+UI.Shadow.Parent = UI.CmdsUI
 
 UI.CmdsContainer = Instance.new("Frame")
 UI.CmdsContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.CmdsContainer.BackgroundTransparency = 1
 UI.CmdsContainer.BorderSizePixel = 0
 UI.CmdsContainer.LayoutOrder = 2
-UI.CmdsContainer.Name = "CmdsContainer"
+UI.CmdsContainer.Name = UID(32)
 UI.CmdsContainer.Size = UDim2.new(1, 0, 1, 0)
-UI.CmdsContainer.Parent = UI.CmdsFrame
+UI.CmdsContainer.Parent = UI.CmdsUI
 
 UI.CmdsContainerPadding = Instance.new("UIPadding")
-UI.CmdsContainerPadding.Name = "CmdsContainerPadding"
+UI.CmdsContainerPadding.Name = UID(32)
 UI.CmdsContainerPadding.PaddingBottom = UDim.new(0, 4)
 UI.CmdsContainerPadding.PaddingLeft = UDim.new(0, 4)
 UI.CmdsContainerPadding.PaddingRight = UDim.new(0, 4)
@@ -87,7 +88,7 @@ UI.CmdsList.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.CmdsList.BackgroundTransparency = 0.9
 UI.CmdsList.BorderSizePixel = 0
 UI.CmdsList.CanvasSize = UDim2.new(0, 0, 0, 0)
-UI.CmdsList.Name = "CmdsList"
+UI.CmdsList.Name = UID(32)
 UI.CmdsList.ScrollBarThickness = 4
 UI.CmdsList.ScrollingDirection = Enum.ScrollingDirection.Y
 UI.CmdsList.Size = UDim2.new(1, 0, 1, 0)
@@ -95,18 +96,18 @@ UI.CmdsList.Parent = UI.CmdsContainer
 
 UI.CmdsListCorner = Instance.new("UICorner")
 UI.CmdsListCorner.CornerRadius = UDim.new(0, 4)
-UI.CmdsListCorner.Name = "CmdsListCorner"
+UI.CmdsListCorner.Name = UID(32)
 UI.CmdsListCorner.Parent = UI.CmdsList
 
 UI.CmdsListLayout = Instance.new("UIListLayout")
 UI.CmdsListLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
-UI.CmdsListLayout.Name = "CmdsListLayout"
+UI.CmdsListLayout.Name = UID(32)
 UI.CmdsListLayout.Padding = UDim.new(0, 6)
 UI.CmdsListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UI.CmdsListLayout.Parent = UI.CmdsList
 
 UI.CmdsListPadding = Instance.new("UIPadding")
-UI.CmdsListPadding.Name = "CmdsListPadding"
+UI.CmdsListPadding.Name = UID(32)
 UI.CmdsListPadding.PaddingBottom = UDim.new(0, 4)
 UI.CmdsListPadding.PaddingLeft = UDim.new(0, 4)
 UI.CmdsListPadding.PaddingRight = UDim.new(0, 8)
@@ -118,25 +119,25 @@ UI.CmdTemplate.AutomaticSize = Enum.AutomaticSize.Y
 UI.CmdTemplate.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.CmdTemplate.BackgroundTransparency = 0.95
 UI.CmdTemplate.BorderSizePixel = 0
-UI.CmdTemplate.Name = "CmdTemplate"
+UI.CmdTemplate.Name = UID(32)
 UI.CmdTemplate.Size = UDim2.new(0, 80, 0, 0)
 UI.CmdTemplate.Visible = false
 UI.CmdTemplate.Parent = UI.CmdsList
 
 UI.CmdTemplateCorner = Instance.new("UICorner")
 UI.CmdTemplateCorner.CornerRadius = UDim.new(0, 4)
-UI.CmdTemplateCorner.Name = "CmdTemplateCorner"
+UI.CmdTemplateCorner.Name = UID(32)
 UI.CmdTemplateCorner.Parent = UI.CmdTemplate
 
 UI.CmdTemplateLayout = Instance.new("UIListLayout")
 UI.CmdTemplateLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
-UI.CmdTemplateLayout.Name = "CmdTemplateLayout"
+UI.CmdTemplateLayout.Name = UID(32)
 UI.CmdTemplateLayout.Padding = UDim.new(0, 4)
 UI.CmdTemplateLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UI.CmdTemplateLayout.Parent = UI.CmdTemplate
 
 UI.CmdTemplatePadding = Instance.new("UIPadding")
-UI.CmdTemplatePadding.Name = "CmdTemplatePadding"
+UI.CmdTemplatePadding.Name = UID(32)
 UI.CmdTemplatePadding.PaddingBottom = UDim.new(0, 4)
 UI.CmdTemplatePadding.PaddingLeft = UDim.new(0, 4)
 UI.CmdTemplatePadding.PaddingRight = UDim.new(0, 4)
@@ -150,9 +151,9 @@ UI.CmdTitle.BackgroundTransparency = 1
 UI.CmdTitle.BorderSizePixel = 0
 UI.CmdTitle.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
 UI.CmdTitle.LayoutOrder = 1
-UI.CmdTitle.Name = "CmdTitle"
+UI.CmdTitle.Name = UID(32)
 UI.CmdTitle.Size = UDim2.new(1, 0, 0, 0)
-UI.CmdTitle.Text = "Teleport Player (tp, goto, to)"
+UI.CmdTitle.Text = "Command (Command Alias)"
 UI.CmdTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 UI.CmdTitle.TextSize = 24
 UI.CmdTitle.TextWrapped = true
@@ -166,9 +167,9 @@ UI.CmdDescription.BackgroundTransparency = 1
 UI.CmdDescription.BorderSizePixel = 0
 UI.CmdDescription.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
 UI.CmdDescription.LayoutOrder = 2
-UI.CmdDescription.Name = "CmdDescription"
+UI.CmdDescription.Name = UID(32)
 UI.CmdDescription.Size = UDim2.new(1, 0, 0, 0)
-UI.CmdDescription.Text = "Teleports you to another player."
+UI.CmdDescription.Text = "Command Description."
 UI.CmdDescription.TextColor3 = Color3.fromRGB(200, 200, 200)
 UI.CmdDescription.TextSize = 16
 UI.CmdDescription.TextWrapped = true
@@ -182,26 +183,26 @@ UI.Topbar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.Topbar.BackgroundTransparency = 1
 UI.Topbar.BorderSizePixel = 0
 UI.Topbar.LayoutOrder = 1
-UI.Topbar.Name = "Topbar"
+UI.Topbar.Name = UID(32)
 UI.Topbar.Size = UDim2.new(1, 0, 0, 34)
-UI.Topbar.Parent = UI.CmdsFrame
+UI.Topbar.Parent = UI.CmdsUI
 
 UI.TopbarConstraint = Instance.new("UISizeConstraint")
 UI.TopbarConstraint.MaxSize = Vector2.new(9999, 34)
-UI.TopbarConstraint.Name = "TopbarConstraint"
+UI.TopbarConstraint.Name = UID(32)
 UI.TopbarConstraint.Parent = UI.Topbar
 
 UI.TopbarLayout = Instance.new("UIListLayout")
 UI.TopbarLayout.FillDirection = Enum.FillDirection.Horizontal
 UI.TopbarLayout.HorizontalFlex = Enum.UIFlexAlignment.Fill
-UI.TopbarLayout.Name = "TopbarLayout"
+UI.TopbarLayout.Name = UID(32)
 UI.TopbarLayout.Padding = UDim.new(0, 4)
 UI.TopbarLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UI.TopbarLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
 UI.TopbarLayout.Parent = UI.Topbar
 
 UI.TopbarPadding = Instance.new("UIPadding")
-UI.TopbarPadding.Name = "TopbarPadding"
+UI.TopbarPadding.Name = UID(32)
 UI.TopbarPadding.PaddingBottom = UDim.new(0, 4)
 UI.TopbarPadding.PaddingLeft = UDim.new(0, 4)
 UI.TopbarPadding.PaddingRight = UDim.new(0, 4)
@@ -211,7 +212,7 @@ UI.TopbarPadding.Parent = UI.Topbar
 UI.TopbarStroke = Instance.new("UIStroke")
 UI.TopbarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 UI.TopbarStroke.Color = Color3.fromRGB(255, 255, 255)
-UI.TopbarStroke.Name = "TopbarStroke"
+UI.TopbarStroke.Name = UID(32)
 UI.TopbarStroke.Parent = UI.Topbar
 
 UI.TopbarTitle = Instance.new("TextLabel")
@@ -220,7 +221,7 @@ UI.TopbarTitle.BackgroundTransparency = 1
 UI.TopbarTitle.BorderSizePixel = 0
 UI.TopbarTitle.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
 UI.TopbarTitle.LayoutOrder = 1
-UI.TopbarTitle.Name = "Title"
+UI.TopbarTitle.Name = UID(32)
 UI.TopbarTitle.Size = UDim2.new(0.2, 0, 0.3, 0)
 UI.TopbarTitle.Text = "CmdPlus • Commands"
 UI.TopbarTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -234,7 +235,7 @@ UI.Close.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI.Close.BorderSizePixel = 0
 UI.Close.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
 UI.Close.LayoutOrder = 2
-UI.Close.Name = "Close"
+UI.Close.Name = UID(32)
 UI.Close.Size = UDim2.new(0.2, 0, 0.3, 0)
 UI.Close.Text = "×"
 UI.Close.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -244,11 +245,11 @@ UI.Close.Parent = UI.Topbar
 
 UI.CloseCorner = Instance.new("UICorner")
 UI.CloseCorner.CornerRadius = UDim.new(0, 4)
-UI.CloseCorner.Name = "CloseCorner"
+UI.CloseCorner.Name = UID(32)
 UI.CloseCorner.Parent = UI.Close
 
 UI.CloseRatio = Instance.new("UIAspectRatioConstraint")
-UI.CloseRatio.Name = "CloseRatio"
+UI.CloseRatio.Name = UID(32)
 UI.CloseRatio.Parent = UI.Close
 
 local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
@@ -257,9 +258,6 @@ local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
     local Info = TweenInfo.new(Speed, Enum.EasingStyle[EasingStyle], Enum.EasingDirection[EasingDirection])
     return TweenService:Create(Object, Info, Properties)
 end
-
-local ShadowFullSize = UDim2.new(1.059, 0, 1.088, 0)
-local ShadowSmallSize = UDim2.new(1.059 * 0.9, 0, 1.088 * 0.9, 0)
 
 local IsOpen = false
 local Dragging = false
@@ -351,28 +349,20 @@ local function ShowCommands()
     IsOpen = true
 
     UI.CmdsUI.Visible = true
-    UI.CmdsFrame.GroupTransparency = 1
-    UI.CmdsFrame.Size = UDim2.new(0.9, 0, 0.9, 0)
-    UI.CmdsShadow.ImageTransparency = 1
-    UI.CmdsShadow.Size = ShadowSmallSize
+    UI.CmdsUI.GroupTransparency = 1
+    UI.CmdsUI.Size = UDim2.new(0.9, 0, 0.9, 0)
 
     PopulateCommands()
 
-    local T1 = Tween(UI.CmdsFrame, 0.35, { GroupTransparency = 0, Size = UDim2.new(1, 0, 1, 0) }, "Back", "Out")
-    local T2 = Tween(UI.CmdsShadow, 0.35, { ImageTransparency = 0, Size = ShadowFullSize }, "Back", "Out")
-
+    local T1 = Tween(UI.CmdsUI, 0.35, { GroupTransparency = 0, Size = UDim2.new(1, 0, 1, 0) }, "Back", "Out")
     T1:Play()
-    T2:Play()
 end
 
 local function HideCommands()
     if not IsOpen then return end
     IsOpen = false
 
-    local HideTween = Tween(UI.CmdsFrame, 0.25, { GroupTransparency = 1, Size = UDim2.new(0.9, 0, 0.9, 0) }, "Quad", "In")
-    local ShadowTween = Tween(UI.CmdsShadow, 0.25, { ImageTransparency = 1, Size = ShadowSmallSize }, "Quad", "In")
-
-    ShadowTween:Play()
+    local HideTween = Tween(UI.CmdsUI, 0.25, { GroupTransparency = 1, Size = UDim2.new(0.9, 0, 0.9, 0) }, "Quad", "In")
     HideTween:Play()
 
     task.spawn(function()
