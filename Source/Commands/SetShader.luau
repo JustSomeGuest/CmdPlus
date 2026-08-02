@@ -934,7 +934,7 @@ local function ResetShader()
     ApplyCharacterLight({ Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 255, 255) })
 end
 
-Cmd.Reg(Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Supports realistic mode and resetting the shader.", "setshader <weather> <time>", function(Args)
+Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Supports realistic mode and resetting the shader.", "setshader <weather> <time>", function(Args)
     local first = Args[2]
     local second = Args[3]
 
@@ -986,4 +986,4 @@ Cmd.Reg(Cmd.new({"setshader", "ss"}, "Changes the current weather and time shade
     local TimeEmoji = TimeOfDay[CurrentTimeName].Emoji
     local WeatherEmoji = Weather[CurrentWeatherName].Emoji
     DebugNotif(WeatherEmoji .. " " .. TimeEmoji .. " Shader set to " .. CurrentWeatherName .. " " .. CurrentTimeName)
-end))
+end)
