@@ -303,8 +303,25 @@ local function PopulateCommands()
 
     for Index, Command in ipairs(SortedCommands) do
         local Entry = UI.CmdTemplate:Clone()
-        Entry.CmdTitle.Text = FormatCommandTitle(Command, CurrentPrefix)
-        Entry.CmdDescription.Text = Command.Description .. "\nUsage: " .. CurrentPrefix .. Command.Usage
+        
+        local TitleLabel, DescLabel
+        for _, child in ipairs(Entry:GetDescendants()) do
+            if child:IsA("TextLabel") then
+                if child.LayoutOrder == 1 then
+                    TitleLabel = child
+                elseif child.LayoutOrder == 2 then
+                    DescLabel = child
+                end
+            end
+        end
+        
+        if TitleLabel then
+            TitleLabel.Text = FormatCommandTitle(Command, CurrentPrefix)
+        end
+        if DescLabel then
+            DescLabel.Text = Command.Description .. "\nUsage: " .. CurrentPrefix .. Command.Usage
+        end
+        
         Entry.LayoutOrder = Index
         Entry.Visible = true
         Entry.Parent = UI.CmdsList
