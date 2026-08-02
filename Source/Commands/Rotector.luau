@@ -116,7 +116,7 @@ local function LookupRotector(UserId)
     return decoded.data, nil
 end
 
-Cmd.Reg(Cmd.new({"rotector", "rot"}, "Checks a player against Rotector for flags, actionability, category, and confidence.", "rotector <player>", function(Args)
+Cmd.new({"rotector", "rot"}, "Checks a player against Rotector for flags, actionability, category, and confidence.", "rotector <player>", function(Args)
     local searchTerm = Args[2]
     if not searchTerm then
         DebugNotif("Usage: .rotector <player>")
@@ -176,7 +176,7 @@ Cmd.Reg(Cmd.new({"rotector", "rot"}, "Checks a player against Rotector for flags
     end
 
     print("[Rotector] Data via rotector.com — statuses may change, do not cache beyond 24h.")
-end))
+end)
 
 local function ScanServerForRotector()
     local AllPlayers = Players:GetPlayers()
