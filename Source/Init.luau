@@ -193,7 +193,7 @@ if not IsFolder("CmdPlus/Assets") then
     MakeFolder("CmdPlus/Assets")
 end
 
-local CmdsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Cmds/"
+local CmdsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Commands/"
 local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Assets/"
 
 local BuiltInCmds = {
