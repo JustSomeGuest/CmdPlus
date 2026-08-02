@@ -38,7 +38,7 @@ UI.CmdsUIStroke.Parent = UI.CmdsUI
 
 UI.Shadow = Instance.new("UIShadow")
 UI.Shadow.BlurRadius = UDim.new(0, 24)
-UI.Shadow.Color = Color3.fromRGB(0, 0, 0)
+UI.Shadow.Color = Color3.fromRGB(255, 255, 255)
 UI.Shadow.Name = UID(32)
 UI.Shadow.Offset = UDim2.fromOffset(0, 0)
 UI.Shadow.Spread = UDim2.fromOffset(7, 7)
