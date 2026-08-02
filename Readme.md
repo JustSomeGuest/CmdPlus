@@ -66,9 +66,9 @@ CmdPlus/
 Register your command:
 
 ```lua
-Cmd.Reg(Cmd.new({"hello", "hi"}, function()
+Cmd.new({"hello", "hi"}, function()
     DebugNotif("Hello!")
-end))
+end)
 ```
 
 You can now execute:
