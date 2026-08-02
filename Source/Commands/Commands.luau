@@ -228,45 +228,62 @@ local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
 end
 
 local IsOpen = false
-local Dragging = false
-local DragStart = nil
-local StartPos = nil
+local function Dragify(DragObject, Target)
+    local Dragging = false
+    local DragInput
+    local DragStart
+    local StartPos
 
-local function ClampPosition(TargetPosition)
-    local ScreenSize = UI.ScreenGui.AbsoluteSize
-    local ElementSize = UI.CmdsUI.AbsoluteSize
-    local MaxX = math.max(0, ScreenSize.X - ElementSize.X)
-    local MaxY = math.max(0, ScreenSize.Y - ElementSize.Y)
-    local ClampedX = math.clamp(TargetPosition.X.Offset, 0, MaxX)
-    local ClampedY = math.clamp(TargetPosition.Y.Offset, 0, MaxY)
-    return UDim2.new(0, ClampedX, 0, ClampedY)
+    local function Clamp(Position)
+        local ScreenSize = UI.ScreenGui.AbsoluteSize
+        local Size = Target.AbsoluteSize
+
+        return UDim2.fromOffset(
+            math.clamp(Position.X.Offset, 0, math.max(0, ScreenSize.X - Size.X)),
+            math.clamp(Position.Y.Offset, 0, math.max(0, ScreenSize.Y - Size.Y))
+        )
+    end
+
+    DragObject.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = Input.Position
+            StartPos = Target.Position
+            DragInput = Input
+
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
+
+    DragObject.InputChanged:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            DragInput = Input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if not Dragging or Input ~= DragInput then
+            return
+        end
+
+        local Delta = Input.Position - DragStart
+
+        Target.Position = Clamp(UDim2.new(
+            StartPos.X.Scale,
+            StartPos.X.Offset + Delta.X,
+            StartPos.Y.Scale,
+            StartPos.Y.Offset + Delta.Y
+        ))
+    end)
 end
 
-UI.Topbar.InputBegan:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-        Dragging = true
-        DragStart = Input.Position
-        StartPos = UI.CmdsUI.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(Input)
-    if not Dragging then return end
-    if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-        local Delta = Input.Position - DragStart
-        local TargetPosition = UDim2.new(
-            StartPos.X.Scale, StartPos.X.Offset + Delta.X,
-            StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y
-        )
-        UI.CmdsUI.Position = ClampPosition(TargetPosition)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-        Dragging = false
-    end
-end)
+Dragify(UI.Topbar, UI.CmdsUI)
 
 local function ClearCommandEntries()
     for _, Child in ipairs(UI.CmdsList:GetChildren()) do
