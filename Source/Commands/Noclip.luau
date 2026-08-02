@@ -49,12 +49,12 @@ local function DisableNoclip()
     SavedCollisions = {}
 end
 
-Cmd.Reg(Cmd.new({"noclip", "nc"}, "Enables noclip, letting you pass through geometry.", "noclip", function()
+Cmd.new({"noclip", "nc"}, "Enables noclip, letting you pass through geometry.", "noclip", function()
     EnableNoclip()
     DebugNotif("Noclip: Enabled")
-end))
+end)
 
-Cmd.Reg(Cmd.new({"clip", "cl"}, "Disables noclip and restores normal collision.", "clip", function()
+Cmd.new({"clip", "cl"}, "Disables noclip and restores normal collision.", "clip", function()
     DisableNoclip()
     DebugNotif("Noclip: Disabled")
-end))
+end)
