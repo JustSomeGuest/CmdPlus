@@ -1,46 +1,38 @@
-# SimpleCMDS
-
-A simple and lightweight command system for Roblox.
-
-SimpleCMDS provides built-in commands, command aliases, customizable prefixes, and support for creating your own commands.
-
-## Loading
-
-Execute SimpleCMDS with:
-
-```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Init.luau"))()
-```
-
-Or, if you want errors prefixed with `[SimpleCMDS]`:
+# CmdPlus
 
 ```lua
 local Success, Result = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/SimpleCMDS/Stable/Source/Init.luau"))()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Init.luau"))()
 end)
 
 if not Success then
-    error("[SimpleCMDS]: " .. tostring(Result))
+    error("[CmdPlus]: " .. tostring(Result))
 end
 ```
 
 ## Features
 
 - Lightweight
-- Built-in commands
+- Extensive built-in commands
 - Command aliases
 - Customizable command prefix
 - User commands
 - Easy to extend
+- Movement utilities
 - Player utilities
 - AntiFling protection
+- AirWalk
+- NoClip
+- WalkSpeed & JumpPower
+- Shader customization
 - Server rejoining
 - Server hopping
 - Player teleportation
+- Continuously updated with new commands
 
 ## Commands
 
-SimpleCMDS ships with a growing set of built-in commands (movement utilities, anti-exploit protections, server tools, and more), each with short aliases for faster typing. Commands are loaded automatically on startup — no need to memorize a fixed list here, since new ones get added over time.
+CmdPlus ships with a constantly expanding collection of built-in commands, including movement utilities, player tools, graphics customization, anti-exploit protections, server utilities, and more. Every command supports aliases where applicable, and new commands are added regularly.
 
 The default prefix is `.` (change it anytime with `setprefix`, see below).
 
@@ -61,12 +53,12 @@ Commands will then use the new prefix:
 
 ## User Commands
 
-SimpleCMDS supports loading your own custom commands.
+CmdPlus supports loading your own custom commands.
 
 Create a `.luau` file inside:
 
 ```text
-SimpleCMDS/
+CmdPlus/
 └── UserCommands/
     └── MyCommand.luau
 ```
@@ -95,7 +87,7 @@ or
 
 **© 2026 JustSomeGuest. All Rights Reserved.**
 
-SimpleCMDS and all associated source code are proprietary software protected by copyright law.
+CmdPlus and all associated source code are proprietary software protected by copyright law.
 
 You may **not**:
 
@@ -104,12 +96,5 @@ You may **not**:
 - Re-upload the source code, modified or unmodified.
 - Claim ownership of this project or any part of it.
 - Use any portion of the source code in another project without explicit written permission from the author.
-- Sell, sublicense, lease, or commercially distribute this project.
-
-Unauthorized copying, modification, redistribution, or republication of any part of this project is strictly prohibited.
-
-Permission to use, modify, or redistribute this project may only be granted by the copyright holder.
-
----
 
 Made with ❤️ by **JustSomeGuest**.
