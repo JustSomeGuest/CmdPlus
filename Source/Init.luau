@@ -76,7 +76,7 @@ local Hui = (gethui and gethui()) or CoreGui
 local CmdPlusUI = Instance.new("ScreenGui")
 CmdPlusUI.DisplayOrder = 100
 CmdPlusUI.Enabled = true
-CmdPlusUI.Name = UID(32)
+CmdPlusUI.Name = UID(64)
 CmdPlusUI.ResetOnSpawn = false
 CmdPlusUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 CmdPlusUI.Parent = Hui
@@ -88,11 +88,11 @@ CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
 end)
 
 for _, Child in ipairs(CmdPlusUI:GetChildren()) do
-    Child.Name = UID(32)
+    Child.Name = UID(64)
 end
 
 CmdPlusUI.DescendantAdded:Connect(function(Child)
-    Child.Name = UID(32)
+    Child.Name = UID(64)
 end)
 
 local NotifsSuccess, Notifs = pcall(function()
