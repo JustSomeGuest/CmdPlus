@@ -1,7 +1,4 @@
 Cmd.new({"serverhop", "shop"}, "Teleports you to a random available server without joining the current server.", "serverhop", function()
-    local TeleportService = Services.TeleportService
-    local HttpService = Services.HttpService
-
     local CurrentJobId = game.JobId
     local PlaceId = game.PlaceId
 
