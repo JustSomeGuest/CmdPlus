@@ -45,29 +45,33 @@ local ReadFile = expect("function", readfile, function() return "" end)
 local ListFiles = expect("function", listfiles, function() return {} end)
 local LoadAsset = expect("function", getcustomasset, expect("function", getsynasset, nil))
 
-local Services = setmetatable({}, {
-    __index = function(self, name)
-        local success, cache = pcall(function()
-            return cloneref(game:GetService(name))
-        end)
-        if success then
-            rawset(self, name, cache)
-            return cache
-        else
-            error("Invalid Service: " .. tostring(name))
-        end
-    end
-})
+local function GetService(Service)
+    return cloneref(game:GetService(Service))
+end
 
-local Workspace = Services.Workspace
-local Players = Services.Players
-local ReplicatedStorage = Services.ReplicatedStorage
-local RunService = Services.RunService
-local StarterGui = Services.StarterGui
-local Lighting = Services.Lighting
+local Workspace = GetService("Workspace")
+local Players = GetService("Players")
+local ReplicatedStorage = GetService("ReplicatedStorage")
+local RunService = GetService("RunService")
+local StarterGui = GetService("StarterGui")
+local Lighting = GetService("Lighting")
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
-local Hui = (gethui and gethui()) or Services.CoreGui
+local CoreGui = GetService("CoreGui")
+local SoundService = GetService("SoundService")
+local TweenService = GetService("TweenService")
+local UserInputService = GetService("UserInputService")
+local GuiService = GetService("GuiService")
+local TextService = GetService("TextService")
+local HttpService = GetService("HttpService")
+local MarketplaceService = GetService("MarketplaceService")
+local TeleportService = GetService("TeleportService")
+local TextChatService = GetService("TextChatService")
+local VoiceChatService = GetService("VoiceChatService")
+local Stats = GetService("Stats")
+local Debris = GetService("Debris")
+
+local Hui = (gethui and gethui()) or CoreGui
 
 local CmdPlusUI = Instance.new("ScreenGui")
 CmdPlusUI.DisplayOrder = 100
@@ -134,14 +138,14 @@ end
 Shared.CmdPlus = Shared.CmdPlus or {}
 Shared.CmdPlus.Cmds = Shared.CmdPlus.Cmds or {}
 
-local Commands = Shared.CmdPlus.Cmds
+local Cmds = Shared.CmdPlus.Cmds
 local CommandRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
 
 function Cmd.Reg(Command)
     for _, Alias in ipairs(Command.Aliases) do
-        Commands[Alias:lower()] = Command.Callback
+        Cmds[Alias:lower()] = Command.Callback
     end
     table.insert(CommandRegistry, Command)
 end
@@ -182,18 +186,18 @@ end
 if not IsFolder("CmdPlus") then
     MakeFolder("CmdPlus")
 end
-if not IsFolder("CmdPlus/UserCommands") then
-    MakeFolder("CmdPlus/UserCommands")
+if not IsFolder("CmdPlus/UserCmds") then
+    MakeFolder("CmdPlus/UserCmds")
 end
 if not IsFolder("CmdPlus/Assets") then
     MakeFolder("CmdPlus/Assets")
 end
 
-local CommandsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Commands/"
+local CmdsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Cmds/"
 local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Assets/"
 
-local BuiltInCommands = {
-    "Commands.luau",
+local BuiltInCmds = {
+    "Cmds.luau",
     "AirWalk.luau",
     "AntiEquip.luau",
     "AntiFling.luau",
@@ -341,9 +345,9 @@ local function CreateCommandEnv()
     local Env = {
         UID = UID,
         CmdPlusUI = CmdPlusUI,
+        GetService = GetService,
         Cmd = Cmd,
-        Services = Services,
-        Commands = Commands,
+        Cmds = Cmds,
         CommandRegistry = CommandRegistry,
         GetCommandList = GetCommandList,
         Prefix = Prefix,
@@ -357,20 +361,20 @@ local function CreateCommandEnv()
         ReplicatedStorage = ReplicatedStorage,
         RunService = RunService,
         StarterGui = StarterGui,
-        CoreGui = Services.CoreGui,
+        CoreGui = CoreGui,
         Hui = Hui,
-        SoundService = Services.SoundService,
-        TweenService = Services.TweenService,
-        UserInputService = Services.UserInputService,
-        GuiService = Services.GuiService,
-        TextService = Services.TextService,
-        HttpService = Services.HttpService,
-        MarketplaceService = Services.MarketplaceService,
-        TeleportService = Services.TeleportService,
-        TextChatService = Services.TextChatService,
-        VoiceChatService = Services.VoiceChatService,
-        Stats = Services.Stats,
-        Debris = Services.Debris,
+        SoundService = SoundService,
+        TweenService = TweenService,
+        UserInputService = UserInputService,
+        GuiService = GuiService,
+        TextService = TextService,
+        HttpService = HttpService,
+        MarketplaceService = MarketplaceService,
+        TeleportService = TeleportService,
+        TextChatService = TextChatService,
+        VoiceChatService = VoiceChatService,
+        Stats = Stats,
+        Debris = Debris,
         Lighting = Lighting,
         Terrain = Terrain,
 
@@ -493,15 +497,15 @@ local function LoadCommandFromURL(url)
 end
 
 local function LoadCoreCmds()
-    for _, cmdFile in ipairs(BuiltInCommands) do
-        local url = CommandsURL .. cmdFile
+    for _, cmdFile in ipairs(BuiltInCmds) do
+        local url = CmdsURL .. cmdFile
         LoadCommandFromURL(url)
     end
 end
 
 local function LoadUserCmds()
-    if IsFolder("CmdPlus/UserCommands") then
-        local files = ListFiles("CmdPlus/UserCommands")
+    if IsFolder("CmdPlus/UserCmds") then
+        local files = ListFiles("CmdPlus/UserCmds")
         for _, file in ipairs(files) do
             if file:match("%.luau$") or file:match("%.lua$") then
                 local success, chunk = pcall(function()
@@ -565,7 +569,7 @@ local function LoadAutoExec()
                                 table.insert(args, word)
                             end
                             local cmdName = args[1] and args[1]:lower()
-                            local cmdFunc = Commands[cmdName]
+                            local cmdFunc = Cmds[cmdName]
                             if cmdFunc then
                                 local success, err = pcall(cmdFunc, args)
                                 if not success then
@@ -619,7 +623,7 @@ Plr.Chatted:Connect(function(Message)
         table.insert(Args, Word)
     end
     local CmdName = Args[1] and Args[1]:lower()
-    local CmdFunc = Commands[CmdName]
+    local CmdFunc = Cmds[CmdName]
     if CmdFunc then
         CmdFunc(Args)
     end
