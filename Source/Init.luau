@@ -175,6 +175,7 @@ local BuiltInCommands = {
     "ESP.luau",
     "Respawn.luau",
     "Freeze.luau",
+    "Gravity.luau",
 }
 
 local Assets = {
