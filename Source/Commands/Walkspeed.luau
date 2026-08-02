@@ -1,4 +1,4 @@
-Cmd.Reg(Cmd.new({"walkspeed", "ws"}, "Changes your character's walking speed.", "walkspeed <number>", function(Args)
+Cmd.new({"walkspeed", "ws"}, "Changes your character's walking speed.", "walkspeed <number>", function(Args)
     local value = tonumber(Args[2])
     if not value then
         DebugNotif("Usage: .walkspeed <number>")
@@ -16,4 +16,4 @@ Cmd.Reg(Cmd.new({"walkspeed", "ws"}, "Changes your character's walking speed.", 
         hum.WalkSpeed = value
         DebugNotif("Walkspeed set to " .. value)
     end
-end))
+end)
