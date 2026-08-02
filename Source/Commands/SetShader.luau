@@ -61,14 +61,14 @@ DOF.Parent = Lighting
 
 local RainSound = Instance.new("Sound")
 RainSound.Name = "WeatherRain"
-RainSound.SoundId = GetAsset("SimpleCMDS/Assets/Rain.mp3") or ""
+RainSound.SoundId = GetAsset("CmdPlus/Assets/CmdPlus_Rain.mp3") or ""
 RainSound.Looped = true
 RainSound.Volume = 0.5
 RainSound.Parent = SoundService
 
 local ThunderSound = Instance.new("Sound")
 ThunderSound.Name = "WeatherThunder"
-ThunderSound.SoundId = GetAsset("SimpleCMDS/Assets/Thunder.mp3") or ""
+ThunderSound.SoundId = GetAsset("CmdPlus/Assets/CmdPlus_Thunder.mp3") or ""
 ThunderSound.Looped = true
 ThunderSound.Volume = 0.35
 ThunderSound.Parent = SoundService
