@@ -35,17 +35,24 @@ local RotectorScanMaxPlayers = 25
 local RotectorScanDelay = 0.15
 
 local function RotectorHttpGet(Url)
-    local RequestFunc = expect("function", http_request,
-        expect("function", request,
-            expect("function", syn and syn.request, nil)))
+    local RequestFunc =
+        http_request
+        or request
+        or (syn and syn.request)
 
-    if not RequestFunc then
+    if type(RequestFunc) ~= "function" then
         local success, result = pcall(function()
             return game:HttpGet(Url)
         end)
+
         if success then
-            return { Success = true, StatusCode = 200, Body = result }
+            return {
+                Success = true,
+                StatusCode = 200,
+                Body = result,
+            }
         end
+
         return nil
     end
 
@@ -61,28 +68,10 @@ local function RotectorHttpGet(Url)
     end
 
     return {
-        Success = true,
+        Success = result.Success ~= false,
         StatusCode = result.StatusCode,
         Body = result.Body,
     }
-end
-
-local function FindPlayersForRotector(searchTerm)
-    local matches = {}
-    local searchLower = searchTerm:lower()
-
-    for _, player in ipairs(Players:GetPlayers()) do
-        local nameLower = player.Name:lower()
-        local displayLower = player.DisplayName:lower()
-
-        if nameLower == searchLower or displayLower == searchLower then
-            table.insert(matches, player)
-        elseif nameLower:match(searchLower) or displayLower:match(searchLower) then
-            table.insert(matches, player)
-        end
-    end
-
-    return matches
 end
 
 local function LookupRotector(UserId)
@@ -123,7 +112,7 @@ Cmd.new({"rotector", "rot"}, "Checks a player against Rotector for flags, action
         return
     end
 
-    local matches = FindPlayersForRotector(searchTerm)
+    local matches = FindPlr(searchTerm)
 
     if #matches == 0 then
         DebugNotif("Player not found: " .. searchTerm)
