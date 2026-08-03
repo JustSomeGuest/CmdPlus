@@ -704,10 +704,7 @@ UI["CmdBtn"].BackgroundTransparency = 0.08
 UI["CmdBtn"].BorderSizePixel = 0
 UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png")
 UI["CmdBtn"].Size = UDim2.new(0, BtnSize, 0, BtnSize)
-UI["CmdBtn"].Position = UDim2.fromOffset(
-    math.floor(Camera.ViewportSize.X / 2 - BtnSize / 2),
-    -BtnSize - 10
-)
+UI["CmdBtn"].Position = UDim2.fromOffset(math.floor(Camera.ViewportSize.X / 2 - BtnSize / 2), -BtnSize - 10)
 UI["CmdBtn"].Visible = false
 UI["CmdBtn"].Parent = CmdPlusUI
 
