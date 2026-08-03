@@ -87,12 +87,12 @@ CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
     end
 end)
 
-for _, Child in ipairs(CmdPlusUI:GetChildren()) do
-    Child.Name = UID(64)
+for _, Descendant in ipairs(CmdPlusUI:GetDescendants()) do
+    Descendant.Name = UID(64)
 end
 
-CmdPlusUI.DescendantAdded:Connect(function(Child)
-    Child.Name = UID(64)
+CmdPlusUI.DescendantAdded:Connect(function(Descendant)
+    Descendant.Name = UID(64)
 end)
 
 local NotifsSuccess, Notifs = pcall(function()
@@ -618,7 +618,6 @@ UI["Cmdbar"].AnchorPoint = Vector2.new(0.5, 0.5)
 UI["Cmdbar"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
 UI["Cmdbar"].BackgroundTransparency = 0.08
 UI["Cmdbar"].BorderSizePixel = 0
-UI["Cmdbar"].Name = "Cmdbar"
 UI["Cmdbar"].Position = UDim2.new(0.5, 0, 0.5, 0)
 UI["Cmdbar"].Size = UDim2.new(1, -200, 0, 40)
 UI["Cmdbar"].Visible = false
@@ -629,7 +628,6 @@ UI["Cmdbox"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 UI["Cmdbox"].BackgroundTransparency = 1
 UI["Cmdbox"].BorderSizePixel = 0
 UI["Cmdbox"].FontFace = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-UI["Cmdbox"].Name = "Cmdbox"
 UI["Cmdbox"].PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
 UI["Cmdbox"].PlaceholderText = "Enter commands here..."
 UI["Cmdbox"].Size = UDim2.new(1, 0, 1, 0)
@@ -643,24 +641,20 @@ UI["Cmdbox"].Parent = UI["Cmdbar"]
 
 UI["CmdbarStroke"] = Instance.new("UIStroke")
 UI["CmdbarStroke"].Color = Color3.fromRGB(255, 255, 255)
-UI["CmdbarStroke"].Name = "CmdbarStroke"
 UI["CmdbarStroke"].Parent = UI["Cmdbar"]
 
 UI["CmdbarCorner"] = Instance.new("UICorner")
 UI["CmdbarCorner"].CornerRadius = UDim.new(0, 4)
-UI["CmdbarCorner"].Name = "CmdbarCorner"
 UI["CmdbarCorner"].Parent = UI["Cmdbar"]
 
 UI["CmdbarShadow"] = Instance.new("UIShadow")
 UI["CmdbarShadow"].BlurRadius = UDim.new(0, 22)
 UI["CmdbarShadow"].Color = Color3.fromRGB(255, 255, 255)
-UI["CmdbarShadow"].Name = "CmdbarShadow"
 UI["CmdbarShadow"].Spread = 2
 UI["CmdbarShadow"].Transparency = 0.25
 UI["CmdbarShadow"].Parent = UI["Cmdbar"]
 
 UI["CmdbarPadding"] = Instance.new("UIPadding")
-UI["CmdbarPadding"].Name = "CmdbarPadding"
 UI["CmdbarPadding"].PaddingBottom = UDim.new(0, 8)
 UI["CmdbarPadding"].PaddingLeft = UDim.new(0, 8)
 UI["CmdbarPadding"].PaddingRight = UDim.new(0, 8)
@@ -671,32 +665,27 @@ UI["CmdBtn"] = Instance.new("ImageButton")
 UI["CmdBtn"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
 UI["CmdBtn"].BackgroundTransparency = 0.08
 UI["CmdBtn"].BorderSizePixel = 0
-UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png") or ""
-UI["CmdBtn"].Name = "CmdBtn"
+UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png")
 UI["CmdBtn"].Size = UDim2.new(0, 38, 0, 38)
 UI["CmdBtn"].Visible = false
 UI["CmdBtn"].Parent = CmdPlusUI
 
 UI["CmdBtnRatio"] = Instance.new("UIAspectRatioConstraint")
-UI["CmdBtnRatio"].Name = "CmdBtnRatio"
 UI["CmdBtnRatio"].Parent = UI["CmdBtn"]
 
 UI["CmdBtnStroke"] = Instance.new("UIStroke")
 UI["CmdBtnStroke"].Color = Color3.fromRGB(255, 255, 255)
-UI["CmdBtnStroke"].Name = "CmdBtnStroke"
 UI["CmdBtnStroke"].Parent = UI["CmdBtn"]
 
 UI["CmdBtnShadow"] = Instance.new("UIShadow")
 UI["CmdBtnShadow"].BlurRadius = UDim.new(0, 18)
 UI["CmdBtnShadow"].Color = Color3.fromRGB(255, 255, 255)
-UI["CmdBtnShadow"].Name = "CmdBtnShadow"
 UI["CmdBtnShadow"].Spread = 4
 UI["CmdBtnShadow"].Transparency = 0.25
 UI["CmdBtnShadow"].Parent = UI["CmdBtn"]
 
 UI["CmdBtnCorner"] = Instance.new("UICorner")
 UI["CmdBtnCorner"].CornerRadius = UDim.new(1, 0)
-UI["CmdBtnCorner"].Name = "CmdBtnCorner"
 UI["CmdBtnCorner"].Parent = UI["CmdBtn"]
 
 local Camera = Workspace.CurrentCamera
