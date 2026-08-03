@@ -163,9 +163,9 @@ function Cmd.new(Aliases, Description, Usage, Callback)
     Command.Description = Description or "No description provided."
     Command.Usage = Usage or (Aliases[1] or "")
     Command.Callback = Callback
-    
-    Cmd.Reg(Command) 
-    
+
+    Cmd.Reg(Command)
+
     return Command
 end
 
@@ -339,6 +339,58 @@ local function FindPlr(searchTerm)
     return matches
 end
 
+local function Dragify(DragObject, MoveObject)
+    MoveObject = MoveObject or DragObject
+
+    local Dragging = false
+    local DragStart
+    local StartPosition
+
+    local function Clamp(Position)
+        local Parent = MoveObject.Parent
+        local ScreenSize = Parent.AbsoluteSize
+        local ObjectSize = MoveObject.AbsoluteSize
+
+        return UDim2.fromOffset(
+            math.clamp(Position.X, 0, math.max(0, ScreenSize.X - ObjectSize.X)),
+            math.clamp(Position.Y, 0, math.max(0, ScreenSize.Y - ObjectSize.Y))
+        )
+    end
+
+    DragObject.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = Input.Position
+            StartPosition = MoveObject.Position
+
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if not Dragging then
+            return
+        end
+
+        if Input.UserInputType ~= Enum.UserInputType.MouseMovement
+        and Input.UserInputType ~= Enum.UserInputType.Touch then
+            return
+        end
+
+        local Delta = Input.Position - DragStart
+
+        MoveObject.Position = Clamp(Vector2.new(
+            StartPosition.X.Offset + Delta.X,
+            StartPosition.Y.Offset + Delta.Y
+        ))
+    end)
+end
+
 local function CreateCommandEnv()
     local Env = {
         UID = UID,
@@ -353,6 +405,7 @@ local function CreateCommandEnv()
         GetPrefix = GetGlobalPrefix,
         GetAsset = GetAsset,
         expect = expect,
+        Dragify = Dragify,
 
         Workspace = Workspace,
         Players = Players,
@@ -698,38 +751,7 @@ TweenService:Create(UI["CmdBtn"], TweenInfo.new(0.45, Enum.EasingStyle.Back, Enu
     Position = UDim2.new(0.5, 0, 0, 4)
 }):Play()
 
-local BtnDragging = false
-local BtnDragStart = nil
-local BtnStartPos = nil
-
-UI["CmdBtn"].InputBegan:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-        BtnDragging = true
-        BtnDragStart = Input.Position
-        BtnStartPos = UI["CmdBtn"].Position
-    end
-end)
-
-UI["CmdBtn"].InputEnded:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-        BtnDragging = false
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(Input)
-    if BtnDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
-        local Delta = Input.Position - BtnDragStart
-        local ViewportSize = Camera.ViewportSize
-
-        local NewX = BtnStartPos.X.Offset + Delta.X
-        local NewY = BtnStartPos.Y.Offset + Delta.Y
-
-        NewX = math.clamp(NewX, 0, ViewportSize.X - UI["CmdBtn"].Size.X.Offset)
-        NewY = math.clamp(NewY, 0, ViewportSize.Y - UI["CmdBtn"].Size.X.Offset)
-
-        UI["CmdBtn"].Position = UDim2.new(0, NewX, 0, NewY)
-    end
-end)
+Dragify(UI["CmdBtn"])
 
 local BtnNormalSize = UDim2.new(0, 38, 0, 38)
 local BtnHoverSize = UDim2.new(0, 44, 0, 44)
