@@ -617,7 +617,7 @@ UI["Cmdbar"] = Instance.new("Frame")
 UI["Cmdbar"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
 UI["Cmdbar"].BackgroundTransparency = 0.08
 UI["Cmdbar"].BorderSizePixel = 0
-UI["Cmdbar"].Position = UDim2.new(0.5, 0, 0.5, 0)
+UI["Cmdbar"].Position = UDim2.new(0.5, 0, 1, 10)
 UI["Cmdbar"].AnchorPoint = Vector2.new(0.5, 0.5)
 UI["Cmdbar"].Size = UDim2.new(1, -200, 0, 40)
 UI["Cmdbar"].Visible = false
@@ -761,7 +761,7 @@ local function OpenCmdbar()
     UI["Cmdbar"].Position = UDim2.new(0.5, 0, 1, 10)
     UI["Cmdbar"].Visible = true
     TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
-        Position = UDim2.new(0.5, 0, 0.5, 0)
+        Position = UDim2.new(0.5, 0, 0.4, 0)
     }):Play()
     task.delay(0.05, function()
         UI["Cmdbox"]:CaptureFocus()
