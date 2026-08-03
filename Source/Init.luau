@@ -40,6 +40,7 @@ local Lighting = GetService("Lighting")
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
 local CoreGui = GetService("CoreGui")
+local Hui = (gethui and gethui()) or CoreGui
 local SoundService = GetService("SoundService")
 local TweenService = GetService("TweenService")
 local UserInputService = GetService("UserInputService")
@@ -52,8 +53,6 @@ local TextChatService = GetService("TextChatService")
 local VoiceChatService = GetService("VoiceChatService")
 local Stats = GetService("Stats")
 local Debris = GetService("Debris")
-
-local Hui = (gethui and gethui()) or CoreGui
 
 local CmdPlusUI = Instance.new("ScreenGui")
 CmdPlusUI.DisplayOrder = 100
