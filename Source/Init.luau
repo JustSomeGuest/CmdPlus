@@ -337,12 +337,13 @@ local function Dragify(DragObject, MoveObject)
     local StartPosition
 
     local function Clamp(Position)
-        local ViewportSize = Workspace.CurrentCamera.ViewportSize
-        local ObjectSize = MoveObject.AbsoluteSize
+        local Inset = GuiService:GetGuiInset()
+        local Viewport = Camera.ViewportSize
+        local Size = MoveObject.AbsoluteSize
 
         return UDim2.fromOffset(
-            math.clamp(Position.X, 0, math.max(0, ViewportSize.X - ObjectSize.X)),
-            math.clamp(Position.Y, 0, math.max(0, ViewportSize.Y - ObjectSize.Y))
+            math.clamp(Position.X, 0, math.max(0, Viewport.X - Size.X)),
+            math.clamp(Position.Y, Inset.Y, math.max(Inset.Y, Viewport.Y - Size.Y))
         )
     end
 
