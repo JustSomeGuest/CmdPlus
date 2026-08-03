@@ -652,7 +652,7 @@ UI["CmdbarCorner"].Name = "CmdbarCorner"
 UI["CmdbarCorner"].Parent = UI["Cmdbar"]
 
 UI["CmdbarShadow"] = Instance.new("UIShadow")
-UI["CmdbarShadow"].BlurRadius = 22
+UI["CmdbarShadow"].BlurRadius = UDim.new(0, 22)
 UI["CmdbarShadow"].Color = Color3.fromRGB(255, 255, 255)
 UI["CmdbarShadow"].Name = "CmdbarShadow"
 UI["CmdbarShadow"].Spread = 2
@@ -687,7 +687,7 @@ UI["CmdBtnStroke"].Name = "CmdBtnStroke"
 UI["CmdBtnStroke"].Parent = UI["CmdBtn"]
 
 UI["CmdBtnShadow"] = Instance.new("UIShadow")
-UI["CmdBtnShadow"].BlurRadius = 18
+UI["CmdBtnShadow"].BlurRadius = UDim.new(0, 18)
 UI["CmdBtnShadow"].Color = Color3.fromRGB(255, 255, 255)
 UI["CmdBtnShadow"].Name = "CmdBtnShadow"
 UI["CmdBtnShadow"].Spread = 4
