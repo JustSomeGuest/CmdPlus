@@ -655,6 +655,7 @@ UI["Cmdbar"].Position = UDim2.new(0.5, 0, 1, 10)
 UI["Cmdbar"].AnchorPoint = Vector2.new(0.5, 0.5)
 UI["Cmdbar"].Size = UDim2.new(1, -200, 0, 40)
 UI["Cmdbar"].Visible = false
+UI["Cmdbar"].ZIndex = 2
 UI["Cmdbar"].Parent = CmdPlusUI
 
 UI["Cmdbox"] = Instance.new("TextBox")
@@ -706,6 +707,7 @@ UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png")
 UI["CmdBtn"].Size = UDim2.new(0, BtnSize, 0, BtnSize)
 UI["CmdBtn"].Position = UDim2.fromOffset(math.floor(Camera.ViewportSize.X / 2 - BtnSize / 2), -BtnSize - 10)
 UI["CmdBtn"].Visible = false
+UI["CmdBtn"].ZIndex = 3
 UI["CmdBtn"].Parent = CmdPlusUI
 
 UI["CmdBtnRatio"] = Instance.new("UIAspectRatioConstraint")
