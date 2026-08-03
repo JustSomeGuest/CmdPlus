@@ -222,68 +222,7 @@ UI.CloseCorner.Parent = UI.Close
 UI.CloseRatio = Instance.new("UIAspectRatioConstraint")
 UI.CloseRatio.Parent = UI.Close
 
-local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
-    EasingStyle = EasingStyle or "Quad"
-    EasingDirection = EasingDirection or "Out"
-    local Info = TweenInfo.new(Speed, Enum.EasingStyle[EasingStyle], Enum.EasingDirection[EasingDirection])
-    return TweenService:Create(Object, Info, Properties)
-end
-
 local IsOpen = false
-local function Dragify(DragObject, Target)
-    local Dragging = false
-    local DragInput
-    local DragStart
-    local StartPos
-
-    local function Clamp(Position)
-        local ScreenSize = UI.ScreenGui.AbsoluteSize
-        local Size = Target.AbsoluteSize
-
-        return UDim2.fromOffset(
-            math.clamp(Position.X.Offset, 0, math.max(0, ScreenSize.X - Size.X)),
-            math.clamp(Position.Y.Offset, 0, math.max(0, ScreenSize.Y - Size.Y))
-        )
-    end
-
-    DragObject.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1
-        or Input.UserInputType == Enum.UserInputType.Touch then
-            Dragging = true
-            DragStart = Input.Position
-            StartPos = Target.Position
-            DragInput = Input
-
-            Input.Changed:Connect(function()
-                if Input.UserInputState == Enum.UserInputState.End then
-                    Dragging = false
-                end
-            end)
-        end
-    end)
-
-    DragObject.InputChanged:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseMovement
-        or Input.UserInputType == Enum.UserInputType.Touch then
-            DragInput = Input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(Input)
-        if not Dragging or Input ~= DragInput then
-            return
-        end
-
-        local Delta = Input.Position - DragStart
-
-        Target.Position = Clamp(UDim2.new(
-            StartPos.X.Scale,
-            StartPos.X.Offset + Delta.X,
-            StartPos.Y.Scale,
-            StartPos.Y.Offset + Delta.Y
-        ))
-    end)
-end
 
 Dragify(UI.Topbar, UI.CmdsUI)
 
