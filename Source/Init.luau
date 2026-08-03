@@ -7,22 +7,6 @@ local Shared = (function()
     return (Success and Env) or _G or (warn("[Shared]: Failed to access a usable global environment.") or {})
 end)()
 
-local function expect(expected, value, fallback)
-    if type(value) == expected then
-        return value
-    end
-    if fallback ~= nil then
-        if type(fallback) == "function" then
-            return function(...)
-                warn("[Expect]: Missing executor functionality. Using fallback function.")
-                return fallback(...)
-            end
-        end
-        warn("[Expect]: Value has unexpected type. Using fallback value.")
-    end
-    return fallback
-end
-
 local function UID(Length)
     local Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     local Id = table.create(Length)
@@ -33,17 +17,15 @@ local function UID(Length)
     return table.concat(Id)
 end
 
-local cloneref = expect("function", cloneref, function(...) return ... end)
-
-local WriteFile = expect("function", writefile, function() return end)
-local IsFile = expect("function", isfile, function() return false end)
-local DelFile = expect("function", delfile, function() return end)
-local IsFolder = expect("function", isfolder, function() return false end)
-local MakeFolder = expect("function", makefolder, function() return end)
-local DelFolder = expect("function", delfolder, function() return end)
-local ReadFile = expect("function", readfile, function() return "" end)
-local ListFiles = expect("function", listfiles, function() return {} end)
-local LoadAsset = expect("function", getcustomasset, expect("function", getsynasset, nil))
+local WriteFile = writefile or function() end
+local IsFile = isfile or function() return false end
+local DelFile = delfile or function() end
+local IsFolder = isfolder or function() return false end
+local MakeFolder = makefolder or function() end
+local DelFolder = delfolder or function() end
+local ReadFile = readfile or function() return "" end
+local ListFiles = listfiles or function() return {} end
+local LoadAsset = getcustomasset or getsynasset
 
 local function GetService(Service)
     return cloneref(game:GetService(Service))
@@ -233,24 +215,27 @@ local Assets = {
 }
 
 local function AssetHttpGet(url)
-    local RequestFunc = expect("function", syn and syn.request,
-        expect("function", request,
-            expect("function", http_request, nil)))
+    local RequestFunc = http_request or request or (syn and syn.request)
 
     if not RequestFunc then
         local success, result = pcall(function()
             return game:HttpGet(url)
         end)
+
         if success then
-            return { Success = true, Body = result }
+            return {
+                Success = true,
+                Body = result,
+            }
         end
+
         return nil
     end
 
     local success, result = pcall(function()
         return RequestFunc({
             Url = url,
-            Method = "GET"
+            Method = "GET",
         })
     end)
 
@@ -404,7 +389,6 @@ local function CreateCommandEnv()
         SetPrefix = SetGlobalPrefix,
         GetPrefix = GetGlobalPrefix,
         GetAsset = GetAsset,
-        expect = expect,
         Dragify = Dragify,
 
         Workspace = Workspace,
