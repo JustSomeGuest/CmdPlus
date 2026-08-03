@@ -758,11 +758,22 @@ local CmdbarTweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingD
 
 local function OpenCmdbar()
     CmdbarOpen = true
-    UI["Cmdbar"].Position = UDim2.new(0.5, 0, 1, 10)
+    UI["Cmdbar"].Position = UDim2.new(0.5, 0, 0.55, 0)
+    UI["Cmdbar"].Size = UDim2.new(0.85, 0, 0, 40)
+    UI["Cmdbar"].BackgroundTransparency = 1
+    UI["CmdbarStroke"].Transparency = 1
     UI["Cmdbar"].Visible = true
-    TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
-        Position = UDim2.new(0.5, 0, 0.4, 0)
+
+    TweenService:Create(UI["Cmdbar"], TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0.5, 0, 0.4, 0),
+        Size = UDim2.new(1, -200, 0, 40),
+        BackgroundTransparency = 0.08,
     }):Play()
+
+    TweenService:Create(UI["CmdbarStroke"], TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Transparency = 0,
+    }):Play()
+
     task.delay(0.05, function()
         UI["Cmdbox"]:CaptureFocus()
     end)
@@ -770,12 +781,20 @@ end
 
 local function CloseCmdbar()
     CmdbarOpen = false
-    local Tween = TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
-        Position = UDim2.new(0.5, 0, 1, 10)
+
+    TweenService:Create(UI["Cmdbar"], TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Position = UDim2.new(0.5, 0, 0.55, 0),
+        Size = UDim2.new(0.85, 0, 0, 40),
+        BackgroundTransparency = 1,
+    }):Play()
+
+    local StrokeTween = TweenService:Create(UI["CmdbarStroke"], TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Transparency = 1,
     })
-    Tween:Play()
-    Tween.Completed:Connect(function()
+    StrokeTween:Play()
+    StrokeTween.Completed:Connect(function()
         UI["Cmdbar"].Visible = false
+        UI["Cmdbar"].Size = UDim2.new(1, -200, 0, 40)
     end)
 end
 
