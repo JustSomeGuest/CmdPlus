@@ -330,13 +330,12 @@ local function Dragify(DragObject, MoveObject)
     local StartPosition
 
     local function Clamp(Position)
-        local Parent = MoveObject.Parent
-        local ScreenSize = Parent.AbsoluteSize
+        local ViewportSize = Workspace.CurrentCamera.ViewportSize
         local ObjectSize = MoveObject.AbsoluteSize
 
         return UDim2.fromOffset(
-            math.clamp(Position.X, 0, math.max(0, ScreenSize.X - ObjectSize.X)),
-            math.clamp(Position.Y, 0, math.max(0, ScreenSize.Y - ObjectSize.Y))
+            math.clamp(Position.X, 0, math.max(0, ViewportSize.X - ObjectSize.X)),
+            math.clamp(Position.Y, 0, math.max(0, ViewportSize.Y - ObjectSize.Y))
         )
     end
 
@@ -696,13 +695,19 @@ UI["CmdbarPadding"].PaddingRight = UDim.new(0, 8)
 UI["CmdbarPadding"].PaddingTop = UDim.new(0, 8)
 UI["CmdbarPadding"].Parent = UI["Cmdbar"]
 
+local Camera = Workspace.CurrentCamera
+local BtnSize = 38
+
 UI["CmdBtn"] = Instance.new("ImageButton")
 UI["CmdBtn"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
 UI["CmdBtn"].BackgroundTransparency = 0.08
 UI["CmdBtn"].BorderSizePixel = 0
 UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png")
-UI["CmdBtn"].Size = UDim2.new(0, 38, 0, 38)
-UI["CmdBtn"].AnchorPoint = Vector2.new(0.5, 0)
+UI["CmdBtn"].Size = UDim2.new(0, BtnSize, 0, BtnSize)
+UI["CmdBtn"].Position = UDim2.fromOffset(
+    math.floor(Camera.ViewportSize.X / 2 - BtnSize / 2),
+    -BtnSize - 10
+)
 UI["CmdBtn"].Visible = false
 UI["CmdBtn"].Parent = CmdPlusUI
 
@@ -724,13 +729,13 @@ UI["CmdBtnCorner"] = Instance.new("UICorner")
 UI["CmdBtnCorner"].CornerRadius = UDim.new(1, 0)
 UI["CmdBtnCorner"].Parent = UI["CmdBtn"]
 
-local Camera = Workspace.CurrentCamera
-
-UI["CmdBtn"].Position = UDim2.new(0.5, 0, 0, -UI["CmdBtn"].Size.X.Offset - 10)
 UI["CmdBtn"].Visible = true
 
 TweenService:Create(UI["CmdBtn"], TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Position = UDim2.new(0.5, 0, 0, 4)
+    Position = UDim2.fromOffset(
+        math.floor(Camera.ViewportSize.X / 2 - BtnSize / 2),
+        4
+    )
 }):Play()
 
 Dragify(UI["CmdBtn"])
