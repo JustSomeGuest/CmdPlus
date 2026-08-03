@@ -37,8 +37,6 @@ local ReplicatedStorage = GetService("ReplicatedStorage")
 local RunService = GetService("RunService")
 local StarterGui = GetService("StarterGui")
 local Lighting = GetService("Lighting")
-local Terrain = Workspace:FindFirstChildOfClass("Terrain")
-
 local CoreGui = GetService("CoreGui")
 local Hui = (gethui and gethui()) or CoreGui
 local SoundService = GetService("SoundService")
@@ -53,6 +51,7 @@ local TextChatService = GetService("TextChatService")
 local VoiceChatService = GetService("VoiceChatService")
 local Stats = GetService("Stats")
 local Debris = GetService("Debris")
+local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
 local CmdPlusUI = Instance.new("ScreenGui")
 CmdPlusUI.DisplayOrder = 100
