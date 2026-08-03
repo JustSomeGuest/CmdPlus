@@ -18,16 +18,19 @@ Cmd.new({"spin"}, "Spins your character.", "spin <speed>", function(Args)
 		SpinConnection:Disconnect()
 	end
 
-	SpinConnection = RunService.RenderStepped:Connect(function(DeltaTime)
-		RootPart.CFrame *= CFrame.Angles(0, math.rad(Speed * DeltaTime * 60), 0)
-	end)
+	local BodyGyro = Instance.new("BodyAngularVelocity")
+	BodyGyro.MaxTorque = Vector3.new(0, 400000, 0)
+	BodyGyro.AngularVelocity = Vector3.new(0, math.rad(Speed), 0)
+	BodyGyro.Parent = RootPart
+
+	SpinConnection = BodyGyro
 
 	DebugNotif("Spin: Now spinning at " .. Speed .. ".")
 end)
 
 Cmd.new({"unspin"}, "Stops spinning.", "unspin", function()
 	if SpinConnection then
-		SpinConnection:Disconnect()
+		SpinConnection:Destroy()
 		SpinConnection = nil
 		DebugNotif("Spin: Stopped spinning.")
 	else
