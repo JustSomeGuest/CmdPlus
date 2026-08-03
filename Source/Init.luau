@@ -614,7 +614,6 @@ end)
 local UI = {}
 
 UI["Cmdbar"] = Instance.new("Frame")
-UI["Cmdbar"].AnchorPoint = Vector2.new(0.5, 0.5)
 UI["Cmdbar"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
 UI["Cmdbar"].BackgroundTransparency = 0.08
 UI["Cmdbar"].BorderSizePixel = 0
@@ -690,7 +689,7 @@ UI["CmdBtnCorner"].Parent = UI["CmdBtn"]
 
 local Camera = Workspace.CurrentCamera
 local BtnSize = 38
-local BtnY = 70
+local BtnY = 4
 
 local function GetCenteredBtnX()
     local ViewportSize = Camera.ViewportSize
