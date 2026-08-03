@@ -7,6 +7,7 @@ UI.CmdsUI.BorderSizePixel = 0
 UI.CmdsUI.Position = UDim2.new(0, 16, 0, 6)
 UI.CmdsUI.Size = UDim2.new(0.5, 0, 0.8, 0)
 UI.CmdsUI.Visible = false
+UI.CmdsUI.ZIndex = 1
 UI.CmdsUI.Parent = CmdPlusUI
 
 UI.CmdsUICorner = Instance.new("UICorner")
