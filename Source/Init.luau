@@ -608,7 +608,258 @@ LoadPrefix()
 LoadAutoExec()
 
 pcall(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Tags.luau"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Tags.luau"))()
+end)
+
+local UI = {}
+
+UI["Cmdbar"] = Instance.new("Frame")
+UI["Cmdbar"].AnchorPoint = Vector2.new(0.5, 0.5)
+UI["Cmdbar"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
+UI["Cmdbar"].BackgroundTransparency = 0.08
+UI["Cmdbar"].BorderSizePixel = 0
+UI["Cmdbar"].Name = "Cmdbar"
+UI["Cmdbar"].Position = UDim2.new(0.5, 0, 0.5, 0)
+UI["Cmdbar"].Size = UDim2.new(1, -200, 0, 40)
+UI["Cmdbar"].Visible = false
+UI["Cmdbar"].Parent = CmdPlusUI
+
+UI["Cmdbox"] = Instance.new("TextBox")
+UI["Cmdbox"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+UI["Cmdbox"].BackgroundTransparency = 1
+UI["Cmdbox"].BorderSizePixel = 0
+UI["Cmdbox"].FontFace = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+UI["Cmdbox"].Name = "Cmdbox"
+UI["Cmdbox"].PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+UI["Cmdbox"].PlaceholderText = "Enter commands here..."
+UI["Cmdbox"].Size = UDim2.new(1, 0, 1, 0)
+UI["Cmdbox"].Text = ""
+UI["Cmdbox"].TextColor3 = Color3.fromRGB(255, 255, 255)
+UI["Cmdbox"].TextScaled = true
+UI["Cmdbox"].TextSize = 16
+UI["Cmdbox"].TextWrapped = true
+UI["Cmdbox"].TextXAlignment = Enum.TextXAlignment.Left
+UI["Cmdbox"].Parent = UI["Cmdbar"]
+
+UI["CmdbarStroke"] = Instance.new("UIStroke")
+UI["CmdbarStroke"].Color = Color3.fromRGB(255, 255, 255)
+UI["CmdbarStroke"].Name = "CmdbarStroke"
+UI["CmdbarStroke"].Parent = UI["Cmdbar"]
+
+UI["CmdbarCorner"] = Instance.new("UICorner")
+UI["CmdbarCorner"].CornerRadius = UDim.new(0, 4)
+UI["CmdbarCorner"].Name = "CmdbarCorner"
+UI["CmdbarCorner"].Parent = UI["Cmdbar"]
+
+UI["CmdbarShadow"] = Instance.new("UIShadow")
+UI["CmdbarShadow"].BlurRadius = 22
+UI["CmdbarShadow"].Color = Color3.fromRGB(255, 255, 255)
+UI["CmdbarShadow"].Name = "CmdbarShadow"
+UI["CmdbarShadow"].Spread = 2
+UI["CmdbarShadow"].Transparency = 0.25
+UI["CmdbarShadow"].Parent = UI["Cmdbar"]
+
+UI["CmdbarPadding"] = Instance.new("UIPadding")
+UI["CmdbarPadding"].Name = "CmdbarPadding"
+UI["CmdbarPadding"].PaddingBottom = UDim.new(0, 8)
+UI["CmdbarPadding"].PaddingLeft = UDim.new(0, 8)
+UI["CmdbarPadding"].PaddingRight = UDim.new(0, 8)
+UI["CmdbarPadding"].PaddingTop = UDim.new(0, 8)
+UI["CmdbarPadding"].Parent = UI["Cmdbar"]
+
+UI["CmdBtn"] = Instance.new("ImageButton")
+UI["CmdBtn"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
+UI["CmdBtn"].BackgroundTransparency = 0.08
+UI["CmdBtn"].BorderSizePixel = 0
+UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png") or ""
+UI["CmdBtn"].Name = "CmdBtn"
+UI["CmdBtn"].Size = UDim2.new(0, 38, 0, 38)
+UI["CmdBtn"].Visible = false
+UI["CmdBtn"].Parent = CmdPlusUI
+
+UI["CmdBtnRatio"] = Instance.new("UIAspectRatioConstraint")
+UI["CmdBtnRatio"].Name = "CmdBtnRatio"
+UI["CmdBtnRatio"].Parent = UI["CmdBtn"]
+
+UI["CmdBtnStroke"] = Instance.new("UIStroke")
+UI["CmdBtnStroke"].Color = Color3.fromRGB(255, 255, 255)
+UI["CmdBtnStroke"].Name = "CmdBtnStroke"
+UI["CmdBtnStroke"].Parent = UI["CmdBtn"]
+
+UI["CmdBtnShadow"] = Instance.new("UIShadow")
+UI["CmdBtnShadow"].BlurRadius = 18
+UI["CmdBtnShadow"].Color = Color3.fromRGB(255, 255, 255)
+UI["CmdBtnShadow"].Name = "CmdBtnShadow"
+UI["CmdBtnShadow"].Spread = 4
+UI["CmdBtnShadow"].Transparency = 0.25
+UI["CmdBtnShadow"].Parent = UI["CmdBtn"]
+
+UI["CmdBtnCorner"] = Instance.new("UICorner")
+UI["CmdBtnCorner"].CornerRadius = UDim.new(1, 0)
+UI["CmdBtnCorner"].Name = "CmdBtnCorner"
+UI["CmdBtnCorner"].Parent = UI["CmdBtn"]
+
+local Camera = Workspace.CurrentCamera
+local BtnSize = 38
+local BtnY = 70
+
+local function GetCenteredBtnX()
+    local ViewportSize = Camera.ViewportSize
+    return (ViewportSize.X / 2) - (BtnSize / 2)
+end
+
+local function SetBtnCenteredPosition(yOffset)
+    UI["CmdBtn"].Position = UDim2.new(0, GetCenteredBtnX(), 0, yOffset)
+end
+
+SetBtnCenteredPosition(-BtnSize - 10)
+UI["CmdBtn"].Visible = true
+
+TweenService:Create(UI["CmdBtn"], TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Position = UDim2.new(0, GetCenteredBtnX(), 0, BtnY)
+}):Play()
+
+Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+    UI["CmdBtn"].Position = UDim2.new(0, GetCenteredBtnX(), 0, BtnY)
+end)
+
+local BtnDragging = false
+local BtnDragStart = nil
+local BtnStartPos = nil
+
+UI["CmdBtn"].InputBegan:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+        BtnDragging = true
+        BtnDragStart = Input.Position
+        BtnStartPos = UI["CmdBtn"].Position
+    end
+end)
+
+UI["CmdBtn"].InputEnded:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+        BtnDragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(Input)
+    if BtnDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+        local Delta = Input.Position - BtnDragStart
+        local ViewportSize = Camera.ViewportSize
+
+        local NewX = BtnStartPos.X.Offset + Delta.X
+        local NewY = BtnStartPos.Y.Offset + Delta.Y
+
+        NewX = math.clamp(NewX, 0, ViewportSize.X - BtnSize)
+        NewY = math.clamp(NewY, 0, ViewportSize.Y - BtnSize)
+
+        UI["CmdBtn"].Position = UDim2.new(0, NewX, 0, NewY)
+        BtnY = NewY
+    end
+end)
+
+local BtnNormalSize = UDim2.new(0, 38, 0, 38)
+local BtnHoverSize = UDim2.new(0, 44, 0, 44)
+local BtnTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local function AnimateBtnHover()
+    TweenService:Create(UI["CmdBtn"], BtnTweenInfo, { Size = BtnHoverSize }):Play()
+end
+
+local function AnimateBtnNormal()
+    TweenService:Create(UI["CmdBtn"], BtnTweenInfo, { Size = BtnNormalSize }):Play()
+end
+
+UI["CmdBtn"].MouseEnter:Connect(function()
+    if not BtnDragging then
+        AnimateBtnHover()
+    end
+end)
+
+UI["CmdBtn"].MouseLeave:Connect(function()
+    AnimateBtnNormal()
+end)
+
+local CmdbarOpen = false
+local CmdbarTweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+local function GetCmdbarCenterX()
+    local ViewportSize = Camera.ViewportSize
+    local BarWidth = ViewportSize.X - 200
+    return (ViewportSize.X / 2) - (BarWidth / 2)
+end
+
+local function GetCmdbarCenterY()
+    return Camera.ViewportSize.Y / 2
+end
+
+local function OpenCmdbar()
+    CmdbarOpen = true
+    UI["Cmdbar"].Position = UDim2.new(0, GetCmdbarCenterX(), 1, 10)
+    UI["Cmdbar"].Visible = true
+    TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
+        Position = UDim2.new(0, GetCmdbarCenterX(), 0, GetCmdbarCenterY())
+    }):Play()
+    task.delay(0.05, function()
+        UI["Cmdbox"]:CaptureFocus()
+    end)
+end
+
+local function CloseCmdbar()
+    CmdbarOpen = false
+    local Tween = TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
+        Position = UDim2.new(0, GetCmdbarCenterX(), 1, 10)
+    })
+    Tween:Play()
+    Tween.Completed:Connect(function()
+        UI["Cmdbar"].Visible = false
+    end)
+end
+
+local function RunCmdbarInput()
+    local Text = UI["Cmdbox"].Text
+    UI["Cmdbox"].Text = ""
+    CloseCmdbar()
+
+    if Text == "" then return end
+
+    local Args = {}
+    for Word in Text:gmatch("%S+") do
+        table.insert(Args, Word)
+    end
+
+    local CmdName = Args[1] and Args[1]:lower()
+    local CmdFunc = Cmds[CmdName]
+
+    if CmdFunc then
+        pcall(CmdFunc, Args)
+    else
+        DebugNotif('"' .. (Args[1] or Text) .. '" isn\'t a valid command.')
+    end
+end
+
+UI["CmdBtn"].MouseButton1Click:Connect(function()
+    AnimateBtnHover()
+    task.delay(0.15, AnimateBtnNormal)
+    if CmdbarOpen then
+        CloseCmdbar()
+    else
+        OpenCmdbar()
+    end
+end)
+
+UI["Cmdbox"].FocusLost:Connect(function(EnterPressed)
+    if EnterPressed then
+        RunCmdbarInput()
+    else
+        CloseCmdbar()
+        UI["Cmdbox"].Text = ""
+    end
+end)
+
+Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+    if CmdbarOpen then
+        UI["Cmdbar"].Position = UDim2.new(0, GetCmdbarCenterX(), 0, GetCmdbarCenterY())
+    end
 end)
 
 Plr.Chatted:Connect(function(Message)
