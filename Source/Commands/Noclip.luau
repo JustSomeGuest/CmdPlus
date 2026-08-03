@@ -14,15 +14,15 @@ local function EnableNoclip()
         for _, part in ipairs(char:GetDescendants()) do
             if part:IsA("BasePart") then
                 SavedCollisions[part] = part.CanCollide
+                part.CanCollide = false
             end
         end
     end
 
-    NoclipConnection = RunService.Stepped:Connect(function()
-        local c = GetChar()
-        if not c then return end
-        for _, part in ipairs(c:GetDescendants()) do
+    NoclipConnection = Players.LocalPlayer.CharacterAdded:Connect(function(newChar)
+        for _, part in ipairs(newChar:GetDescendants()) do
             if part:IsA("BasePart") then
+                SavedCollisions[part] = part.CanCollide
                 part.CanCollide = false
             end
         end
