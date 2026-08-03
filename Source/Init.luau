@@ -322,6 +322,13 @@ local function FindPlr(searchTerm)
     return matches
 end
 
+local function Tween(Object, Speed, Properties, EasingStyle, EasingDirection)
+    EasingStyle = EasingStyle or "Quad"
+    EasingDirection = EasingDirection or "Out"
+    local Info = TweenInfo.new(Speed, Enum.EasingStyle[EasingStyle], Enum.EasingDirection[EasingDirection])
+    return TweenService:Create(Object, Info, Properties)
+end
+
 local function Dragify(DragObject, MoveObject)
     MoveObject = MoveObject or DragObject
 
@@ -386,6 +393,7 @@ local function CreateCommandEnv()
         SetPrefix = SetGlobalPrefix,
         GetPrefix = GetGlobalPrefix,
         GetAsset = GetAsset,
+        Tween = Tween,
         Dragify = Dragify,
 
         Workspace = Workspace,
