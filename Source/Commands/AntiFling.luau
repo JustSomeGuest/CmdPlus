@@ -130,39 +130,6 @@ local function Antifling(Notify)
         CleanupChar(OtherPlr.Character)
     end)
 
-    local LastKey = nil
-    local QuotaPerStep = 256
-
-    AntiflingConns[#AntiflingConns + 1] = RunService.PreSimulation:Connect(function()
-        local Quota = QuotaPerStep
-        local Key = LastKey
-
-        if Key ~= nil and TrackedParts[Key] == nil then
-            Key = nil
-        end
-
-        while Quota > 0 do
-            Key = next(TrackedParts, Key)
-            if not Key then
-                LastKey = nil
-                break
-            end
-
-            local Part = Key
-            if typeof(Part) == "Instance" and Part:IsA("BasePart") and Part.Parent then
-                if Part.CanCollide ~= false then
-                    Part.CanCollide = false
-                end
-                LastKey = Part
-            else
-                ClearPart(Part)
-                LastKey = nil
-            end
-
-            Quota = Quota - 1
-        end
-    end)
-
     if Notify then
         DebugNotif("AntiFling: Enabled")
     end
