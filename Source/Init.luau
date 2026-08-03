@@ -331,53 +331,49 @@ end
 
 local function Dragify(DragObject, MoveObject)
     MoveObject = MoveObject or DragObject
-
-    local Dragging = false
-    local DragStart
-    local StartPosition
-
-    local function Clamp(Position)
-        local Inset = GuiService:GetGuiInset()
-        local Viewport = Camera.ViewportSize
-        local Size = MoveObject.AbsoluteSize
-
-        return UDim2.fromOffset(
-            math.clamp(Position.X, 0, math.max(0, Viewport.X - Size.X)),
-            math.clamp(Position.Y, Inset.Y, math.max(Inset.Y, Viewport.Y - Size.Y))
-        )
-    end
-
-    DragObject.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1
-        or Input.UserInputType == Enum.UserInputType.Touch then
-            Dragging = true
-            DragStart = Input.Position
-            StartPosition = MoveObject.Position
-
-            Input.Changed:Connect(function()
-                if Input.UserInputState == Enum.UserInputState.End then
-                    Dragging = false
+    local dragInput
+    local dragStart
+    local dragging = false
+    local startPos
+    DragObject.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragStart = input.Position
+            dragging = true
+            startPos = MoveObject.AbsolutePosition
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
                 end
             end)
         end
     end)
-
-    UserInputService.InputChanged:Connect(function(Input)
-        if not Dragging then
+    DragObject.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if not dragging or input ~= dragInput then
             return
         end
-
-        if Input.UserInputType ~= Enum.UserInputType.MouseMovement
-        and Input.UserInputType ~= Enum.UserInputType.Touch then
-            return
-        end
-
-        local Delta = Input.Position - DragStart
-
-        MoveObject.Position = Clamp(Vector2.new(
-            StartPosition.X.Offset + Delta.X,
-            StartPosition.Y.Offset + Delta.Y
-        ))
+        local delta = input.Position - dragStart
+        local objectSize = MoveObject.AbsoluteSize
+        local parent = MoveObject.Parent
+        local parentSize = parent.AbsoluteSize
+        local padding = 3
+        local newX = math.clamp(
+            startPos.X + delta.X,
+            padding,
+            parentSize.X - objectSize.X - padding
+        )
+        local newY = math.clamp(
+            startPos.Y + delta.Y,
+            padding,
+            parentSize.Y - objectSize.Y - padding
+        )
+        MoveObject.Position = UDim2.fromOffset(newX, newY)
     end)
 end
 
