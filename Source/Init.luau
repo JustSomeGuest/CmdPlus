@@ -618,6 +618,7 @@ UI["Cmdbar"].BackgroundColor3 = Color3.fromRGB(19, 19, 22)
 UI["Cmdbar"].BackgroundTransparency = 0.08
 UI["Cmdbar"].BorderSizePixel = 0
 UI["Cmdbar"].Position = UDim2.new(0.5, 0, 0.5, 0)
+UI["Cmdbar"].AnchorPoint = Vector2.new(0.5, 0.5)
 UI["Cmdbar"].Size = UDim2.new(1, -200, 0, 40)
 UI["Cmdbar"].Visible = false
 UI["Cmdbar"].Parent = CmdPlusUI
@@ -666,6 +667,7 @@ UI["CmdBtn"].BackgroundTransparency = 0.08
 UI["CmdBtn"].BorderSizePixel = 0
 UI["CmdBtn"].Image = GetAsset("CmdPlus/Assets/CmdPlus_Logo.png")
 UI["CmdBtn"].Size = UDim2.new(0, 38, 0, 38)
+UI["CmdBtn"].AnchorPoint = Vector2.new(0.5, 0)
 UI["CmdBtn"].Visible = false
 UI["CmdBtn"].Parent = CmdPlusUI
 
@@ -688,28 +690,13 @@ UI["CmdBtnCorner"].CornerRadius = UDim.new(1, 0)
 UI["CmdBtnCorner"].Parent = UI["CmdBtn"]
 
 local Camera = Workspace.CurrentCamera
-local BtnSize = 38
-local BtnY = 4
 
-local function GetCenteredBtnX()
-    local ViewportSize = Camera.ViewportSize
-    return (ViewportSize.X / 2) - (BtnSize / 2)
-end
-
-local function SetBtnCenteredPosition(yOffset)
-    UI["CmdBtn"].Position = UDim2.new(0, GetCenteredBtnX(), 0, yOffset)
-end
-
-SetBtnCenteredPosition(-BtnSize - 10)
+UI["CmdBtn"].Position = UDim2.new(0.5, 0, 0, -UI["CmdBtn"].Size.X.Offset - 10)
 UI["CmdBtn"].Visible = true
 
 TweenService:Create(UI["CmdBtn"], TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Position = UDim2.new(0, GetCenteredBtnX(), 0, BtnY)
+    Position = UDim2.new(0.5, 0, 0, 4)
 }):Play()
-
-Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-    UI["CmdBtn"].Position = UDim2.new(0, GetCenteredBtnX(), 0, BtnY)
-end)
 
 local BtnDragging = false
 local BtnDragStart = nil
@@ -737,11 +724,10 @@ UserInputService.InputChanged:Connect(function(Input)
         local NewX = BtnStartPos.X.Offset + Delta.X
         local NewY = BtnStartPos.Y.Offset + Delta.Y
 
-        NewX = math.clamp(NewX, 0, ViewportSize.X - BtnSize)
-        NewY = math.clamp(NewY, 0, ViewportSize.Y - BtnSize)
+        NewX = math.clamp(NewX, 0, ViewportSize.X - UI["CmdBtn"].Size.X.Offset)
+        NewY = math.clamp(NewY, 0, ViewportSize.Y - UI["CmdBtn"].Size.X.Offset)
 
         UI["CmdBtn"].Position = UDim2.new(0, NewX, 0, NewY)
-        BtnY = NewY
     end
 end)
 
@@ -770,22 +756,12 @@ end)
 local CmdbarOpen = false
 local CmdbarTweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
-local function GetCmdbarCenterX()
-    local ViewportSize = Camera.ViewportSize
-    local BarWidth = ViewportSize.X - 200
-    return (ViewportSize.X / 2) - (BarWidth / 2)
-end
-
-local function GetCmdbarCenterY()
-    return Camera.ViewportSize.Y / 2
-end
-
 local function OpenCmdbar()
     CmdbarOpen = true
-    UI["Cmdbar"].Position = UDim2.new(0, GetCmdbarCenterX(), 1, 10)
+    UI["Cmdbar"].Position = UDim2.new(0.5, 0, 1, 10)
     UI["Cmdbar"].Visible = true
     TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
-        Position = UDim2.new(0, GetCmdbarCenterX(), 0, GetCmdbarCenterY())
+        Position = UDim2.new(0.5, 0, 0.5, 0)
     }):Play()
     task.delay(0.05, function()
         UI["Cmdbox"]:CaptureFocus()
@@ -795,7 +771,7 @@ end
 local function CloseCmdbar()
     CmdbarOpen = false
     local Tween = TweenService:Create(UI["Cmdbar"], CmdbarTweenInfo, {
-        Position = UDim2.new(0, GetCmdbarCenterX(), 1, 10)
+        Position = UDim2.new(0.5, 0, 1, 10)
     })
     Tween:Play()
     Tween.Completed:Connect(function()
@@ -841,12 +817,6 @@ UI["Cmdbox"].FocusLost:Connect(function(EnterPressed)
     else
         CloseCmdbar()
         UI["Cmdbox"].Text = ""
-    end
-end)
-
-Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-    if CmdbarOpen then
-        UI["Cmdbar"].Position = UDim2.new(0, GetCmdbarCenterX(), 0, GetCmdbarCenterY())
     end
 end)
 
