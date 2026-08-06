@@ -121,13 +121,6 @@ local CmdRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
 
-function Cmd.Reg(Command)
-    for _, Alias in ipairs(Command.Aliases) do
-        Cmds[Alias:lower()] = Command.Callback
-    end
-    table.insert(CmdRegistry, Command)
-end
-
 function Cmd.new(Aliases, Description, Usage, Callback)
     if type(Description) == "function" then
         Callback = Description
@@ -138,13 +131,18 @@ function Cmd.new(Aliases, Description, Usage, Callback)
         Usage = Aliases[1] or ""
     end
 
-    local Command = setmetatable({}, Cmd)
-    Command.Aliases = Aliases
-    Command.Description = Description or "No description provided."
-    Command.Usage = Usage or (Aliases[1] or "")
-    Command.Callback = Callback
+    local Command = setmetatable({
+        Aliases = Aliases,
+        Description = Description or "No description provided.",
+        Usage = Usage or (Aliases[1] or ""),
+        Callback = Callback
+    }, Cmd)
 
-    Cmd.Reg(Command)
+    for _, Alias in ipairs(Aliases) do
+        Cmds[Alias:lower()] = Callback
+    end
+
+    table.insert(CmdRegistry, Command)
 
     return Command
 end
@@ -171,8 +169,9 @@ if not IsFolder("CmdPlus/Assets") then
     MakeFolder("CmdPlus/Assets")
 end
 
-local CmdsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Commands/"
-local AssetsURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Assets/"
+local MainURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/"
+local CmdsURL = MainURL .. "Commands/"
+local AssetsURL = MainURL .. "Assets/"
 
 local BuiltInCmds = {
     "Commands.luau",
@@ -510,7 +509,7 @@ local function CreateCommandEnv()
     })
 end
 
-local function LoadCommandFromURL(url)
+local function LoadCmd(url)
     local success, result = pcall(function()
         return game:HttpGet(url)
     end)
@@ -536,7 +535,7 @@ end
 local function LoadCoreCmds()
     for _, cmdFile in ipairs(BuiltInCmds) do
         local url = CmdsURL .. cmdFile
-        LoadCommandFromURL(url)
+        LoadCmd(url)
     end
 end
 
@@ -646,106 +645,8 @@ CreateAutoExec()
 LoadPrefix()
 LoadAutoExec()
 
-Shared.CmdPlus.TagLoaded = false
-
-local function CreateTag()
-    local TUI = {}
-    
-    local function CreateBillboard()
-        local Character = Plr.Character or Plr.CharacterAdded:Wait()
-        local Head = Character:WaitForChild("Head")
-        
-        local TagColor = Color3.fromRGB(51, 101, 255)
-        local DisplayName = "JustAGuest"
-        local Tag = "Owner"
-
-        TUI["OwnerTag"] = Instance.new("BillboardGui")
-        TUI["OwnerTag"]["Active"] = true
-        TUI["OwnerTag"]["Adornee"] = Head
-        TUI["OwnerTag"]["AlwaysOnTop"] = false
-        TUI["OwnerTag"]["LightInfluence"] = 0
-        TUI["OwnerTag"]["MaxDistance"] = 100
-        TUI["OwnerTag"]["Name"] = UID(64)
-        TUI["OwnerTag"]["ResetOnSpawn"] = false
-        TUI["OwnerTag"]["Size"] = UDim2.fromOffset(1000, 34)
-        TUI["OwnerTag"]["StudsOffset"] = Vector3.new(0, 2.5, 0)
-        TUI["OwnerTag"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
-        TUI["OwnerTag"]["Parent"] = Hui
-
-        TUI["TagText"] = Instance.new("TextLabel")
-        TUI["TagText"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
-        TUI["TagText"]["AutomaticSize"] = Enum.AutomaticSize.X
-        TUI["TagText"]["BackgroundColor3"] = Color3.fromRGB(0, 0, 0)
-        TUI["TagText"]["BackgroundTransparency"] = 0
-        TUI["TagText"]["BorderSizePixel"] = 0
-        TUI["TagText"]["FontFace"] = Font.new("rbxasset://fonts/families/Sarpanch.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-        TUI["TagText"]["Name"] = "Tag"
-        TUI["TagText"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
-        TUI["TagText"]["Text"] = Tag .. " • " .. DisplayName
-        TUI["TagText"]["TextColor3"] = TagColor
-        TUI["TagText"]["TextSize"] = 24
-        TUI["TagText"]["TextTransparency"] = 0
-        TUI["TagText"]["Parent"] = TUI["OwnerTag"]
-
-        TUI["TagPadding"] = Instance.new("UIPadding")
-        TUI["TagPadding"]["Name"] = "TagPadding"
-        TUI["TagPadding"]["PaddingLeft"] = UDim.new(0, 4)
-        TUI["TagPadding"]["PaddingRight"] = UDim.new(0, 4)
-        TUI["TagPadding"]["Parent"] = TUI["TagText"]
-
-        TUI["TagConstraint"] = Instance.new("UISizeConstraint")
-        TUI["TagConstraint"]["MaxSize"] = Vector2.new(math.huge, math.huge)
-        TUI["TagConstraint"]["MinSize"] = Vector2.new(100, 34)
-        TUI["TagConstraint"]["Name"] = "TagConstraint"
-        TUI["TagConstraint"]["Parent"] = TUI["TagText"]
-
-        TUI["TagStroke"] = Instance.new("UIStroke")
-        TUI["TagStroke"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-        TUI["TagStroke"]["Color"] = Color3.fromRGB(255, 255, 255)
-        TUI["TagStroke"]["Name"] = "TagStroke"
-        TUI["TagStroke"]["Thickness"] = 2
-        TUI["TagStroke"]["Parent"] = TUI["TagText"]
-
-        TUI["TagStrokeGradient"] = Instance.new("UIGradient")
-        TUI["TagStrokeGradient"]["Color"] = ColorSequence.new{
-            ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 0, 0)),
-            ColorSequenceKeypoint.new(0.499, TagColor),
-            ColorSequenceKeypoint.new(1.000, Color3.fromRGB(0, 0, 0))
-        }
-        TUI["TagStrokeGradient"]["Name"] = "TagStrokeGradient"
-        TUI["TagStrokeGradient"]["Parent"] = TUI["TagStroke"]
-
-        TUI["TagCorner"] = Instance.new("UICorner")
-        TUI["TagCorner"]["CornerRadius"] = UDim.new(0, 3)
-        TUI["TagCorner"]["Name"] = "TagCorner"
-        TUI["TagCorner"]["Parent"] = TUI["TagText"]
-
-        TweenService:Create(TUI["TagStroke"], TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-            Thickness = 4
-        }):Play()
-        
-        TweenService:Create(TUI["TagStroke"], TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-            Thickness = 2
-        }):Play()
-    end
-
-    pcall(CreateBillboard)
-    Plr.CharacterAdded:Connect(function(Character)
-        if TUI["OwnerTag"] then
-            TUI["OwnerTag"]:Destroy()
-            TUI["OwnerTag"] = nil
-        end
-        local Head = Character:WaitForChild("Head", 5)
-        if Head then
-            pcall(CreateBillboard)
-        end
-    end)
-
-    Shared.CmdPlus.TagLoaded = true
-end
-
 pcall(function()
-    CreateTag()
+    loadstring(game:HttpGet(MainURL .. "Tags.luau"))()
 end)
 
 local UI = {}
