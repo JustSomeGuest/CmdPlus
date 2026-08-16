@@ -70,7 +70,7 @@ CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
 end)
 
 local NotifsSuccess, Notifs = pcall(function()
-    local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Stable/Source/Notify.luau"))()
+    local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Main/Source/Notify.luau"))()
     Lib.Settings = {
         Theme = {
             Accent = Color3.fromRGB(255, 255, 255),
