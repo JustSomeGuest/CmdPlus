@@ -2,18 +2,19 @@ if not game:IsLoaded() then
     game.Loaded:Wait() 
 end
 
-local Shared = (function()
-    local Success, Env = pcall(getgenv)
-    return (Success and Env) or _G or (warn("[Shared]: Failed to access a usable global environment.") or {})
-end)()
+local Shared = (type(getgenv) == "function" and getgenv()) or shared or _G
 
 local function UID(Length)
-    local Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    Length = Length or 64
+
+    local Chars = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]]
     local Id = table.create(Length)
+
     for i = 1, Length do
-        local Index = math.random(#Chars)
-        Id[i] = Chars:sub(Index, Index)
+        local Rand = math.random(1, #Chars)
+        Id[i] = Chars:sub(Rand, Rand)
     end
+
     return table.concat(Id)
 end
 
