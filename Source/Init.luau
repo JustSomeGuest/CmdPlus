@@ -18,18 +18,9 @@ local function UID(Length)
     return table.concat(Id)
 end
 
-local WriteFile = writefile or function() end
-local IsFile = isfile or function() return false end
-local DelFile = delfile or function() end
-local IsFolder = isfolder or function() return false end
-local MakeFolder = makefolder or function() end
-local DelFolder = delfolder or function() end
-local ReadFile = readfile or function() return "" end
-local ListFiles = listfiles or function() return {} end
-local LoadAsset = getcustomasset or getsynasset
-
 local function GetService(Service)
-    return cloneref(game:GetService(Service))
+    local Service = game:GetService(Service)
+    return cloneref and cloneref(Service) or Service
 end
 
 local Workspace = GetService("Workspace")
@@ -54,10 +45,20 @@ local Stats = GetService("Stats")
 local Debris = GetService("Debris")
 local Terrain = Workspace:FindFirstChildOfClass("Terrain")
 
+local WriteFile = writefile or function() end
+local IsFile = isfile or function() return false end
+local DelFile = delfile or function() end
+local IsFolder = isfolder or function() return false end
+local MakeFolder = makefolder or function() end
+local DelFolder = delfolder or function() end
+local ReadFile = readfile or function() return "" end
+local ListFiles = listfiles or function() return {} end
+local LoadAsset = getcustomasset or getsynasset
+
 local CmdPlusUI = Instance.new("ScreenGui")
 CmdPlusUI.DisplayOrder = 100
 CmdPlusUI.Enabled = true
-CmdPlusUI.Name = UID(64)
+CmdPlusUI.Name = UID()
 CmdPlusUI.ResetOnSpawn = false
 CmdPlusUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 CmdPlusUI.Parent = Hui
@@ -66,14 +67,6 @@ CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
     if not CmdPlusUI.Enabled then
         CmdPlusUI.Enabled = true
     end
-end)
-
-for _, Descendant in ipairs(CmdPlusUI:GetDescendants()) do
-    Descendant.Name = UID(64)
-end
-
-CmdPlusUI.DescendantAdded:Connect(function(Descendant)
-    Descendant.Name = UID(64)
 end)
 
 local NotifsSuccess, Notifs = pcall(function()
