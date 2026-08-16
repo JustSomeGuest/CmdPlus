@@ -4,6 +4,11 @@ end
 
 local Shared = (type(getgenv) == "function" and getgenv()) or shared or _G
 
+local function GetService(Service)
+    local Service = game:GetService(Service)
+    return cloneref and cloneref(Service) or Service
+end
+
 local function UID(Length)
     Length = Length or 64
 
@@ -16,11 +21,6 @@ local function UID(Length)
     end
 
     return table.concat(Id)
-end
-
-local function GetService(Service)
-    local Service = game:GetService(Service)
-    return cloneref and cloneref(Service) or Service
 end
 
 local Workspace = GetService("Workspace")
