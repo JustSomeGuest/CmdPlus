@@ -1,13 +1,7 @@
 # CmdPlus
 
 ```lua
-local Success, Result = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/Init.luau"))()
-end)
-
-if not Success then
-    error("[CmdPlus]: " .. tostring(Result))
-end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Init"))()
 ```
 
 ## Features
