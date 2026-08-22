@@ -77,19 +77,19 @@ end
 
 Cmd.new({"airwalk", "aw"}, "Enables airwalk.", "airwalk", function()
     if Airwalk.Active then
-        DebugNotif("Airwalk is already active")
+        DebugNotif("Airwalk: Already active")
         return
     end
 
     local char = Players.LocalPlayer.Character
     if not char then
-        DebugNotif("You need a character to start airwalk.")
+        DebugNotif("AirWalk: You need a character to start airwalk")
         return
     end
 
     StartAirwalk(char)
     Airwalk.Active = true
-    DebugNotif("Airwalk enabled")
+    DebugNotif("Airwalk: Enabled")
 
     Airwalk.CharacterConn = Players.LocalPlayer.CharacterAdded:Connect(function(newChar)
         if Airwalk.Active then
@@ -103,8 +103,8 @@ end)
 Cmd.new({"unairwalk", "unaw"}, "Disables airwalk.", "unairwalk", function()
     if Airwalk.Active then
         StopAirwalk()
-        DebugNotif("Airwalk disabled")
+        DebugNotif("Airwalk: Disabled")
     else
-        DebugNotif("Airwalk is not active")
+        DebugNotif("Airwalk: Not active")
     end
 end)
