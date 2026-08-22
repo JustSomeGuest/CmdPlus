@@ -12,7 +12,11 @@ local OriginalLighting = {
     OutdoorAmbient = Lighting.OutdoorAmbient,
     ColorShift_Top = Lighting.ColorShift_Top,
     ColorShift_Bottom = Lighting.ColorShift_Bottom,
-    ShadowSoftness = Lighting.ShadowSoftness
+    ShadowSoftness = Lighting.ShadowSoftness,
+    Technology = Lighting.Technology,
+    GlobalShadows = Lighting.GlobalShadows,
+    EnvironmentDiffuseScale = Lighting.EnvironmentDiffuseScale,
+    EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale,
 }
 
 local OriginalWater = nil
@@ -58,6 +62,10 @@ SunRays.Parent = Lighting
 
 local DOF = Instance.new("DepthOfFieldEffect")
 DOF.Parent = Lighting
+
+local Blur = Instance.new("BlurEffect")
+Blur.Size = 0
+Blur.Parent = Lighting
 
 local RainSound = Instance.new("Sound")
 RainSound.Name = "WeatherRain"
@@ -145,6 +153,7 @@ local function CreatePuddle(Position, Normal)
     local YAxis = ZAxis:Cross(XAxis).Unit
     Puddle.CFrame = CFrame.fromMatrix(Position, XAxis, YAxis, ZAxis)
     Puddle.Parent = Workspace
+
     ActivePuddles[Puddle] = true
 
     local FadeIn = TweenService:Create(Puddle, TweenInfo.new(0.4), {Transparency = 0.35})
@@ -166,12 +175,15 @@ end
 local function SpawnPuddleNearPlayer(Radius)
     local Character = Player.Character
     if not Character then return end
+
     local Root = Character:FindFirstChild("HumanoidRootPart")
     if not Root then return end
+
     local OffsetX = math.random(-Radius, Radius)
     local OffsetZ = math.random(-Radius, Radius)
     local Origin = Root.Position + Vector3.new(OffsetX, 20, OffsetZ)
     local Result = Workspace:Raycast(Origin, Vector3.new(0, -60, 0), RainRaycastFilter)
+
     if Result and Result.Instance then
         CreatePuddle(Result.Position, Result.Normal)
     end
@@ -226,6 +238,7 @@ end
 local function StopRainEffects()
     RainEffectActive = false
     RainEmitter.Rate = 0
+
     if RainLoopConn then
         RainLoopConn:Disconnect()
         RainLoopConn = nil
@@ -249,6 +262,7 @@ local function SetupLight(Character)
         Light.Name = "TorchLight"
         Light.Parent = Root
     end
+
     if CurrentLightConfig then
         Light.Enabled = CurrentLightConfig.Brightness > 0.05
         Light.Brightness = CurrentLightConfig.Brightness
@@ -263,20 +277,25 @@ end
 if Player.Character then
     SetupLight(Player.Character)
 end
+
 Player.CharacterAdded:Connect(SetupLight)
 
 local function ApplyCharacterLight(LightConfig)
     CurrentLightConfig = LightConfig
+
     local Character = Player.Character
     if not Character then return end
+
     local Root = Character:FindFirstChild("HumanoidRootPart")
     if not Root then return end
+
     local Light = Root:FindFirstChild("TorchLight")
     if not Light then
         Light = Instance.new("PointLight")
         Light.Name = "TorchLight"
         Light.Parent = Root
     end
+
     Light.Enabled = LightConfig.Brightness > 0.05
     Light.Brightness = LightConfig.Brightness
     Light.Range = LightConfig.Range
@@ -284,272 +303,307 @@ local function ApplyCharacterLight(LightConfig)
     Light.Shadows = true
 end
 
+local function ApplyGlobalLighting(Tech, DiffuseScale, SpecularScale)
+    Lighting.Technology = Tech or "ShadowMap"
+    Lighting.GlobalShadows = true
+    Lighting.EnvironmentDiffuseScale = DiffuseScale or 1
+    Lighting.EnvironmentSpecularScale = SpecularScale or 1
+end
+
 local TimeOfDay = {
     Night = {
         Emoji = "🌙",
+        Tech = "ShadowMap",
+        DiffuseScale = 0.6,
+        SpecularScale = 1.4,
         Lighting = {
             ClockTime = 0,
-            Brightness = 0.45,
-            ExposureCompensation = -0.55,
-            Ambient = Color3.fromRGB(14, 17, 30),
-            OutdoorAmbient = Color3.fromRGB(22, 28, 50),
-            ColorShift_Top = Color3.fromRGB(38, 55, 105),
-            ColorShift_Bottom = Color3.fromRGB(6, 8, 18),
-            ShadowSoftness = 0.08
+            Brightness = 0.3,
+            ExposureCompensation = -0.5,
+            Ambient = Color3.fromRGB(8, 10, 22),
+            OutdoorAmbient = Color3.fromRGB(18, 22, 48),
+            ColorShift_Top = Color3.fromRGB(30, 45, 100),
+            ColorShift_Bottom = Color3.fromRGB(4, 6, 16),
+            ShadowSoftness = 0.05
         },
         Atmosphere = {
-            Color = Color3.fromRGB(40, 55, 110),
-            Decay = Color3.fromRGB(8, 10, 22),
-            Density = 0.42,
-            Offset = 0.05,
+            Color = Color3.fromRGB(30, 40, 90),
+            Decay = Color3.fromRGB(6, 8, 22),
+            Density = 0.45,
+            Offset = 0,
             Glare = 0,
-            Haze = 1.2
+            Haze = 2.2
         },
         ColorCorrection = {
             Brightness = -0.12,
-            Contrast = 0.38,
-            Saturation = -0.28,
-            TintColor = Color3.fromRGB(170, 188, 235)
+            Contrast = 0.35,
+            Saturation = -0.3,
+            TintColor = Color3.fromRGB(160, 180, 240)
         },
-        Bloom = {Intensity = 0.4, Size = 18, Threshold = 0.85},
+        Bloom = {Intensity = 0.8, Size = 56, Threshold = 0.7},
         SunRays = {Intensity = 0, Spread = 1},
-        DOF = {FocusDistance = 40, InFocusRadius = 55, NearIntensity = 0.12, FarIntensity = 0.18},
+        DOF = {FocusDistance = 60, InFocusRadius = 55, NearIntensity = 0.08, FarIntensity = 0.18},
+        Blur = 0,
         Water = {
-            Color = Color3.fromRGB(10, 22, 50),
-            Transparency = 0.18,
-            Reflectance = 0.55,
+            Color = Color3.fromRGB(8, 18, 45),
+            Transparency = 0.1,
+            Reflectance = 0.9,
             WaveSize = 0.08,
-            WaveSpeed = 6
+            WaveSpeed = 5
         },
-        Light = {Brightness = 2.2, Range = 18, Color = Color3.fromRGB(255, 225, 175)}
+        Light = {Brightness = 2.5, Range = 18, Color = Color3.fromRGB(255, 210, 140)}
     },
     Sunrise = {
         Emoji = "🌅",
+        Tech = "ShadowMap",
+        DiffuseScale = 0.8,
+        SpecularScale = 1.2,
         Lighting = {
             ClockTime = 6,
-            Brightness = 1.35,
-            ExposureCompensation = -0.08,
-            Ambient = Color3.fromRGB(55, 44, 50),
-            OutdoorAmbient = Color3.fromRGB(105, 88, 82),
-            ColorShift_Top = Color3.fromRGB(255, 158, 95),
-            ColorShift_Bottom = Color3.fromRGB(255, 175, 130),
-            ShadowSoftness = 0.22
+            Brightness = 1.2,
+            ExposureCompensation = -0.1,
+            Ambient = Color3.fromRGB(55, 38, 30),
+            OutdoorAmbient = Color3.fromRGB(110, 80, 68),
+            ColorShift_Top = Color3.fromRGB(255, 155, 80),
+            ColorShift_Bottom = Color3.fromRGB(255, 120, 60),
+            ShadowSoftness = 0.12
         },
         Atmosphere = {
-            Color = Color3.fromRGB(255, 158, 100),
-            Decay = Color3.fromRGB(155, 80, 55),
-            Density = 0.38,
+            Color = Color3.fromRGB(255, 155, 90),
+            Decay = Color3.fromRGB(160, 70, 45),
+            Density = 0.42,
             Offset = 0.08,
-            Glare = 0.22,
-            Haze = 1.5
+            Glare = 0.55,
+            Haze = 2.4
         },
         ColorCorrection = {
             Brightness = -0.04,
             Contrast = 0.32,
-            Saturation = 0.28,
-            TintColor = Color3.fromRGB(255, 215, 180)
+            Saturation = 0.38,
+            TintColor = Color3.fromRGB(255, 210, 170)
         },
-        Bloom = {Intensity = 0.55, Size = 28, Threshold = 0.78},
-        SunRays = {Intensity = 0.18, Spread = 0.88},
-        DOF = {FocusDistance = 60, InFocusRadius = 80, NearIntensity = 0.08, FarIntensity = 0.12},
+        Bloom = {Intensity = 1.2, Size = 56, Threshold = 0.72},
+        SunRays = {Intensity = 0.45, Spread = 1},
+        DOF = {FocusDistance = 80, InFocusRadius = 75, NearIntensity = 0.05, FarIntensity = 0.12},
+        Blur = 0,
         Water = {
-            Color = Color3.fromRGB(85, 118, 195),
-            Transparency = 0.16,
-            Reflectance = 0.42,
+            Color = Color3.fromRGB(120, 90, 60),
+            Transparency = 0.15,
+            Reflectance = 0.75,
             WaveSize = 0.1,
-            WaveSpeed = 7
+            WaveSpeed = 6
         },
-        Light = {Brightness = 0.45, Range = 14, Color = Color3.fromRGB(255, 210, 165)}
+        Light = {Brightness = 0.6, Range = 14, Color = Color3.fromRGB(255, 200, 140)}
     },
     Morning = {
         Emoji = "🌄",
+        Tech = "ShadowMap",
+        DiffuseScale = 1.0,
+        SpecularScale = 1.0,
         Lighting = {
             ClockTime = 8.5,
-            Brightness = 1.85,
-            ExposureCompensation = 0.04,
-            Ambient = Color3.fromRGB(72, 74, 82),
-            OutdoorAmbient = Color3.fromRGB(132, 132, 138),
-            ColorShift_Top = Color3.fromRGB(238, 222, 200),
-            ColorShift_Bottom = Color3.fromRGB(228, 222, 210),
-            ShadowSoftness = 0.14
+            Brightness = 2.4,
+            ExposureCompensation = 0.08,
+            Ambient = Color3.fromRGB(72, 70, 75),
+            OutdoorAmbient = Color3.fromRGB(140, 138, 140),
+            ColorShift_Top = Color3.fromRGB(245, 232, 210),
+            ColorShift_Bottom = Color3.fromRGB(238, 230, 220),
+            ShadowSoftness = 0.08
         },
         Atmosphere = {
-            Color = Color3.fromRGB(198, 195, 188),
-            Decay = Color3.fromRGB(118, 118, 125),
-            Density = 0.22,
+            Color = Color3.fromRGB(210, 205, 195),
+            Decay = Color3.fromRGB(130, 128, 135),
+            Density = 0.18,
             Offset = 0.04,
-            Glare = 0.08,
-            Haze = 0.85
-        },
-        ColorCorrection = {
-            Brightness = -0.02,
-            Contrast = 0.28,
-            Saturation = 0.12,
-            TintColor = Color3.fromRGB(252, 245, 235)
-        },
-        Bloom = {Intensity = 0.35, Size = 22, Threshold = 0.88},
-        SunRays = {Intensity = 0.09, Spread = 0.82},
-        DOF = {FocusDistance = 70, InFocusRadius = 95, NearIntensity = 0.05, FarIntensity = 0.09},
-        Water = {
-            Color = Color3.fromRGB(48, 118, 205),
-            Transparency = 0.14,
-            Reflectance = 0.38,
-            WaveSize = 0.1,
-            WaveSpeed = 7
-        },
-        Light = {Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 248, 238)}
-    },
-    Noon = {
-        Emoji = "☀️",
-        Lighting = {
-            ClockTime = 12,
-            Brightness = 2.2,
-            ExposureCompensation = 0.1,
-            Ambient = Color3.fromRGB(88, 90, 98),
-            OutdoorAmbient = Color3.fromRGB(158, 160, 165),
-            ColorShift_Top = Color3.fromRGB(235, 240, 252),
-            ColorShift_Bottom = Color3.fromRGB(220, 228, 248),
-            ShadowSoftness = 0.06
-        },
-        Atmosphere = {
-            Color = Color3.fromRGB(172, 198, 238),
-            Decay = Color3.fromRGB(72, 85, 105),
-            Density = 0.11,
-            Offset = 0.02,
-            Glare = 0.05,
-            Haze = 0.55
+            Glare = 0.12,
+            Haze = 1.2
         },
         ColorCorrection = {
             Brightness = 0.0,
-            Contrast = 0.3,
-            Saturation = 0.14,
-            TintColor = Color3.fromRGB(252, 252, 255)
+            Contrast = 0.22,
+            Saturation = 0.12,
+            TintColor = Color3.fromRGB(255, 248, 238)
         },
-        Bloom = {Intensity = 0.28, Size = 22, Threshold = 0.95},
-        SunRays = {Intensity = 0.1, Spread = 0.85},
-        DOF = {FocusDistance = 80, InFocusRadius = 110, NearIntensity = 0.03, FarIntensity = 0.07},
+        Bloom = {Intensity = 0.45, Size = 36, Threshold = 0.88},
+        SunRays = {Intensity = 0.18, Spread = 0.9},
+        DOF = {FocusDistance = 120, InFocusRadius = 110, NearIntensity = 0.02, FarIntensity = 0.06},
+        Blur = 0,
         Water = {
-            Color = Color3.fromRGB(15, 108, 242),
-            Transparency = 0.1,
-            Reflectance = 0.48,
+            Color = Color3.fromRGB(55, 130, 215),
+            Transparency = 0.12,
+            Reflectance = 0.55,
             WaveSize = 0.1,
             WaveSpeed = 7
         },
-        Light = {Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 255, 255)}
+        Light = {Brightness = 0, Range = 10, Color = Color3.fromRGB(255, 248, 238)}
+    },
+    Noon = {
+        Emoji = "☀️",
+        Tech = "ShadowMap",
+        DiffuseScale = 1.0,
+        SpecularScale = 1.0,
+        Lighting = {
+            ClockTime = 12,
+            Brightness = 4.5,
+            ExposureCompensation = 0.45,
+            Ambient = Color3.fromRGB(95, 96, 108),
+            OutdoorAmbient = Color3.fromRGB(175, 175, 178),
+            ColorShift_Top = Color3.fromRGB(252, 252, 255),
+            ColorShift_Bottom = Color3.fromRGB(230, 238, 255),
+            ShadowSoftness = 0.04
+        },
+        Atmosphere = {
+            Color = Color3.fromRGB(175, 210, 252),
+            Decay = Color3.fromRGB(80, 95, 115),
+            Density = 0.09,
+            Offset = 0.02,
+            Glare = 0.08,
+            Haze = 0.55
+        },
+        ColorCorrection = {
+            Brightness = 0.04,
+            Contrast = 0.18,
+            Saturation = 0.1,
+            TintColor = Color3.fromRGB(255, 255, 255)
+        },
+        Bloom = {Intensity = 0.55, Size = 32, Threshold = 0.95},
+        SunRays = {Intensity = 0.22, Spread = 0.85},
+        DOF = {FocusDistance = 200, InFocusRadius = 180, NearIntensity = 0, FarIntensity = 0.02},
+        Blur = 0,
+        Water = {
+            Color = Color3.fromRGB(15, 120, 255),
+            Transparency = 0.08,
+            Reflectance = 0.65,
+            WaveSize = 0.1,
+            WaveSpeed = 8
+        },
+        Light = {Brightness = 0, Range = 10, Color = Color3.fromRGB(255, 255, 255)}
     },
     Afternoon = {
         Emoji = "🌞",
+        Tech = "ShadowMap",
+        DiffuseScale = 1.0,
+        SpecularScale = 1.0,
         Lighting = {
             ClockTime = 15.5,
-            Brightness = 2.0,
-            ExposureCompensation = 0.06,
-            Ambient = Color3.fromRGB(80, 80, 88),
-            OutdoorAmbient = Color3.fromRGB(142, 142, 148),
-            ColorShift_Top = Color3.fromRGB(242, 232, 212),
-            ColorShift_Bottom = Color3.fromRGB(228, 222, 205),
-            ShadowSoftness = 0.1
+            Brightness = 3.2,
+            ExposureCompensation = 0.28,
+            Ambient = Color3.fromRGB(85, 84, 88),
+            OutdoorAmbient = Color3.fromRGB(155, 152, 148),
+            ColorShift_Top = Color3.fromRGB(252, 242, 225),
+            ColorShift_Bottom = Color3.fromRGB(245, 235, 215),
+            ShadowSoftness = 0.06
         },
         Atmosphere = {
-            Color = Color3.fromRGB(205, 195, 172),
-            Decay = Color3.fromRGB(95, 90, 82),
-            Density = 0.15,
+            Color = Color3.fromRGB(225, 208, 182),
+            Decay = Color3.fromRGB(108, 100, 92),
+            Density = 0.14,
             Offset = 0.03,
-            Glare = 0.07,
-            Haze = 0.82
+            Glare = 0.1,
+            Haze = 0.95
         },
         ColorCorrection = {
-            Brightness = -0.01,
-            Contrast = 0.3,
-            Saturation = 0.16,
-            TintColor = Color3.fromRGB(255, 245, 228)
+            Brightness = 0.02,
+            Contrast = 0.2,
+            Saturation = 0.14,
+            TintColor = Color3.fromRGB(255, 246, 232)
         },
-        Bloom = {Intensity = 0.3, Size = 22, Threshold = 0.92},
-        SunRays = {Intensity = 0.11, Spread = 0.88},
-        DOF = {FocusDistance = 72, InFocusRadius = 100, NearIntensity = 0.04, FarIntensity = 0.08},
+        Bloom = {Intensity = 0.48, Size = 34, Threshold = 0.92},
+        SunRays = {Intensity = 0.2, Spread = 0.88},
+        DOF = {FocusDistance = 150, InFocusRadius = 140, NearIntensity = 0, FarIntensity = 0.03},
+        Blur = 0,
         Water = {
-            Color = Color3.fromRGB(22, 102, 228),
-            Transparency = 0.12,
-            Reflectance = 0.42,
+            Color = Color3.fromRGB(22, 115, 240),
+            Transparency = 0.1,
+            Reflectance = 0.6,
             WaveSize = 0.1,
             WaveSpeed = 7
         },
-        Light = {Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 248, 235)}
+        Light = {Brightness = 0, Range = 10, Color = Color3.fromRGB(255, 246, 232)}
     },
     Sunset = {
         Emoji = "🌇",
+        Tech = "ShadowMap",
+        DiffuseScale = 0.75,
+        SpecularScale = 1.3,
         Lighting = {
             ClockTime = 18.5,
             Brightness = 1.1,
-            ExposureCompensation = -0.12,
-            Ambient = Color3.fromRGB(50, 38, 44),
-            OutdoorAmbient = Color3.fromRGB(88, 68, 62),
-            ColorShift_Top = Color3.fromRGB(255, 108, 52),
-            ColorShift_Bottom = Color3.fromRGB(255, 72, 45),
-            ShadowSoftness = 0.28
+            ExposureCompensation = -0.08,
+            Ambient = Color3.fromRGB(50, 35, 28),
+            OutdoorAmbient = Color3.fromRGB(95, 70, 58),
+            ColorShift_Top = Color3.fromRGB(255, 110, 45),
+            ColorShift_Bottom = Color3.fromRGB(255, 60, 30),
+            ShadowSoftness = 0.14
         },
         Atmosphere = {
-            Color = Color3.fromRGB(255, 118, 72),
-            Decay = Color3.fromRGB(125, 44, 38),
-            Density = 0.44,
+            Color = Color3.fromRGB(255, 118, 65),
+            Decay = Color3.fromRGB(140, 48, 38),
+            Density = 0.52,
             Offset = 0.1,
-            Glare = 0.28,
-            Haze = 1.8
+            Glare = 0.65,
+            Haze = 2.6
         },
         ColorCorrection = {
             Brightness = -0.06,
             Contrast = 0.4,
-            Saturation = 0.38,
-            TintColor = Color3.fromRGB(255, 188, 148)
+            Saturation = 0.5,
+            TintColor = Color3.fromRGB(255, 185, 140)
         },
-        Bloom = {Intensity = 0.65, Size = 30, Threshold = 0.72},
-        SunRays = {Intensity = 0.22, Spread = 0.95},
-        DOF = {FocusDistance = 50, InFocusRadius = 72, NearIntensity = 0.1, FarIntensity = 0.2},
+        Bloom = {Intensity = 1.4, Size = 60, Threshold = 0.68},
+        SunRays = {Intensity = 0.55, Spread = 1},
+        DOF = {FocusDistance = 70, InFocusRadius = 65, NearIntensity = 0.06, FarIntensity = 0.16},
+        Blur = 0,
         Water = {
-            Color = Color3.fromRGB(138, 65, 38),
+            Color = Color3.fromRGB(160, 72, 40),
             Transparency = 0.14,
-            Reflectance = 0.45,
+            Reflectance = 0.85,
             WaveSize = 0.1,
-            WaveSpeed = 7
+            WaveSpeed = 6
         },
-        Light = {Brightness = 1.2, Range = 16, Color = Color3.fromRGB(255, 165, 105)}
+        Light = {Brightness = 1.4, Range = 16, Color = Color3.fromRGB(255, 160, 100)}
     },
     Evening = {
         Emoji = "🌆",
+        Tech = "ShadowMap",
+        DiffuseScale = 0.65,
+        SpecularScale = 1.35,
         Lighting = {
             ClockTime = 20.5,
-            Brightness = 0.75,
+            Brightness = 0.7,
             ExposureCompensation = -0.28,
-            Ambient = Color3.fromRGB(25, 22, 38),
-            OutdoorAmbient = Color3.fromRGB(40, 40, 62),
-            ColorShift_Top = Color3.fromRGB(72, 72, 132),
-            ColorShift_Bottom = Color3.fromRGB(18, 14, 35),
-            ShadowSoftness = 0.12
+            Ambient = Color3.fromRGB(22, 20, 38),
+            OutdoorAmbient = Color3.fromRGB(40, 40, 68),
+            ColorShift_Top = Color3.fromRGB(70, 72, 138),
+            ColorShift_Bottom = Color3.fromRGB(18, 14, 36),
+            ShadowSoftness = 0.08
         },
         Atmosphere = {
-            Color = Color3.fromRGB(78, 82, 148),
-            Decay = Color3.fromRGB(18, 18, 38),
-            Density = 0.45,
-            Offset = 0.06,
-            Glare = 0.04,
-            Haze = 1.55
+            Color = Color3.fromRGB(78, 85, 158),
+            Decay = Color3.fromRGB(18, 18, 40),
+            Density = 0.48,
+            Offset = 0.02,
+            Glare = 0.08,
+            Haze = 2.0
         },
         ColorCorrection = {
-            Brightness = -0.1,
-            Contrast = 0.42,
+            Brightness = -0.08,
+            Contrast = 0.38,
             Saturation = -0.1,
-            TintColor = Color3.fromRGB(195, 198, 242)
+            TintColor = Color3.fromRGB(195, 198, 248)
         },
-        Bloom = {Intensity = 0.5, Size = 22, Threshold = 0.8},
-        SunRays = {Intensity = 0.03, Spread = 0.92},
-        DOF = {FocusDistance = 45, InFocusRadius = 60, NearIntensity = 0.12, FarIntensity = 0.22},
+        Bloom = {Intensity = 0.9, Size = 52, Threshold = 0.72},
+        SunRays = {Intensity = 0.04, Spread = 0.95},
+        DOF = {FocusDistance = 80, InFocusRadius = 72, NearIntensity = 0.06, FarIntensity = 0.2},
+        Blur = 0,
         Water = {
-            Color = Color3.fromRGB(18, 22, 52),
-            Transparency = 0.2,
-            Reflectance = 0.5,
+            Color = Color3.fromRGB(18, 22, 58),
+            Transparency = 0.12,
+            Reflectance = 0.88,
             WaveSize = 0.08,
-            WaveSpeed = 6
+            WaveSpeed = 5
         },
-        Light = {Brightness = 1.8, Range = 18, Color = Color3.fromRGB(255, 208, 158)}
+        Light = {Brightness = 2.0, Range = 18, Color = Color3.fromRGB(255, 210, 155)}
     }
 }
 
@@ -569,38 +623,48 @@ local Weather = {
         SaturationAdd = 0,
         HazeAdd = 0,
         DensityAdd = 0,
+        ContrastAdd = 0,
+        BlurAdd = 0,
         Sound = nil
     },
     Cloudy = {
         Emoji = "☁️",
-        BrightnessMul = 0.78,
+        BrightnessMul = 0.72,
         SaturationAdd = -0.18,
-        HazeAdd = 0.65,
-        DensityAdd = 0.12,
+        HazeAdd = 0.8,
+        DensityAdd = 0.14,
+        ContrastAdd = 0.08,
+        BlurAdd = 0,
         Sound = nil
     },
     Rain = {
         Emoji = "🌧️",
-        BrightnessMul = 0.62,
+        BrightnessMul = 0.55,
         SaturationAdd = -0.22,
-        HazeAdd = 0.9,
-        DensityAdd = 0.18,
+        HazeAdd = 1.1,
+        DensityAdd = 0.22,
+        ContrastAdd = 0.12,
+        BlurAdd = 0,
         Sound = "Rain"
     },
     Thunderstorm = {
         Emoji = "⛈️",
-        BrightnessMul = 0.44,
+        BrightnessMul = 0.38,
         SaturationAdd = -0.32,
-        HazeAdd = 1.25,
-        DensityAdd = 0.28,
+        HazeAdd = 1.6,
+        DensityAdd = 0.32,
+        ContrastAdd = 0.18,
+        BlurAdd = 0,
         Sound = "Thunderstorm"
     },
     Fog = {
         Emoji = "🌫️",
-        BrightnessMul = 0.82,
-        SaturationAdd = -0.08,
-        HazeAdd = 1.8,
-        DensityAdd = 0.35,
+        BrightnessMul = 0.78,
+        SaturationAdd = -0.14,
+        HazeAdd = 2.2,
+        DensityAdd = 0.42,
+        ContrastAdd = -0.05,
+        BlurAdd = 4,
         Sound = nil
     }
 }
@@ -667,14 +731,14 @@ local function StartThunderFlash()
             local OriginalBrightness = ColorCorrection.Brightness
             local OriginalBloom = Bloom.Intensity
 
-            ColorCorrection.Brightness = OriginalBrightness + 0.55
-            Bloom.Intensity = OriginalBloom + 0.5
-            task.wait(0.06)
+            ColorCorrection.Brightness = OriginalBrightness + 0.7
+            Bloom.Intensity = OriginalBloom + 0.6
+            task.wait(0.05)
             ColorCorrection.Brightness = OriginalBrightness
             Bloom.Intensity = OriginalBloom
-            task.wait(0.08)
-            ColorCorrection.Brightness = OriginalBrightness + 0.35
-            task.wait(0.05)
+            task.wait(0.07)
+            ColorCorrection.Brightness = OriginalBrightness + 0.4
+            task.wait(0.04)
             ColorCorrection.Brightness = OriginalBrightness
         end
     end)
@@ -682,6 +746,7 @@ end
 
 local function UpdateWeatherSound(WeatherName)
     local W = Weather[WeatherName]
+
     if W.Sound == "Rain" then
         if not RainSound.IsPlaying then RainSound:Play() end
         ThunderSound:Stop()
@@ -699,6 +764,7 @@ end
 
 local function UpdateWeatherSky(WeatherName)
     local W = Weather[WeatherName]
+
     if W.Sound == "Rain" or W.Sound == "Thunderstorm" then
         if OriginalSky then OriginalSky.Parent = nil end
         StormSky.Parent = Lighting
@@ -712,6 +778,8 @@ local function ApplyCombined(TimeName, WeatherName)
     local T = TimeOfDay[TimeName]
     local W = Weather[WeatherName]
     if not T or not W then return end
+
+    ApplyGlobalLighting(T.Tech, T.DiffuseScale, T.SpecularScale)
 
     Lighting.ClockTime = T.Lighting.ClockTime
     Lighting.Brightness = T.Lighting.Brightness * W.BrightnessMul
@@ -730,7 +798,7 @@ local function ApplyCombined(TimeName, WeatherName)
     Atmosphere.Haze = T.Atmosphere.Haze + W.HazeAdd
 
     ColorCorrection.Brightness = T.ColorCorrection.Brightness
-    ColorCorrection.Contrast = T.ColorCorrection.Contrast
+    ColorCorrection.Contrast = T.ColorCorrection.Contrast + W.ContrastAdd
     ColorCorrection.Saturation = T.ColorCorrection.Saturation + W.SaturationAdd
     ColorCorrection.TintColor = T.ColorCorrection.TintColor
 
@@ -745,6 +813,8 @@ local function ApplyCombined(TimeName, WeatherName)
     DOF.InFocusRadius = T.DOF.InFocusRadius
     DOF.NearIntensity = T.DOF.NearIntensity
     DOF.FarIntensity = T.DOF.FarIntensity
+
+    Blur.Size = T.Blur + W.BlurAdd
 
     if Terrain then
         Terrain.WaterColor = T.Water.Color
@@ -791,12 +861,16 @@ end
 
 local function BlendTime(A, B, t)
     return {
+        Tech = A.Tech,
+        DiffuseScale = lerp(A.DiffuseScale, B.DiffuseScale, t),
+        SpecularScale = lerp(A.SpecularScale, B.SpecularScale, t),
         Lighting = lerpSection(A.Lighting, B.Lighting, t),
         Atmosphere = lerpSection(A.Atmosphere, B.Atmosphere, t),
         ColorCorrection = lerpSection(A.ColorCorrection, B.ColorCorrection, t),
         Bloom = lerpSection(A.Bloom, B.Bloom, t),
         SunRays = lerpSection(A.SunRays, B.SunRays, t),
         DOF = lerpSection(A.DOF, B.DOF, t),
+        Blur = lerp(A.Blur, B.Blur, t),
         Water = lerpSection(A.Water, B.Water, t),
         Light = lerpLight(A.Light, B.Light, t)
     }
@@ -838,6 +912,8 @@ local function UpdateRealistic()
     local Blended = BlendTime(TimeOfDay[nameA], TimeOfDay[nameB], t)
     local W = Weather[CurrentWeatherName]
 
+    ApplyGlobalLighting(Blended.Tech, Blended.DiffuseScale, Blended.SpecularScale)
+
     Lighting.ClockTime = Blended.Lighting.ClockTime
     Lighting.Brightness = Blended.Lighting.Brightness * W.BrightnessMul
     Lighting.ExposureCompensation = Blended.Lighting.ExposureCompensation
@@ -855,7 +931,7 @@ local function UpdateRealistic()
     Atmosphere.Haze = Blended.Atmosphere.Haze + W.HazeAdd
 
     ColorCorrection.Brightness = Blended.ColorCorrection.Brightness
-    ColorCorrection.Contrast = Blended.ColorCorrection.Contrast
+    ColorCorrection.Contrast = Blended.ColorCorrection.Contrast + W.ContrastAdd
     ColorCorrection.Saturation = Blended.ColorCorrection.Saturation + W.SaturationAdd
     ColorCorrection.TintColor = Blended.ColorCorrection.TintColor
 
@@ -870,6 +946,8 @@ local function UpdateRealistic()
     DOF.InFocusRadius = Blended.DOF.InFocusRadius
     DOF.NearIntensity = Blended.DOF.NearIntensity
     DOF.FarIntensity = Blended.DOF.FarIntensity
+
+    Blur.Size = Blended.Blur + W.BlurAdd
 
     if Terrain then
         Terrain.WaterColor = Blended.Water.Color
@@ -917,6 +995,10 @@ local function ResetShader()
     RainSound:Stop()
     ThunderSound:Stop()
 
+    Lighting.Technology = OriginalLighting.Technology
+    Lighting.GlobalShadows = OriginalLighting.GlobalShadows
+    Lighting.EnvironmentDiffuseScale = OriginalLighting.EnvironmentDiffuseScale
+    Lighting.EnvironmentSpecularScale = OriginalLighting.EnvironmentSpecularScale
     Lighting.ClockTime = OriginalLighting.ClockTime
     Lighting.Brightness = OriginalLighting.Brightness
     Lighting.ExposureCompensation = OriginalLighting.ExposureCompensation
@@ -950,6 +1032,7 @@ local function ResetShader()
     Bloom:Destroy()
     SunRays:Destroy()
     DOF:Destroy()
+    Blur:Destroy()
     RainSound:Destroy()
     ThunderSound:Destroy()
     StormSky:Destroy()
@@ -988,6 +1071,7 @@ Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Suppo
     if second then
         local secondTime = ResolveTimeName(second)
         local secondWeather = ResolveWeatherName(second)
+
         if secondTime then timeName = secondTime end
         if secondWeather then weatherName = secondWeather end
     end
@@ -1004,5 +1088,6 @@ Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Suppo
 
     local TimeEmoji = TimeOfDay[CurrentTimeName].Emoji
     local WeatherEmoji = Weather[CurrentWeatherName].Emoji
+
     DebugNotif(WeatherEmoji .. " " .. TimeEmoji .. " Shader set to " .. CurrentWeatherName .. " " .. CurrentTimeName)
 end)
