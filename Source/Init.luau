@@ -59,6 +59,7 @@ local CmdPlusUI = Instance.new("ScreenGui")
 CmdPlusUI.DisplayOrder = 100
 CmdPlusUI.Enabled = true
 CmdPlusUI.Name = UID()
+CmdPlusUI.IgnoreGuiInset = true
 CmdPlusUI.ResetOnSpawn = false
 CmdPlusUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 CmdPlusUI.Parent = Hui
