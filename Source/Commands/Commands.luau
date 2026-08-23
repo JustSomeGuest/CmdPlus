@@ -28,11 +28,11 @@ UI.CmdsUIStroke.Color = Color3.fromRGB(255, 255, 255)
 UI.CmdsUIStroke.Parent = UI.CmdsUI
 
 UI.Shadow = Instance.new("UIShadow")
-UI.Shadow.BlurRadius = UDim.new(0, 24)
+UI.Shadow.BlurRadius = UDim.new(0, 8)
 UI.Shadow.Color = Color3.fromRGB(255, 255, 255)
 UI.Shadow.Offset = UDim2.fromOffset(0, 0)
-UI.Shadow.Spread = UDim2.fromOffset(7, 7)
-UI.Shadow.Transparency = 0.25
+UI.Shadow.Spread = UDim2.fromOffset(0, 0)
+UI.Shadow.Transparency = 0.5
 UI.Shadow.Parent = UI.CmdsUI
 
 UI.CmdsContainer = Instance.new("Frame")
