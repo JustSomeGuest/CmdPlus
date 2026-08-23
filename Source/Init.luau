@@ -325,49 +325,57 @@ end
 
 local function Dragify(DragObject, MoveObject)
     MoveObject = MoveObject or DragObject
-    local dragInput
-    local dragStart
-    local dragging = false
-    local startPos
-    DragObject.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-            dragStart = input.Position
-            dragging = true
-            startPos = MoveObject.AbsolutePosition
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
+
+    local DragInput
+    local DragStart
+    local Dragging = false
+    local StartPos
+
+    DragObject.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            DragStart = Input.Position
+            Dragging = true
+            StartPos = MoveObject.Position
+
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
                 end
             end)
         end
     end)
-    DragObject.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
+
+    DragObject.InputChanged:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            DragInput = Input
         end
     end)
-    UserInputService.InputChanged:Connect(function(input)
-        if not dragging or input ~= dragInput then
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if not Dragging or Input ~= DragInput then
             return
         end
-        local delta = input.Position - dragStart
-        local objectSize = MoveObject.AbsoluteSize
-        local parent = MoveObject.Parent
-        local parentSize = parent.AbsoluteSize
-        local padding = 3
-        local newX = math.clamp(
-            startPos.X + delta.X,
-            padding,
-            parentSize.X - objectSize.X - padding
+
+        local Delta = Input.Position - DragStart
+        local Size = CmdPlusUI.AbsoluteSize
+        local ObjectSize = MoveObject.AbsoluteSize
+        local Padding = 3
+
+        local NewX = math.clamp(
+            StartPos.X.Offset + Delta.X,
+            Padding,
+            Size.X - ObjectSize.X - Padding
         )
-        local newY = math.clamp(
-            startPos.Y + delta.Y,
-            padding,
-            parentSize.Y - objectSize.Y - padding
+
+        local NewY = math.clamp(
+            StartPos.Y.Offset + Delta.Y,
+            Padding,
+            Size.Y - ObjectSize.Y - Padding
         )
-        MoveObject.Position = UDim2.fromOffset(newX, newY)
+
+        MoveObject.Position = UDim2.fromOffset(NewX, NewY)
     end)
 end
 
