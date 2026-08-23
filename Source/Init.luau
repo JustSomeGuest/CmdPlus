@@ -690,10 +690,9 @@ UI.CmdbarCorner.CornerRadius = UDim.new(0, 4)
 UI.CmdbarCorner.Parent = UI.Cmdbar
 
 UI.CmdbarShadow = Instance.new("UIShadow")
-UI.CmdbarShadow.BlurRadius = UDim.new(0, 22)
+UI.CmdbarShadow.BlurRadius = UDim.new(0, 8)
 UI.CmdbarShadow.Color = Color3.fromRGB(255, 255, 255)
-UI.CmdbarShadow.Spread = UDim2.new(0, 2, 0, 2)
-UI.CmdbarShadow.Transparency = 0.25
+UI.CmdbarShadow.Transparency = 0.5
 UI.CmdbarShadow.Parent = UI.Cmdbar
 
 UI.CmdbarPadding = Instance.new("UIPadding")
@@ -725,10 +724,9 @@ UI.CmdBtnStroke.Color = Color3.fromRGB(255, 255, 255)
 UI.CmdBtnStroke.Parent = UI.CmdBtn
 
 UI.CmdBtnShadow = Instance.new("UIShadow")
-UI.CmdBtnShadow.BlurRadius = UDim.new(0, 18)
+UI.CmdBtnShadow.BlurRadius = UDim.new(0, 8)
 UI.CmdBtnShadow.Color = Color3.fromRGB(255, 255, 255)
-UI.CmdBtnShadow.Spread = UDim2.new(0, 4, 0, 4)
-UI.CmdBtnShadow.Transparency = 0.25
+UI.CmdBtnShadow.Transparency = 0.5
 UI.CmdBtnShadow.Parent = UI.CmdBtn
 
 UI.CmdBtnCorner = Instance.new("UICorner")
