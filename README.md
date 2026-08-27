@@ -1,7 +1,7 @@
 # CmdPlus
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Init"))()
+loadstring(game:HttpGet("https://justsomeguest.pages.dev/scripts/cmdplus"))()
 ```
 
 ## Features
