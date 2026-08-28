@@ -1,3 +1,6 @@
+local Players = GetService("Players")
+local RunService = GetService("RunService")
+
 local Airwalk = {
     Active = false,
     Platform = nil,
@@ -7,51 +10,79 @@ local Airwalk = {
     FloorHeight = 0
 }
 
-local function StartAirwalk(character)
+local function StartAirwalk(Character)
     if Airwalk.Platform then
         Airwalk.Platform:Destroy()
     end
 
-    local rootPart = character:WaitForChild("HumanoidRootPart", 5)
-    if not rootPart then return end
+    local RootPart = Character:WaitForChild("HumanoidRootPart", 5)
+    if not RootPart then
+        return
+    end
 
-    local platform = Instance.new("Part")
-    platform.Name = UID(64)
-    platform.Size = Vector3.new(20, 1, 20)
-    platform.Anchored = true
-    platform.CanCollide = true
-    platform.Transparency = 1
-    platform.Parent = workspace
+    local Platform = Instance.new("Part")
+    Platform.Name = UID(64)
+    Platform.Size = Vector3.new(20, 1, 20)
+    Platform.Anchored = true
+    Platform.CanCollide = true
+    Platform.Transparency = 1
+    Platform.Parent = workspace
 
-    Airwalk.Platform = platform
-    Airwalk.FloorHeight = rootPart.Position.Y - 3
+    Airwalk.Platform = Platform
+    Airwalk.FloorHeight = RootPart.Position.Y - 3
 
-    platform.CFrame = CFrame.new(rootPart.Position.X, Airwalk.FloorHeight, rootPart.Position.Z)
+    Platform.CFrame = CFrame.new(
+        RootPart.Position.X,
+        Airwalk.FloorHeight,
+        RootPart.Position.Z
+    )
 
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        Airwalk.StateConn = humanoid.StateChanged:Connect(function(oldState, newState)
-            if newState == Enum.HumanoidStateType.Landed then
-                local root = character:FindFirstChild("HumanoidRootPart")
-                if not root or not Airwalk.Platform then return end
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
 
-                local rayOrigin = root.Position
-                local rayDir = Vector3.new(0, -10, 0)
-                local raycastParams = RaycastParams.new()
-                raycastParams.FilterDescendantsInstances = {character, platform}
-                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+    if Humanoid then
+        Airwalk.StateConn = Humanoid.StateChanged:Connect(function(OldState, NewState)
+            if NewState ~= Enum.HumanoidStateType.Landed then
+                return
+            end
 
-                local result = workspace:Raycast(rayOrigin, rayDir, raycastParams)
-                if result then
-                    Airwalk.FloorHeight = result.Position.Y
-                end
+            local Root = Character:FindFirstChild("HumanoidRootPart")
+
+            if not Root or not Airwalk.Platform then
+                return
+            end
+
+            local RayOrigin = Root.Position
+            local RayDirection = Vector3.new(0, -10, 0)
+
+            local RaycastParams = RaycastParams.new()
+            RaycastParams.FilterDescendantsInstances = {
+                Character,
+                Platform
+            }
+            RaycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+            local Result = workspace:Raycast(
+                RayOrigin,
+                RayDirection,
+                RaycastParams
+            )
+
+            if Result then
+                Airwalk.FloorHeight = Result.Position.Y
             end
         end)
     end
 
     Airwalk.UpdateConn = RunService.Heartbeat:Connect(function()
-        if not rootPart or not Airwalk.Platform then return end
-        Airwalk.Platform.CFrame = CFrame.new(rootPart.Position.X, Airwalk.FloorHeight, rootPart.Position.Z)
+        if not RootPart or not Airwalk.Platform then
+            return
+        end
+
+        Airwalk.Platform.CFrame = CFrame.new(
+            RootPart.Position.X,
+            Airwalk.FloorHeight,
+            RootPart.Position.Z
+        )
     end)
 end
 
@@ -60,51 +91,69 @@ local function StopAirwalk()
         Airwalk.UpdateConn:Disconnect()
         Airwalk.UpdateConn = nil
     end
+
     if Airwalk.StateConn then
         Airwalk.StateConn:Disconnect()
         Airwalk.StateConn = nil
     end
+
     if Airwalk.CharacterConn then
         Airwalk.CharacterConn:Disconnect()
         Airwalk.CharacterConn = nil
     end
+
     if Airwalk.Platform then
         Airwalk.Platform:Destroy()
         Airwalk.Platform = nil
     end
+
     Airwalk.Active = false
 end
 
-Cmd.new({"airwalk", "aw"}, "Enables airwalk.", "airwalk", function()
-    if Airwalk.Active then
-        DebugNotif("Airwalk: Already active")
-        return
+Cmd.new(
+    {"airwalk", "aw"},
+    "Enables airwalk.",
+    "airwalk",
+    function()
+        if Airwalk.Active then
+            Notify("Airwalk: Already active")
+            return
+        end
+
+        local Character = Players.LocalPlayer.Character
+
+        if not Character then
+            Notify("Airwalk: You need a character to start airwalk")
+            return
+        end
+
+        StartAirwalk(Character)
+
+        Airwalk.Active = true
+        Notify("Airwalk: Enabled")
+
+        Airwalk.CharacterConn = Players.LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
+            if not Airwalk.Active then
+                return
+            end
+
+            StopAirwalk()
+            StartAirwalk(NewCharacter)
+            Airwalk.Active = true
+        end)
     end
+)
 
-    local char = Players.LocalPlayer.Character
-    if not char then
-        DebugNotif("AirWalk: You need a character to start airwalk")
-        return
-    end
-
-    StartAirwalk(char)
-    Airwalk.Active = true
-    DebugNotif("Airwalk: Enabled")
-
-    Airwalk.CharacterConn = Players.LocalPlayer.CharacterAdded:Connect(function(newChar)
+Cmd.new(
+    {"unairwalk", "unaw"},
+    "Disables airwalk.",
+    "unairwalk",
+    function()
         if Airwalk.Active then
             StopAirwalk()
-            StartAirwalk(newChar)
-            Airwalk.Active = true
+            Notify("Airwalk: Disabled")
+        else
+            Notify("Airwalk: Not active")
         end
-    end)
-end)
-
-Cmd.new({"unairwalk", "unaw"}, "Disables airwalk.", "unairwalk", function()
-    if Airwalk.Active then
-        StopAirwalk()
-        DebugNotif("Airwalk: Disabled")
-    else
-        DebugNotif("Airwalk: Not active")
     end
-end)
+)
