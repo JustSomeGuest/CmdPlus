@@ -2,7 +2,7 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local Shared = (type(getgenv) == "function" and getgenv()) or shared or _G
+local Env = (type(getgenv) == "function" and getgenv()) or shared or _G
 
 local function GetService(Name)
     local Svc = game:GetService(Name)
@@ -90,7 +90,7 @@ if not NotifsSuccess then
     warn("[CmdPlus] Failed to load Notify library, falling back to StarterGui notifications")
 end
 
-local function DebugNotif(Text)
+local function Notify(Text)
     if NotifsSuccess then
         local success = pcall(function()
             Notifs:Notify("CmdPlus", Text)
@@ -108,10 +108,10 @@ local function DebugNotif(Text)
     })
 end
 
-Shared.CmdPlus = Shared.CmdPlus or {}
-Shared.CmdPlus.Cmds = Shared.CmdPlus.Cmds or {}
+Env.CmdPlus = Env.CmdPlus or {}
+Env.CmdPlus.Cmds = Env.CmdPlus.Cmds or {}
 
-local Cmds = Shared.CmdPlus.Cmds
+local Cmds = Env.CmdPlus.Cmds
 local CmdRegistry = {}
 local Cmd = {}
 Cmd.__index = Cmd
@@ -361,7 +361,7 @@ local function Dragify(DragObject, MoveObject)
         local Delta = Input.Position - DragStart
         local Size = CmdPlusUI.AbsoluteSize
         local ObjectSize = MoveObject.AbsoluteSize
-        local Padding = 3
+        local Padding = 12
 
         local NewX = math.clamp(
             StartPos.X.Offset + Delta.X,
@@ -380,10 +380,10 @@ local function Dragify(DragObject, MoveObject)
 end
 
 local function CreateCommandEnv()
-    local Env = {
-        UID = UID,
+    local ModEnv = setmetatable({
         CmdPlusUI = CmdPlusUI,
         GetService = GetService,
+        UID = UID,
         Cmd = Cmd,
         Cmds = Cmds,
         CmdRegistry = CmdRegistry,
@@ -394,29 +394,8 @@ local function CreateCommandEnv()
         GetAsset = GetAsset,
         Tween = Tween,
         Dragify = Dragify,
-
-        Workspace = Workspace,
-        Players = Players,
-        ReplicatedStorage = ReplicatedStorage,
-        RunService = RunService,
-        StarterGui = StarterGui,
-        CoreGui = CoreGui,
-        Hui = Hui,
-        SoundService = SoundService,
-        TweenService = TweenService,
-        UserInputService = UserInputService,
-        GuiService = GuiService,
-        TextService = TextService,
-        HttpService = HttpService,
-        MarketplaceService = MarketplaceService,
-        TeleportService = TeleportService,
-        TextChatService = TextChatService,
-        VoiceChatService = VoiceChatService,
-        Stats = Stats,
-        Debris = Debris,
-        Lighting = Lighting,
-        Terrain = Terrain,
-
+        Notify = Notify,
+        FindPlr = FindPlr,
         WriteFile = WriteFile,
         ReadFile = ReadFile,
         IsFile = IsFile,
@@ -425,91 +404,14 @@ local function CreateCommandEnv()
         MakeFolder = MakeFolder,
         DelFolder = DelFolder,
         ListFiles = ListFiles,
-        DebugNotif = DebugNotif,
-        FindPlr = FindPlr,
-
-        print = print,
-        warn = warn,
-        error = error,
-        assert = assert,
-        pcall = pcall,
-        xpcall = xpcall,
-        select = select,
-        type = type,
-        typeof = typeof,
-        tostring = tostring,
-        tonumber = tonumber,
-        rawset = rawset,
-        rawget = rawget,
-        rawequal = rawequal,
-        rawlen = rawlen,
-        setmetatable = setmetatable,
-        getmetatable = getmetatable,
-        unpack = unpack or table.unpack,
-        require = require,
-        collectgarbage = collectgarbage,
-        loadstring = loadstring,
-        newproxy = newproxy,
-
-        pairs = pairs,
-        ipairs = ipairs,
-        next = next,
-        table = table,
-        string = string,
-        math = math,
-        os = os,
-        coroutine = coroutine,
-        utf8 = utf8,
-        bit32 = bit32,
-        debug = debug,
-
-        game = game,
-        workspace = workspace,
-        script = script,
-        task = task,
-        delay = delay,
-        spawn = spawn,
-        wait = wait,
-        tick = tick,
-        time = time,
-        elapsedTime = elapsedTime,
-
-        Vector2 = Vector2,
-        Vector3 = Vector3,
-        Vector2int16 = Vector2int16,
-        Vector3int16 = Vector3int16,
-        CFrame = CFrame,
-        Color3 = Color3,
-        ColorSequence = ColorSequence,
-        ColorSequenceKeypoint = ColorSequenceKeypoint,
-        NumberSequence = NumberSequence,
-        NumberSequenceKeypoint = NumberSequenceKeypoint,
-        NumberRange = NumberRange,
-        UDim = UDim,
-        UDim2 = UDim2,
-        Rect = Rect,
-        Region3 = Region3,
-        Region3int16 = Region3int16,
-        BrickColor = BrickColor,
-        Enum = Enum,
-        Instance = Instance,
-        Ray = Ray,
-        Axes = Axes,
-        Faces = Faces,
-        PhysicalProperties = PhysicalProperties,
-        TweenInfo = TweenInfo,
-        DateTime = DateTime,
-        Random = Random,
-        Font = Font,
-        OverlapParams = OverlapParams,
-        RaycastParams = RaycastParams,
-    }
-
-    local RealEnv = getfenv()
-    return setmetatable(Env, {
-        __index = RealEnv,
-        __newindex = RealEnv,
+        Hui = Hui,
+        Terrain = Terrain,
+    }, {
+        __index = getfenv(0),
+        __newindex = getfenv(0),
     })
+
+    return ModEnv
 end
 
 local function LoadCmd(url)
@@ -829,7 +731,7 @@ local function RunCmdbarInput()
     if CmdFunc then
         pcall(CmdFunc, Args)
     else
-        DebugNotif('"' .. (Args[1] or Text) .. '" isn\'t a valid command.')
+        Notify('"' .. (Args[1] or Text) .. '" isn\'t a valid command.')
     end
 end
 
