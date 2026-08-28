@@ -375,7 +375,7 @@ local function Dragify(DragObject, MoveObject)
     end)
 end
 
-local function CreateCommandEnv()
+local function CreateCmdEnv()
     local ModEnv = setmetatable({
         CmdPlusUI = CmdPlusUI,
         GetService = GetService,
@@ -417,7 +417,7 @@ local function LoadCmd(url)
     if success and result then
         local func, err = loadstring(result)
         if func then
-            local env = CreateCommandEnv()
+            local env = CreateCmdEnv()
             setfenv(func, env)
             local success, err = pcall(func)
             if not success then
@@ -449,7 +449,7 @@ local function LoadUserCmds()
                     local content = ReadFile(file)
                     local func = loadstring(content)
                     if func then
-                        local env = CreateCommandEnv()
+                        local env = CreateCmdEnv()
                         setfenv(func, env)
                         return func()
                     end
@@ -468,7 +468,7 @@ local function LoadAutoConfig()
             local content = ReadFile("CmdPlus/Autoload.luau")
             local func = loadstring(content)
             if func then
-                local env = CreateCommandEnv()
+                local env = CreateCmdEnv()
                 setfenv(func, env)
                 return func()
             end
@@ -495,7 +495,7 @@ local function LoadAutoExec()
         if success and content then
             local func, err = loadstring(content)
             if func then
-                local env = CreateCommandEnv()
+                local env = CreateCmdEnv()
                 setfenv(func, env)
                 local success, result = pcall(func)
                 if success and type(result) == "table" then
