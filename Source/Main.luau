@@ -206,34 +206,6 @@ local Assets = {
     ["CmdPlus/Assets/CmdPlus_Thunder.mp3"] = AssetsURL .. "Thunder.mp3",
 }
 
-local function AssetHttpGet(url)
-    local RequestFunc = http_request or request or (syn and syn.request)
-
-    if not RequestFunc then
-        local success, result = pcall(function()
-            return game:HttpGet(url)
-        end)
-
-        if success then
-            return {
-                Success = true,
-                Body = result,
-            }
-        end
-
-        return nil
-    end
-
-    local success, result = pcall(function()
-        return RequestFunc({
-            Url = url,
-            Method = "GET",
-        })
-    end)
-
-    return success and result or nil
-end
-
 local function GetAsset(Path)
     if not LoadAsset then
         warn("[CmdPlus] getcustomasset/getsynasset not supported by this executor")
@@ -241,6 +213,7 @@ local function GetAsset(Path)
     end
 
     local RemoteURL = Assets[Path]
+
     if not RemoteURL then
         warn("[CmdPlus] No asset registered for path: " .. Path)
         return nil
@@ -251,7 +224,30 @@ local function GetAsset(Path)
     end
 
     if not IsFile(Path) then
-        local Response = AssetHttpGet(RemoteURL)
+        local RequestFunc = http_request or request or (syn and syn.request)
+        local Response
+
+        if RequestFunc then
+            local Success, Result = pcall(function()
+                return RequestFunc({
+                    Url = RemoteURL,
+                    Method = "GET",
+                })
+            end)
+
+            Response = Success and Result or nil
+        else
+            local Success, Result = pcall(function()
+                return game:HttpGet(RemoteURL)
+            end)
+
+            if Success then
+                Response = {
+                    Success = true,
+                    Body = Result,
+                }
+            end
+        end
 
         if not Response or not Response.Success or not Response.Body then
             warn("[CmdPlus] Failed to download asset: " .. Path)
@@ -261,12 +257,12 @@ local function GetAsset(Path)
         WriteFile(Path, Response.Body)
     end
 
-    local success, result = pcall(function()
+    local Success, Result = pcall(function()
         return LoadAsset(Path)
     end)
 
-    if success then
-        return result
+    if Success then
+        return Result
     end
 
     warn("[CmdPlus] Failed to load local asset: " .. Path)
