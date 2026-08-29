@@ -1,47 +1,59 @@
-local LocalPlayer = Players.LocalPlayer
-
 local function GetRootPart()
-	local Character = LocalPlayer.Character
-	if not Character then
-		return nil, "You need a character."
-	end
+    local Character = Plr.Character
 
-	local RootPart = Character:FindFirstChild("HumanoidRootPart")
-	if not RootPart then
-		return nil, "Could not find HumanoidRootPart."
-	end
+    if not Character then
+        return nil, "You need a character."
+    end
 
-	return RootPart
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+    if not RootPart then
+        return nil, "Could not find HumanoidRootPart."
+    end
+
+    return RootPart
 end
 
-Cmd.new({"freeze"}, "Freezes your character.", "freeze", function()
-	local RootPart, Error = GetRootPart()
-	if not RootPart then
-		DebugNotif("Freeze: " .. Error)
-		return
-	end
+Cmd.new(
+    {"freeze"},
+    "Freezes your character.",
+    "freeze",
+    function()
+        local RootPart, Error = GetRootPart()
 
-	if RootPart.Anchored then
-		DebugNotif("Freeze: You're already frozen.")
-		return
-	end
+        if not RootPart then
+            Notify("Freeze: " .. Error)
+            return
+        end
 
-	RootPart.Anchored = true
-	DebugNotif("Freeze: Character frozen.")
-end)
+        if RootPart.Anchored then
+            Notify("Freeze: You're already frozen.")
+            return
+        end
 
-Cmd.new({"unfreeze"}, "Unfreezes your character.", "unfreeze", function()
-	local RootPart, Error = GetRootPart()
-	if not RootPart then
-		DebugNotif("Unfreeze: " .. Error)
-		return
-	end
+        RootPart.Anchored = true
+        Notify("Freeze: Character frozen.")
+    end
+)
 
-	if not RootPart.Anchored then
-		DebugNotif("Unfreeze: You're already unfrozen.")
-		return
-	end
+Cmd.new(
+    {"unfreeze"},
+    "Unfreezes your character.",
+    "unfreeze",
+    function()
+        local RootPart, Error = GetRootPart()
 
-	RootPart.Anchored = false
-	DebugNotif("Unfreeze: Character unfrozen.")
-end)
+        if not RootPart then
+            Notify("Unfreeze: " .. Error)
+            return
+        end
+
+        if not RootPart.Anchored then
+            Notify("Unfreeze: You're already unfrozen.")
+            return
+        end
+
+        RootPart.Anchored = false
+        Notify("Unfreeze: Character unfrozen.")
+    end
+)
