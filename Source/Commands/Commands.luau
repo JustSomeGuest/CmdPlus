@@ -224,7 +224,7 @@ local IsOpen = false
 
 Dragify(UI.Topbar, UI.CmdsUI)
 
-local function ClearCommandEntries()
+local function ClearCmdEntries()
     for _, Child in ipairs(UI.CmdsList:GetChildren()) do
         if Child:IsA("Frame") and Child ~= UI.CmdTemplate then
             Child:Destroy()
@@ -232,103 +232,146 @@ local function ClearCommandEntries()
     end
 end
 
-local function FormatCommandTitle(Command, CurrentPrefix)
-    local Primary = CurrentPrefix .. Command.Aliases[1]
-    if #Command.Aliases > 1 then
+local function FormatCmdTitle(Cmd, CurrentPrefix)
+    local Primary = CurrentPrefix .. Cmd.Aliases[1]
+
+    if #Cmd.Aliases > 1 then
         local Extra = {}
-        for i = 2, #Command.Aliases do
-            table.insert(Extra, CurrentPrefix .. Command.Aliases[i])
+
+        for Index = 2, #Cmd.Aliases do
+            table.insert(
+                Extra,
+                CurrentPrefix .. Cmd.Aliases[Index]
+            )
         end
+
         return Primary .. " (" .. table.concat(Extra, ", ") .. ")"
     end
+
     return Primary
 end
 
-local function PopulateCommands()
-    ClearCommandEntries()
+local function PopulateCmds()
+    ClearCmdEntries()
 
     local CurrentPrefix = GetPrefix()
+    local SortedCmds = {}
 
-    local SortedCommands = {}
-    for _, Command in ipairs(CmdRegistry) do
-        table.insert(SortedCommands, Command)
+    for _, Cmd in ipairs(CmdRegistry) do
+        table.insert(SortedCmds, Cmd)
     end
 
-    table.sort(SortedCommands, function(a, b)
-        return a.Aliases[1]:lower() < b.Aliases[1]:lower()
+    table.sort(SortedCmds, function(CmdA, CmdB)
+        return CmdA.Aliases[1]:lower() < CmdB.Aliases[1]:lower()
     end)
 
-    for Index, Command in ipairs(SortedCommands) do
+    for Index, Cmd in ipairs(SortedCmds) do
         local Entry = UI.CmdTemplate:Clone()
-        
-        local TitleLabel, DescLabel
-        for _, child in ipairs(Entry:GetDescendants()) do
-            if child:IsA("TextLabel") then
-                if child.LayoutOrder == 1 then
-                    TitleLabel = child
-                elseif child.LayoutOrder == 2 then
-                    DescLabel = child
+
+        local TitleLabel
+        local DescLabel
+
+        for _, Child in ipairs(Entry:GetDescendants()) do
+            if Child:IsA("TextLabel") then
+                if Child.LayoutOrder == 1 then
+                    TitleLabel = Child
+                elseif Child.LayoutOrder == 2 then
+                    DescLabel = Child
                 end
             end
         end
-        
+
         if TitleLabel then
-            TitleLabel.Text = FormatCommandTitle(Command, CurrentPrefix)
+            TitleLabel.Text = FormatCmdTitle(Cmd, CurrentPrefix)
         end
+
         if DescLabel then
-            local Usage = Command.Usage:gsub("<", "&lt;"):gsub(">", "&gt;")
-            DescLabel.Text = Command.Description .. "\nUsage: " .. CurrentPrefix .. Usage
+            local Usage = Cmd.Usage
+                :gsub("<", "&lt;")
+                :gsub(">", "&gt;")
+
+            DescLabel.Text =
+                Cmd.Description
+                .. "\nUsage: "
+                .. CurrentPrefix
+                .. Usage
         end
-        
+
         Entry.LayoutOrder = Index
         Entry.Visible = true
         Entry.Parent = UI.CmdsList
     end
 end
 
-local function ShowCommands()
-    if IsOpen then return end
+local function ShowCmds()
+    if IsOpen then
+        return
+    end
+
     IsOpen = true
 
     UI.CmdsUI.Visible = true
     UI.CmdsUI.GroupTransparency = 1
     UI.CmdsUI.Size = UDim2.new(0, 0, 0, 0)
 
-    PopulateCommands()
+    PopulateCmds()
 
-    local T1 = Tween(UI.CmdsUI, 0.35, {
-        GroupTransparency = 0,
-        Size = UDim2.new(0.5, 0, 0.8, 0)
-    }, "Back", "Out")
+    local ShowTween = Tween(
+        UI.CmdsUI,
+        0.35,
+        {
+            GroupTransparency = 0,
+            Size = UDim2.new(0.5, 0, 0.8, 0)
+        },
+        "Back",
+        "Out"
+    )
 
-    T1:Play()
+    ShowTween:Play()
 end
 
-local function HideCommands()
-    if not IsOpen then return end
+local function HideCmds()
+    if not IsOpen then
+        return
+    end
+
     IsOpen = false
 
-    local HideTween = Tween(UI.CmdsUI, 0.25, {
-        GroupTransparency = 1,
-        Size = UDim2.new(0, 0, 0, 0)
-    }, "Quad", "In")
+    local HideTween = Tween(
+        UI.CmdsUI,
+        0.25,
+        {
+            GroupTransparency = 1,
+            Size = UDim2.new(0, 0, 0, 0)
+        },
+        "Quad",
+        "In"
+    )
 
     HideTween:Play()
 
     task.spawn(function()
         HideTween.Completed:Wait()
-        UI.CmdsUI.Visible = false
+
+        if not IsOpen then
+            UI.CmdsUI.Visible = false
+        end
     end)
 end
 
 UI.Close.MouseButton1Click:Connect(function()
-    HideCommands()
+    HideCmds()
 end)
 
-Cmd.new({"commands", "cmds"}, "Opens a scrollable list of all available commands.", "commands", function(Args)
-    if IsOpen then
-        HideCommands()
-    else
-        ShowCommands()
+Cmd.new(
+    {"commands", "cmds"},
+    "Opens a scrollable list of all available commands.",
+    "commands",
+    function()
+        if IsOpen then
+            HideCmds()
+        else
+            ShowCmds()
+        end
     end
-end)
+)
