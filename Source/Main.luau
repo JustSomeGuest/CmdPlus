@@ -294,6 +294,8 @@ local function GetGlobalPrefix()
     return Prefix
 end
 
+local Plr = Players.LocalPlayer
+
 local function FindPlr(searchTerm)
     local matches = {}
     local searchLower = searchTerm:lower()
@@ -391,6 +393,7 @@ local function CreateCmdEnv()
         Tween = Tween,
         Dragify = Dragify,
         Notify = Notify,
+        Plr = Plr,
         FindPlr = FindPlr,
         WriteFile = WriteFile,
         ReadFile = ReadFile,
@@ -536,8 +539,6 @@ local function LoadPrefix()
         end
     end
 end
-
-local Plr = Players.LocalPlayer
 
 LoadCoreCmds()
 LoadUserCmds()
