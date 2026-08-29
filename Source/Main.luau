@@ -142,7 +142,7 @@ function Cmd.new(Aliases, Description, Usage, Callback)
     return Command
 end
 
-local function GetCommandList()
+local function GetCmdList()
     local List = {}
     for _, Command in ipairs(CmdRegistry) do
         table.insert(List, {
@@ -383,7 +383,7 @@ local function CreateCmdEnv()
         Cmd = Cmd,
         Cmds = Cmds,
         CmdRegistry = CmdRegistry,
-        GetCommandList = GetCommandList,
+        GetCmdList = GetCmdList,
         Prefix = Prefix,
         SetPrefix = SetGlobalPrefix,
         GetPrefix = GetGlobalPrefix,
