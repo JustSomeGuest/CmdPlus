@@ -1,61 +1,90 @@
-local AntiEquipConns = {}
-local AntiEquipActive = false
+local AntiEquip = {
+    Active = false,
+    CharacterConn = nil,
+    ToolConn = nil
+}
 
-local function BlockTool(Tool)
-    local Backpack = Plr:FindFirstChild("Backpack")
-
-    if Backpack then
-        Tool.Parent = Backpack
-    else
-        Tool.Parent = nil
+local function HookAntiEquip(Character)
+    if AntiEquip.ToolConn then
+        AntiEquip.ToolConn:Disconnect()
+        AntiEquip.ToolConn = nil
     end
-end
 
-local function HookCharacter(Character)
-    AntiEquipConns[#AntiEquipConns + 1] = Character.ChildAdded:Connect(function(Child)
-        if AntiEquipActive and Child:IsA("Tool") then
-            BlockTool(Child)
+    AntiEquip.ToolConn = Character.ChildAdded:Connect(function(Child)
+        if not AntiEquip.Active or not Child:IsA("Tool") then
+            return
+        end
+
+        local Backpack = Plr:FindFirstChild("Backpack")
+
+        if Backpack then
+            Child.Parent = Backpack
+        else
+            Child.Parent = nil
         end
     end)
 
     for _, Child in ipairs(Character:GetChildren()) do
         if Child:IsA("Tool") then
-            BlockTool(Child)
+            local Backpack = Plr:FindFirstChild("Backpack")
+
+            if Backpack then
+                Child.Parent = Backpack
+            else
+                Child.Parent = nil
+            end
         end
     end
 end
 
-local function AntiEquip()
-    for _, Connection in ipairs(AntiEquipConns) do
-        Connection:Disconnect()
+local function StartAntiEquip()
+    if AntiEquip.Active then
+        Notify("AntiEquip: Already active")
+        return
     end
-
-    AntiEquipConns = {}
-    AntiEquipActive = true
 
     local Character = Plr.Character
 
-    if Character then
-        HookCharacter(Character)
+    if not Character then
+        Notify("AntiEquip: You need a character to start AntiEquip")
+        return
     end
 
-    AntiEquipConns[#AntiEquipConns + 1] = Plr.CharacterAdded:Connect(function(Character)
-        if AntiEquipActive then
-            HookCharacter(Character)
+    AntiEquip.Active = true
+    HookAntiEquip(Character)
+
+    if AntiEquip.CharacterConn then
+        AntiEquip.CharacterConn:Disconnect()
+    end
+
+    AntiEquip.CharacterConn = Plr.CharacterAdded:Connect(function(NewCharacter)
+        if not AntiEquip.Active then
+            return
         end
+
+        HookAntiEquip(NewCharacter)
     end)
 
     Notify("AntiEquip: Enabled")
 end
 
-local function UnAntiEquip()
-    AntiEquipActive = false
-
-    for _, Connection in ipairs(AntiEquipConns) do
-        Connection:Disconnect()
+local function StopAntiEquip()
+    if not AntiEquip.Active then
+        Notify("AntiEquip: Not active")
+        return
     end
 
-    AntiEquipConns = {}
+    AntiEquip.Active = false
+
+    if AntiEquip.ToolConn then
+        AntiEquip.ToolConn:Disconnect()
+        AntiEquip.ToolConn = nil
+    end
+
+    if AntiEquip.CharacterConn then
+        AntiEquip.CharacterConn:Disconnect()
+        AntiEquip.CharacterConn = nil
+    end
 
     Notify("AntiEquip: Disabled")
 end
@@ -64,12 +93,12 @@ Cmd.new(
     {"antiequip", "preventtools", "prevtools"},
     "Prevents you from equipping tools.",
     "antiequip",
-    AntiEquip
+    StartAntiEquip
 )
 
 Cmd.new(
     {"unantiequip", "unpreventtools", "unprevtools"},
     "Allows you to equip tools again.",
     "unantiequip",
-    UnAntiEquip
+    StopAntiEquip
 )
