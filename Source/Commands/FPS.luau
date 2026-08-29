@@ -1,15 +1,22 @@
-Cmd.new({"fps"}, "Shows your current FPS.", "fps", function()
-	local Frames = 0
-	local Start = tick()
+local RunService = GetService("RunService")
 
-	local Connection = RunService.RenderStepped:Connect(function()
-		Frames += 1
-	end)
+Cmd.new(
+    {"fps"},
+    "Shows your current FPS.",
+    "fps",
+    function()
+        local Frames = 0
+        local Start = tick()
 
-	task.wait(1)
+        local Connection = RunService.RenderStepped:Connect(function()
+            Frames += 1
+        end)
 
-	Connection:Disconnect()
+        task.wait(1)
 
-	local FPS = math.round(Frames / (tick() - Start))
-	DebugNotif("FPS: " .. FPS)
-end)
+        Connection:Disconnect()
+
+        local FPS = math.round(Frames / (tick() - Start))
+        Notify("FPS: " .. FPS)
+    end
+)
