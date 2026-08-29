@@ -1,39 +1,54 @@
 local SpinConnection
 
-Cmd.new({"spin"}, "Spins your character.", "spin <speed>", function(Args)
-	local Speed = tonumber(Args[2])
-	if not Speed then
-		DebugNotif("Spin: Usage: .spin <speed>")
-		return
-	end
+Cmd.new(
+    {"spin"},
+    "Spins your character.",
+    "spin <speed>",
+    function(Args)
+        local Speed = tonumber(Args[2])
 
-	local Character = Players.LocalPlayer.Character
-	local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
-	if not RootPart then
-		DebugNotif("Spin: Could not find HumanoidRootPart.")
-		return
-	end
+        if not Speed then
+            Notify("Spin: Usage: .spin <speed>")
+            return
+        end
 
-	if SpinConnection then
-		SpinConnection:Disconnect()
-	end
+        if SpinConnection then
+            Notify("Spin: Already active")
+            return
+        end
 
-	local BodyGyro = Instance.new("BodyAngularVelocity")
-	BodyGyro.MaxTorque = Vector3.new(0, 400000, 0)
-	BodyGyro.AngularVelocity = Vector3.new(0, math.rad(Speed), 0)
-	BodyGyro.Parent = RootPart
+        local Character = Plr.Character
+        local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
 
-	SpinConnection = BodyGyro
+        if not RootPart then
+            Notify("Spin: Could not find HumanoidRootPart.")
+            return
+        end
 
-	DebugNotif("Spin: Now spinning at " .. Speed .. ".")
-end)
+        local BodyAngularVelocity = Instance.new("BodyAngularVelocity")
+        BodyAngularVelocity.MaxTorque = Vector3.new(0, 400000, 0)
+        BodyAngularVelocity.AngularVelocity = Vector3.new(0, math.rad(Speed), 0)
+        BodyAngularVelocity.Parent = RootPart
 
-Cmd.new({"unspin"}, "Stops spinning.", "unspin", function()
-	if SpinConnection then
-		SpinConnection:Destroy()
-		SpinConnection = nil
-		DebugNotif("Spin: Stopped spinning.")
-	else
-		DebugNotif("Spin: You're not spinning.")
-	end
-end)
+        SpinConnection = BodyAngularVelocity
+
+        Notify("Spin: Now spinning at " .. Speed .. ".")
+    end
+)
+
+Cmd.new(
+    {"unspin"},
+    "Stops spinning.",
+    "unspin",
+    function()
+        if not SpinConnection then
+            Notify("Spin: Not active")
+            return
+        end
+
+        SpinConnection:Destroy()
+        SpinConnection = nil
+
+        Notify("Spin: Stopped spinning.")
+    end
+)
