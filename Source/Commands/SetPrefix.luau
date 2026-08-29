@@ -1,22 +1,30 @@
-Cmd.new({"setprefix", "prefix"}, "Changes the command prefix to a single non-letter character.", "setprefix <prefix>", function(Args)
-    local newPrefix = Args[2]
-    if not newPrefix then
-        DebugNotif("Usage: .setprefix <prefix>")
-        return
-    end
+Cmd.new(
+    {"setprefix", "prefix"},
+    "Changes the command prefix to a single non-letter character.",
+    "setprefix <prefix>",
+    function(Args)
+        local NewPrefix = Args[2]
 
-    if #newPrefix ~= 1 then
-        DebugNotif("Prefix must be a single character")
-        return
-    end
+        if not NewPrefix then
+            Notify("Usage: .setprefix <prefix>")
+            return
+        end
 
-    local char = string.sub(newPrefix, 1, 1)
-    if char:match("%a") then
-        DebugNotif("Prefix cannot be a letter")
-        return
-    end
+        if #NewPrefix ~= 1 then
+            Notify("Prefix must be a single character")
+            return
+        end
 
-    SetPrefix(char)
-    WriteFile("SimpleCMDS/Prefix.luau", char)
-    DebugNotif("Prefix set to: " .. char)
-end)
+        local Character = string.sub(NewPrefix, 1, 1)
+
+        if Character:match("%a") then
+            Notify("Prefix cannot be a letter")
+            return
+        end
+
+        SetPrefix(Character)
+        WriteFile("SimpleCMDS/Prefix.luau", Character)
+
+        Notify("Prefix set to: " .. Character)
+    end
+)
