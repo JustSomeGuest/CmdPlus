@@ -1,4 +1,3 @@
-local Players = GetService("Players")
 local RunService = GetService("RunService")
 
 local Airwalk = {
@@ -13,9 +12,21 @@ local Airwalk = {
 local function StartAirwalk(Character)
     if Airwalk.Platform then
         Airwalk.Platform:Destroy()
+        Airwalk.Platform = nil
+    end
+
+    if Airwalk.StateConn then
+        Airwalk.StateConn:Disconnect()
+        Airwalk.StateConn = nil
+    end
+
+    if Airwalk.UpdateConn then
+        Airwalk.UpdateConn:Disconnect()
+        Airwalk.UpdateConn = nil
     end
 
     local RootPart = Character:WaitForChild("HumanoidRootPart", 5)
+
     if not RootPart then
         return
     end
@@ -120,7 +131,7 @@ Cmd.new(
             return
         end
 
-        local Character = Players.LocalPlayer.Character
+        local Character = Plr.Character
 
         if not Character then
             Notify("Airwalk: You need a character to start airwalk")
@@ -132,7 +143,7 @@ Cmd.new(
         Airwalk.Active = true
         Notify("Airwalk: Enabled")
 
-        Airwalk.CharacterConn = Players.LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
+        Airwalk.CharacterConn = Plr.CharacterAdded:Connect(function(NewCharacter)
             if not Airwalk.Active then
                 return
             end
@@ -140,6 +151,14 @@ Cmd.new(
             StopAirwalk()
             StartAirwalk(NewCharacter)
             Airwalk.Active = true
+
+            Airwalk.CharacterConn = Plr.CharacterAdded:Connect(function(Character)
+                if Airwalk.Active then
+                    StopAirwalk()
+                    StartAirwalk(Character)
+                    Airwalk.Active = true
+                end
+            end)
         end)
     end
 )
