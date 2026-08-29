@@ -39,7 +39,7 @@ end
 
 local function EnableNoclip()
     if NoclipConnection then
-        return
+        return false
     end
 
     local Character = GetChar()
@@ -51,13 +51,17 @@ local function EnableNoclip()
     NoclipConnection = Plr.CharacterAdded:Connect(function(NewCharacter)
         ApplyNoclip(NewCharacter)
     end)
+
+    return true
 end
 
 local function DisableNoclip()
-    if NoclipConnection then
-        NoclipConnection:Disconnect()
-        NoclipConnection = nil
+    if not NoclipConnection then
+        return false
     end
+
+    NoclipConnection:Disconnect()
+    NoclipConnection = nil
 
     if CharacterDescendantConnection then
         CharacterDescendantConnection:Disconnect()
@@ -79,6 +83,8 @@ local function DisableNoclip()
     end
 
     SavedCollisions = {}
+
+    return true
 end
 
 Cmd.new(
@@ -86,8 +92,11 @@ Cmd.new(
     "Enables noclip, letting you pass through geometry.",
     "noclip",
     function()
-        EnableNoclip()
-        Notify("Noclip: Enabled")
+        if EnableNoclip() then
+            Notify("Noclip: Enabled")
+        else
+            Notify("Noclip: Already active")
+        end
     end
 )
 
@@ -96,7 +105,10 @@ Cmd.new(
     "Disables noclip and restores normal collision.",
     "clip",
     function()
-        DisableNoclip()
-        Notify("Noclip: Disabled")
+        if DisableNoclip() then
+            Notify("Noclip: Disabled")
+        else
+            Notify("Noclip: Not active")
+        end
     end
 )
