@@ -1,122 +1,229 @@
+local Players = GetService("Players")
+local RunService = GetService("RunService")
+
 local antiflingConn
 local antiflingPlayerConn
+local playerConns = {}
 local tracked = {}
 local origCan = {}
 local signals = {}
 
-local function clearPart(p)
-	tracked[p] = nil
-	origCan[p] = nil
-	if signals[p] then
-		signals[p]:Disconnect()
-		signals[p] = nil
-	end
+local function clearPart(Part)
+    tracked[Part] = nil
+    origCan[Part] = nil
+
+    if signals[Part] then
+        signals[Part]:Disconnect()
+        signals[Part] = nil
+    end
 end
 
-local function apply(p)
-	if not (p and typeof(p) == "Instance" and p:IsA("BasePart")) or tracked[p] then return end
-	tracked[p] = true
-	if origCan[p] == nil then origCan[p] = p.CanCollide end
-	if not signals[p] then
-		signals[p] = p:GetPropertyChangedSignal("CanCollide"):Connect(function()
-			if tracked[p] and p.CanCollide ~= false then
-				p.CanCollide = false
-			end
-		end)
-	end
-	if p.CanCollide ~= false then p.CanCollide = false end
+local function apply(Part)
+    if not (
+        Part
+        and typeof(Part) == "Instance"
+        and Part:IsA("BasePart")
+    ) or tracked[Part] then
+        return
+    end
+
+    tracked[Part] = true
+
+    if origCan[Part] == nil then
+        origCan[Part] = Part.CanCollide
+    end
+
+    signals[Part] = Part:GetPropertyChangedSignal("CanCollide"):Connect(function()
+        if tracked[Part] and Part.CanCollide ~= false then
+            Part.CanCollide = false
+        end
+    end)
+
+    if Part.CanCollide ~= false then
+        Part.CanCollide = false
+    end
 end
 
-local function seedChar(char)
-	if not char then return end
-	for _, d in ipairs(char:GetDescendants()) do
-		if d:IsA("BasePart") then apply(d) end
-	end
-	char.DescendantAdded:Connect(function(inst)
-		if inst:IsA("BasePart") then apply(inst) end
-	end)
-	char.DescendantRemoving:Connect(function(inst)
-		if inst:IsA("BasePart") then clearPart(inst) end
-	end)
+local function seedChar(Character)
+    if not Character then
+        return
+    end
+
+    for _, Descendant in ipairs(Character:GetDescendants()) do
+        if Descendant:IsA("BasePart") then
+            apply(Descendant)
+        end
+    end
+
+    local AddedConn = Character.DescendantAdded:Connect(function(Instance)
+        if Instance:IsA("BasePart") then
+            apply(Instance)
+        end
+    end)
+
+    local RemovingConn = Character.DescendantRemoving:Connect(function(Instance)
+        if Instance:IsA("BasePart") then
+            clearPart(Instance)
+        end
+    end)
+
+    playerConns[Character] = {
+        AddedConn,
+        RemovingConn
+    }
 end
 
-local function cleanupChar(char)
-	if not char then return end
-	for _, d in ipairs(char:GetDescendants()) do
-		if tracked[d] then clearPart(d) end
-	end
+local function cleanupChar(Character)
+    if not Character then
+        return
+    end
+
+    if playerConns[Character] then
+        for _, Connection in ipairs(playerConns[Character]) do
+            Connection:Disconnect()
+        end
+
+        playerConns[Character] = nil
+    end
+
+    for _, Descendant in ipairs(Character:GetDescendants()) do
+        if tracked[Descendant] then
+            clearPart(Descendant)
+        end
+    end
 end
 
-local function hookPlayer(plr)
-	if plr == Players.LocalPlayer then return end
-	if plr.Character then seedChar(plr.Character) end
-	plr.CharacterAdded:Connect(function(char) seedChar(char) end)
-	plr.CharacterRemoving:Connect(function(char) cleanupChar(char) end)
+local function hookPlayer(Player)
+    if Player == Plr then
+        return
+    end
+
+    if Player.Character then
+        seedChar(Player.Character)
+    end
+
+    Player.CharacterAdded:Connect(function(Character)
+        seedChar(Character)
+    end)
+
+    Player.CharacterRemoving:Connect(function(Character)
+        cleanupChar(Character)
+    end)
 end
 
 local function antifling(notify)
-	if antiflingConn then antiflingConn:Disconnect() end
+    if antiflingConn then
+        antiflingConn:Disconnect()
+        antiflingConn = nil
+    end
 
-	tracked = {}
-	origCan = {}
-	signals = {}
+    if antiflingPlayerConn then
+        antiflingPlayerConn:Disconnect()
+        antiflingPlayerConn = nil
+    end
 
-	for _, plr in ipairs(Players:GetPlayers()) do
-		hookPlayer(plr)
-	end
+    for _, Connections in pairs(playerConns) do
+        for _, Connection in ipairs(Connections) do
+            Connection:Disconnect()
+        end
+    end
 
-	antiflingPlayerConn = Players.PlayerAdded:Connect(hookPlayer)
-	Players.PlayerRemoving:Connect(function(plr)
-		if plr == Players.LocalPlayer then return end
-		cleanupChar(plr.Character)
-	end)
+    playerConns = {}
+    tracked = {}
+    origCan = {}
+    signals = {}
 
-	local lastKey = nil
-	antiflingConn = RunService.PreSimulation:Connect(function()
-		local quota = 256
-		local k = lastKey
-		if k ~= nil and tracked[k] == nil then k = nil end
-		while quota > 0 do
-			k = next(tracked, k)
-			if not k then lastKey = nil break end
-			local p = k
-			if typeof(p) == "Instance" and p:IsA("BasePart") and p.Parent then
-				if p.CanCollide ~= false then p.CanCollide = false end
-				lastKey = p
-			else
-				clearPart(p)
-				lastKey = nil
-			end
-			quota -= 1
-		end
-	end)
+    for _, Player in ipairs(Players:GetPlayers()) do
+        hookPlayer(Player)
+    end
 
-	if notify then DebugNotif("AntiFling: Enabled") end
+    antiflingPlayerConn = Players.PlayerAdded:Connect(hookPlayer)
+
+    antiflingConn = RunService.PreSimulation:Connect(function()
+        local Quota = 256
+        local Key = nil
+
+        while Quota > 0 do
+            Key = next(tracked, Key)
+
+            if not Key then
+                break
+            end
+
+            if typeof(Key) == "Instance"
+                and Key:IsA("BasePart")
+                and Key.Parent then
+
+                if Key.CanCollide ~= false then
+                    Key.CanCollide = false
+                end
+            else
+                clearPart(Key)
+            end
+
+            Quota -= 1
+        end
+    end)
+
+    if notify then
+        Notify("AntiFling: Enabled")
+    end
 end
 
 local function unantifling()
-	if antiflingConn then antiflingConn:Disconnect() antiflingConn = nil end
-	if antiflingPlayerConn then antiflingPlayerConn:Disconnect() antiflingPlayerConn = nil end
+    if antiflingConn then
+        antiflingConn:Disconnect()
+        antiflingConn = nil
+    end
 
-	for p in tracked do
-		if typeof(p) == "Instance" and p:IsA("BasePart") then
-			p.CanCollide = origCan[p] ~= nil and origCan[p] or true
-		end
-	end
+    if antiflingPlayerConn then
+        antiflingPlayerConn:Disconnect()
+        antiflingPlayerConn = nil
+    end
 
-	for _, c in signals do c:Disconnect() end
+    for Character, Connections in pairs(playerConns) do
+        for _, Connection in ipairs(Connections) do
+            Connection:Disconnect()
+        end
+    end
 
-	tracked = {}
-	origCan = {}
-	signals = {}
+    playerConns = {}
 
-	DebugNotif("AntiFling: Disabled")
+    for Part in pairs(tracked) do
+        if typeof(Part) == "Instance" and Part:IsA("BasePart") then
+            if Part.Parent then
+                if origCan[Part] ~= nil then
+                    Part.CanCollide = origCan[Part]
+                end
+            end
+        end
+    end
+
+    for _, Connection in pairs(signals) do
+        Connection:Disconnect()
+    end
+
+    tracked = {}
+    origCan = {}
+    signals = {}
+
+    Notify("AntiFling: Disabled")
 end
 
-Cmd.new({"antifling", "af"}, "Prevents your character from being flung.", "antifling", function()
-	antifling(true)
-end)
+Cmd.new(
+    {"antifling", "af"},
+    "Prevents your character from being flung.",
+    "antifling",
+    function()
+        antifling(true)
+    end
+)
 
-Cmd.new({"unantifling", "uaf"}, "Disables anti-fling.", "unantifling", function()
-	unantifling()
-end)
+Cmd.new(
+    {"unantifling", "uaf"},
+    "Disables anti-fling.",
+    "unantifling",
+    function()
+        unantifling()
+    end
+)
