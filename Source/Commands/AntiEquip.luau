@@ -1,10 +1,9 @@
-local Player = Players.LocalPlayer
-
 local AntiEquipConns = {}
 local AntiEquipActive = false
 
-local function BlockTool(Tool, Character)
-    local Backpack = Player:FindFirstChild("Backpack")
+local function BlockTool(Tool)
+    local Backpack = Plr:FindFirstChild("Backpack")
+
     if Backpack then
         Tool.Parent = Backpack
     else
@@ -15,54 +14,62 @@ end
 local function HookCharacter(Character)
     AntiEquipConns[#AntiEquipConns + 1] = Character.ChildAdded:Connect(function(Child)
         if AntiEquipActive and Child:IsA("Tool") then
-            BlockTool(Child, Character)
+            BlockTool(Child)
         end
     end)
 
     for _, Child in ipairs(Character:GetChildren()) do
         if Child:IsA("Tool") then
-            BlockTool(Child, Character)
+            BlockTool(Child)
         end
     end
 end
 
-local function AntiEquip(Notify)
+local function AntiEquip()
     for _, Connection in ipairs(AntiEquipConns) do
         Connection:Disconnect()
     end
+
     AntiEquipConns = {}
     AntiEquipActive = true
 
-    local Character = Player.Character
+    local Character = Plr.Character
+
     if Character then
         HookCharacter(Character)
     end
 
-    AntiEquipConns[#AntiEquipConns + 1] = Player.CharacterAdded:Connect(function(Char)
+    AntiEquipConns[#AntiEquipConns + 1] = Plr.CharacterAdded:Connect(function(Character)
         if AntiEquipActive then
-            HookCharacter(Char)
+            HookCharacter(Character)
         end
     end)
 
-    if Notify then
-        DebugNotif("AntiEquip: Enabled")
-    end
+    Notify("AntiEquip: Enabled")
 end
 
 local function UnAntiEquip()
     AntiEquipActive = false
+
     for _, Connection in ipairs(AntiEquipConns) do
         Connection:Disconnect()
     end
+
     AntiEquipConns = {}
 
-    DebugNotif("AntiEquip: Disabled")
+    Notify("AntiEquip: Disabled")
 end
 
-Cmd.new({"antiequip", "preventtools", "prevtools"}, "Prevents you from equipping tools.", "antiequip", function()
-    AntiEquip(true)
-end)
+Cmd.new(
+    {"antiequip", "preventtools", "prevtools"},
+    "Prevents you from equipping tools.",
+    "antiequip",
+    AntiEquip
+)
 
-Cmd.new({"unantiequip", "unpreventtools", "unprevtools"}, "Allows you to equip tools again.", "unantiequip", function()
-    UnAntiEquip()
-end)
+Cmd.new(
+    {"unantiequip", "unpreventtools", "unprevtools"},
+    "Allows you to equip tools again.",
+    "unantiequip",
+    UnAntiEquip
+)
