@@ -1,19 +1,27 @@
-Cmd.new({"walkspeed", "ws"}, "Changes your character's walking speed.", "walkspeed <number>", function(Args)
-    local value = tonumber(Args[2])
-    if not value then
-        DebugNotif("Usage: .walkspeed <number>")
-        return
-    end
+Cmd.new(
+    {"walkspeed", "ws"},
+    "Changes your character's walking speed.",
+    "walkspeed <number>",
+    function(Args)
+        local Value = tonumber(Args[2])
 
-    local char = Players.LocalPlayer.Character
-    if not char then
-        DebugNotif("You need a character to use that command.")
-        return
-    end
+        if not Value then
+            Notify("Usage: .walkspeed <number>")
+            return
+        end
 
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.WalkSpeed = value
-        DebugNotif("Walkspeed set to " .. value)
+        local Character = Plr.Character
+
+        if not Character then
+            Notify("You need a character to use that command.")
+            return
+        end
+
+        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+        if Humanoid then
+            Humanoid.WalkSpeed = Value
+            Notify("Walkspeed set to " .. Value)
+        end
     end
-end)
+)
