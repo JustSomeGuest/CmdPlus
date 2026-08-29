@@ -1,50 +1,62 @@
 local Camera = workspace.CurrentCamera
 local PreviousSubject
 
-Cmd.new({"spectate", "view"}, "Spectates a player.", "spectate <player>", function(Args)
-	local TargetName = Args[2]
-	if not TargetName then
-		DebugNotif("Spectate: Usage: .spectate <player>")
-		return
-	end
+Cmd.new(
+    {"spectate", "view"},
+    "Spectates a player.",
+    "spectate <player>",
+    function(Args)
+        local TargetName = Args[2]
 
-	local Matches = FindPlr(TargetName)
+        if not TargetName then
+            Notify("Spectate: Usage: .spectate <player>")
+            return
+        end
 
-	if #Matches == 0 then
-		DebugNotif("Spectate: Player not found.")
-		return
-	end
+        local Matches = FindPlr(TargetName)
 
-	if #Matches > 1 then
-		DebugNotif("Spectate: Multiple players matched.")
-		return
-	end
+        if #Matches == 0 then
+            Notify("Spectate: Player not found.")
+            return
+        end
 
-	local Character = Matches[1].Character
-	local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+        if #Matches > 1 then
+            Notify("Spectate: Multiple players matched.")
+            return
+        end
 
-	if not Humanoid then
-		DebugNotif("Spectate: Target has no Humanoid.")
-		return
-	end
+        local TargetPlayer = Matches[1]
+        local Character = TargetPlayer.Character
+        local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
 
-	PreviousSubject = Camera.CameraSubject
-	Camera.CameraSubject = Humanoid
+        if not Humanoid then
+            Notify("Spectate: Target has no Humanoid.")
+            return
+        end
 
-	DebugNotif("Spectate: Now viewing " .. Matches[1].Name .. ".")
-end)
+        PreviousSubject = Camera.CameraSubject
+        Camera.CameraSubject = Humanoid
 
-Cmd.new({"unspectate", "unview"}, "Stops spectating.", "unspectate", function()
-	local Character = Players.LocalPlayer.Character
-	local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+        Notify("Spectate: Now viewing " .. TargetPlayer.Name .. ".")
+    end
+)
 
-	if not Humanoid then
-		DebugNotif("Unspectate: Could not find your Humanoid.")
-		return
-	end
+Cmd.new(
+    {"unspectate", "unview"},
+    "Stops spectating.",
+    "unspectate",
+    function()
+        local Character = Plr.Character
+        local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
 
-	Camera.CameraSubject = Humanoid
-	PreviousSubject = nil
+        if not Humanoid then
+            Notify("Unspectate: Could not find your Humanoid.")
+            return
+        end
 
-	DebugNotif("Unspectate: Returned to yourself.")
-end)
+        Camera.CameraSubject = Humanoid
+        PreviousSubject = nil
+
+        Notify("Unspectate: Returned to yourself.")
+    end
+)
