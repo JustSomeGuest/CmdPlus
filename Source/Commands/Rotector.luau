@@ -1,3 +1,6 @@
+local Players = GetService("Players")
+local HttpService = GetService("HttpService")
+
 local RotectorBaseURL = "https://roscoe.rotector.com"
 
 local RotectorFlagNames = {
@@ -41,41 +44,44 @@ local function RotectorHttpGet(Url)
         or (syn and syn.request)
 
     if type(RequestFunc) ~= "function" then
-        local success, result = pcall(function()
+        local Success, Result = pcall(function()
             return game:HttpGet(Url)
         end)
 
-        if success then
+        if Success then
             return {
                 Success = true,
                 StatusCode = 200,
-                Body = result,
+                Body = Result,
             }
         end
 
         return nil
     end
 
-    local success, result = pcall(function()
+    local Success, Result = pcall(function()
         return RequestFunc({
             Url = Url,
             Method = "GET",
         })
     end)
 
-    if not success or not result then
+    if not Success or not Result then
         return nil
     end
 
     return {
-        Success = result.Success ~= false,
-        StatusCode = result.StatusCode,
-        Body = result.Body,
+        Success = Result.Success ~= false,
+        StatusCode = Result.StatusCode,
+        Body = Result.Body,
     }
 end
 
 local function LookupRotector(UserId)
-    local Url = RotectorBaseURL .. "/v1/lookup/roblox/user/" .. tostring(UserId)
+    local Url = RotectorBaseURL
+        .. "/v1/lookup/roblox/user/"
+        .. tostring(UserId)
+
     local Response = RotectorHttpGet(Url)
 
     if not Response then
@@ -87,96 +93,158 @@ local function LookupRotector(UserId)
     end
 
     if Response.StatusCode and Response.StatusCode ~= 200 then
-        return nil, "HTTP " .. tostring(Response.StatusCode) .. ": " .. Response.Body:sub(1, 150)
+        return nil,
+            "HTTP "
+            .. tostring(Response.StatusCode)
+            .. ": "
+            .. Response.Body:sub(1, 150)
     end
 
-    local success, decoded = pcall(function()
+    local Success, Decoded = pcall(function()
         return HttpService:JSONDecode(Response.Body)
     end)
 
-    if not success or not decoded then
-        return nil, "Failed to parse response: " .. Response.Body:sub(1, 150)
+    if not Success or not Decoded then
+        return nil,
+            "Failed to parse response: "
+            .. Response.Body:sub(1, 150)
     end
 
-    if not decoded.success or not decoded.data then
-        return nil, "Rotector returned an error: " .. Response.Body:sub(1, 150)
+    if not Decoded.success or not Decoded.data then
+        return nil,
+            "Rotector returned an error: "
+            .. Response.Body:sub(1, 150)
     end
 
-    return decoded.data, nil
+    return Decoded.data, nil
 end
 
-Cmd.new({"rotector", "rot"}, "Checks a player against Rotector for flags, actionability, category, and confidence.", "rotector <player>", function(Args)
-    local searchTerm = Args[2]
-    if not searchTerm then
-        DebugNotif("Usage: .rotector <player>")
-        return
-    end
+Cmd.new(
+    {"rotector", "rot"},
+    "Checks a player against Rotector for flags, actionability, category, and confidence.",
+    "rotector <player>",
+    function(Args)
+        local SearchTerm = Args[2]
 
-    local matches = FindPlr(searchTerm)
-
-    if #matches == 0 then
-        DebugNotif("Player not found: " .. searchTerm)
-        return
-    end
-
-    if #matches > 1 then
-        local playerNames = {}
-        for i, player in ipairs(matches) do
-            table.insert(playerNames, player.Name .. " (" .. player.DisplayName .. ")")
+        if not SearchTerm then
+            Notify("Usage: .rotector <player>")
+            return
         end
-        DebugNotif("Multiple players found: " .. table.concat(playerNames, ", "))
-        return
-    end
 
-    local targetPlayer = matches[1]
+        local Matches = FindPlr(SearchTerm)
 
-    DebugNotif("Checking " .. targetPlayer.Name .. " against Rotector...")
+        if #Matches == 0 then
+            Notify("Player not found: " .. SearchTerm)
+            return
+        end
 
-    local Data, Err = LookupRotector(targetPlayer.UserId)
+        if #Matches > 1 then
+            local PlayerNames = {}
 
-    if not Data then
-        DebugNotif("Rotector lookup failed: " .. tostring(Err))
-        return
-    end
+            for _, Player in ipairs(Matches) do
+                table.insert(
+                    PlayerNames,
+                    Player.Name .. " (" .. Player.DisplayName .. ")"
+                )
+            end
 
-    local FlagName = RotectorFlagNames[Data.flagType] or "Unknown"
-    local Actionable = RotectorActionable[Data.flagType] or "Unknown"
+            Notify(
+                "Multiple players found: "
+                .. table.concat(PlayerNames, ", ")
+            )
 
-    local Message = targetPlayer.Name .. " (" .. targetPlayer.DisplayName .. "): " .. FlagName .. " | Actionable: " .. Actionable
+            return
+        end
 
-    if Data.category and RotectorCategoryNames[Data.category] then
-        Message = Message .. " | Category: " .. RotectorCategoryNames[Data.category]
-    end
+        local TargetPlayer = Matches[1]
 
-    if Data.confidence then
-        Message = Message .. " | Confidence: " .. tostring(math.floor(Data.confidence * 100)) .. "%"
-    end
+        Notify(
+            "Checking "
+            .. TargetPlayer.Name
+            .. " against Rotector..."
+        )
 
-    DebugNotif(Message)
+        local Data, Err = LookupRotector(TargetPlayer.UserId)
 
-    print("[Rotector] " .. Message)
+        if not Data then
+            Notify(
+                "Rotector lookup failed: "
+                .. tostring(Err)
+            )
 
-    if Data.reasons then
-        for ReasonKey, ReasonData in pairs(Data.reasons) do
-            if type(ReasonData) == "table" and ReasonData.message then
-                print("[Rotector] " .. ReasonKey .. ": " .. ReasonData.message)
+            return
+        end
+
+        local FlagName =
+            RotectorFlagNames[Data.flagType]
+            or "Unknown"
+
+        local Actionable =
+            RotectorActionable[Data.flagType]
+            or "Unknown"
+
+        local Message =
+            TargetPlayer.Name
+            .. " ("
+            .. TargetPlayer.DisplayName
+            .. "): "
+            .. FlagName
+            .. " | Actionable: "
+            .. Actionable
+
+        if Data.category
+            and RotectorCategoryNames[Data.category] then
+
+            Message = Message
+                .. " | Category: "
+                .. RotectorCategoryNames[Data.category]
+        end
+
+        if Data.confidence then
+            Message = Message
+                .. " | Confidence: "
+                .. tostring(
+                    math.floor(Data.confidence * 100)
+                )
+                .. "%"
+        end
+
+        Notify(Message)
+
+        print("[Rotector] " .. Message)
+
+        if Data.reasons then
+            for ReasonKey, ReasonData in pairs(Data.reasons) do
+                if type(ReasonData) == "table"
+                    and ReasonData.message then
+
+                    print(
+                        "[Rotector] "
+                        .. ReasonKey
+                        .. ": "
+                        .. ReasonData.message
+                    )
+                end
             end
         end
-    end
 
-    print("[Rotector] Data via rotector.com — statuses may change, do not cache beyond 24h.")
-end)
+        print(
+            "[Rotector] Data via rotector.com — statuses may change, do not cache beyond 24h."
+        )
+    end
+)
 
 local function ScanServerForRotector()
     local AllPlayers = Players:GetPlayers()
     local ScanList = {}
 
-    for i, player in ipairs(AllPlayers) do
-        if i > RotectorScanMaxPlayers then
+    for Index, Player in ipairs(AllPlayers) do
+        if Index > RotectorScanMaxPlayers then
             break
         end
-        if player ~= Players.LocalPlayer then
-            table.insert(ScanList, player)
+
+        if Player ~= Plr then
+            table.insert(ScanList, Player)
         end
     end
 
@@ -184,32 +252,58 @@ local function ScanServerForRotector()
         return
     end
 
-    print("[Rotector] Scanning " .. #ScanList .. " player(s)...")
+    print(
+        "[Rotector] Scanning "
+        .. #ScanList
+        .. " player(s)..."
+    )
 
     local FlaggedResults = {}
     local ErrorCount = 0
 
-    for _, player in ipairs(ScanList) do
-        local Data, Err = LookupRotector(player.UserId)
+    for _, Player in ipairs(ScanList) do
+        local Data, Err = LookupRotector(Player.UserId)
 
         if Data then
-            local FlagName = RotectorFlagNames[Data.flagType] or "Unknown"
-            local Actionable = RotectorActionable[Data.flagType] or "Unknown"
+            local FlagName =
+                RotectorFlagNames[Data.flagType]
+                or "Unknown"
 
-            print("[Rotector] " .. player.Name .. ": " .. FlagName)
+            local Actionable =
+                RotectorActionable[Data.flagType]
+                or "Unknown"
 
-            if Data.flagType == 1 or Data.flagType == 2 or Data.flagType == 5 then
+            print(
+                "[Rotector] "
+                .. Player.Name
+                .. ": "
+                .. FlagName
+            )
+
+            if Data.flagType == 1
+                or Data.flagType == 2
+                or Data.flagType == 5 then
+
                 table.insert(FlaggedResults, {
-                    Player = player,
+                    Player = Player,
                     FlagName = FlagName,
                     Actionable = Actionable,
-                    Category = Data.category and RotectorCategoryNames[Data.category] or nil,
+                    Category =
+                        Data.category
+                        and RotectorCategoryNames[Data.category]
+                        or nil,
                     Confidence = Data.confidence,
                 })
             end
         else
             ErrorCount = ErrorCount + 1
-            print("[Rotector] " .. player.Name .. ": lookup failed - " .. tostring(Err))
+
+            print(
+                "[Rotector] "
+                .. Player.Name
+                .. ": lookup failed - "
+                .. tostring(Err)
+            )
         end
 
         task.wait(RotectorScanDelay)
@@ -217,23 +311,50 @@ local function ScanServerForRotector()
 
     if #FlaggedResults > 0 then
         for _, Result in ipairs(FlaggedResults) do
-            local Message = "⚠️ " .. Result.Player.Name .. " (" .. Result.Player.DisplayName .. "): " .. Result.FlagName .. " | Actionable: " .. Result.Actionable
+            local Message =
+                "⚠️ "
+                .. Result.Player.Name
+                .. " ("
+                .. Result.Player.DisplayName
+                .. "): "
+                .. Result.FlagName
+                .. " | Actionable: "
+                .. Result.Actionable
 
             if Result.Category then
-                Message = Message .. " | " .. Result.Category
+                Message = Message
+                    .. " | "
+                    .. Result.Category
             end
 
             if Result.Confidence then
-                Message = Message .. " | " .. tostring(math.floor(Result.Confidence * 100)) .. "%"
+                Message = Message
+                    .. " | "
+                    .. tostring(
+                        math.floor(
+                            Result.Confidence * 100
+                        )
+                    )
+                    .. "%"
             end
 
-            DebugNotif(Message)
+            Notify(Message)
         end
     else
-        DebugNotif("Rotector: scanned " .. #ScanList .. " player(s), no flags found")
+        Notify(
+            "Rotector: scanned "
+            .. #ScanList
+            .. " player(s), no flags found"
+        )
     end
 
-    print("[Rotector] Scan complete. " .. #FlaggedResults .. " flagged, " .. ErrorCount .. " errors, via rotector.com — do not cache beyond 24h.")
+    print(
+        "[Rotector] Scan complete. "
+        .. #FlaggedResults
+        .. " flagged, "
+        .. ErrorCount
+        .. " errors, via rotector.com — do not cache beyond 24h."
+    )
 end
 
 task.spawn(ScanServerForRotector)
