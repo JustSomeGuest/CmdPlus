@@ -1,16 +1,23 @@
-Cmd.new({"respawn", "reset"}, "Respawns your character.", "respawn", function()
-	local Character = Players.LocalPlayer.Character
-	if not Character then
-		DebugNotif("Respawn: You need a character to respawn.")
-		return
-	end
+Cmd.new(
+    {"respawn", "reset"},
+    "Respawns your character.",
+    "respawn",
+    function()
+        local Character = Plr.Character
 
-	local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-	if not Humanoid then
-		DebugNotif("Respawn: Could not find Humanoid.")
-		return
-	end
+        if not Character then
+            Notify("Respawn: You need a character to respawn.")
+            return
+        end
 
-	Humanoid.Health = 0
-	DebugNotif("Respawn: Respawning character...")
-end)
+        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+        if not Humanoid then
+            Notify("Respawn: Could not find Humanoid.")
+            return
+        end
+
+        Humanoid.Health = 0
+        Notify("Respawn: Respawning character...")
+    end
+)
