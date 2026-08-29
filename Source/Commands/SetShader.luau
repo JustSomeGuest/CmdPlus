@@ -1,3 +1,10 @@
+local Lighting = GetService("Lighting")
+local SoundService = GetService("SoundService")
+local TweenService = GetService("TweenService")
+local Workspace = GetService("Workspace")
+local Players = GetService("Players")
+local RunService = GetService("RunService")
+
 for _, v in ipairs(Lighting:GetChildren()) do
     if v:IsA("PostEffect") or v:IsA("Atmosphere") then
         v:Destroy()
@@ -81,7 +88,7 @@ ThunderSound.Looped = true
 ThunderSound.Volume = 0.35
 ThunderSound.Parent = SoundService
 
-local Player = Players.LocalPlayer
+local Player = Plr
 local CurrentLightConfig = nil
 
 local RainPart = Instance.new("Part")
@@ -131,6 +138,7 @@ local RainEffectActive = false
 local RainLoopConn = nil
 local PuddleLoopThread = nil
 local ActivePuddles = {}
+local RainUpdateConnections = {}
 
 local function CreatePuddle(Position, Normal)
     local Puddle = Instance.new("Part")
@@ -212,6 +220,7 @@ local function StartRainEffects(Intensity)
             conn = Root:GetPropertyChangedSignal("CFrame"):Connect(function()
                 UpdateRainPosition()
             end)
+            table.insert(RainUpdateConnections, conn)
             Char.AncestryChanged:Connect(function()
                 if not Char.Parent then
                     conn:Disconnect()
@@ -243,6 +252,11 @@ local function StopRainEffects()
         RainLoopConn:Disconnect()
         RainLoopConn = nil
     end
+    
+    for _, Conn in ipairs(RainUpdateConnections) do
+        Conn:Disconnect()
+    end
+    RainUpdateConnections = {}
 end
 
 local function UpdateWeatherParticles(WeatherName)
@@ -278,7 +292,7 @@ if Player.Character then
     SetupLight(Player.Character)
 end
 
-Player.CharacterAdded:Connect(SetupLight)
+local CharacterAddedConnection = Player.CharacterAdded:Connect(SetupLight)
 
 local function ApplyCharacterLight(LightConfig)
     CurrentLightConfig = LightConfig
@@ -710,6 +724,7 @@ local CurrentTimeName = "Morning"
 local CurrentWeatherName = "Clear"
 local ThunderFlashActive = false
 local ThunderFlashConn = nil
+local ThunderFlashThread = nil
 
 local function StopThunderFlash()
     ThunderFlashActive = false
@@ -717,13 +732,14 @@ local function StopThunderFlash()
         ThunderFlashConn:Disconnect()
         ThunderFlashConn = nil
     end
+    ThunderFlashThread = nil
 end
 
 local function StartThunderFlash()
     if ThunderFlashActive then return end
     ThunderFlashActive = true
 
-    task.spawn(function()
+    ThunderFlashThread = task.spawn(function()
         while ThunderFlashActive do
             task.wait(math.random(4, 11))
             if not ThunderFlashActive then break end
@@ -905,6 +921,7 @@ end
 
 local RealisticActive = false
 local RealisticConn = nil
+local RealisticThread = nil
 
 local function UpdateRealistic()
     local hour = GetLocalHour()
@@ -958,6 +975,9 @@ local function UpdateRealistic()
     end
 
     ApplyCharacterLight(Blended.Light)
+    UpdateWeatherSound(CurrentWeatherName)
+    UpdateWeatherSky(CurrentWeatherName)
+    UpdateWeatherParticles(CurrentWeatherName)
 end
 
 local function StartRealistic()
@@ -966,14 +986,14 @@ local function StartRealistic()
     UpdateRealistic()
     local lastUpdate = 0
     RealisticConn = Lighting:GetPropertyChangedSignal("ClockTime"):Connect(function()
-        local now = tick()
+        local now = os.clock()
         if now - lastUpdate >= 1 then
             lastUpdate = now
             UpdateRealistic()
         end
     end)
 
-    task.spawn(function()
+    RealisticThread = task.spawn(function()
         while RealisticActive do
             UpdateRealistic()
             task.wait(5)
@@ -987,6 +1007,7 @@ local function StopRealistic()
         RealisticConn:Disconnect()
         RealisticConn = nil
     end
+    RealisticThread = nil
 end
 
 local function ResetShader()
@@ -1037,6 +1058,11 @@ local function ResetShader()
     ThunderSound:Destroy()
     StormSky:Destroy()
 
+    if CharacterAddedConnection then
+        CharacterAddedConnection:Disconnect()
+        CharacterAddedConnection = nil
+    end
+
     ApplyCharacterLight({Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 255, 255)})
 end
 
@@ -1045,7 +1071,7 @@ Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Suppo
     local second = Args[3]
 
     if not first then
-        DebugNotif("Usage: .setshader <weather> <time> / .setshader realistic / .setshader off")
+        Notify("Usage: .setshader <weather> <time> / .setshader realistic / .setshader off")
         return
     end
 
@@ -1053,13 +1079,13 @@ Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Suppo
 
     if lowerFirst == "realistic" then
         StartRealistic()
-        DebugNotif("Time of Day: Realistic (following local time)")
+        Notify("Time of Day: Realistic (following local time)")
         return
     end
 
     if lowerFirst == "off" or lowerFirst == "stop" then
         ResetShader()
-        DebugNotif("Shader reset to default")
+        Notify("Shader reset to default")
         return
     end
 
@@ -1077,7 +1103,7 @@ Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Suppo
     end
 
     if not timeName and not weatherName then
-        DebugNotif("Invalid input. Try: .setshader clear noon / .setshader rainy morning")
+        Notify("Invalid input. Try: .setshader clear noon / .setshader rainy morning")
         return
     end
 
@@ -1089,5 +1115,5 @@ Cmd.new({"setshader", "ss"}, "Changes the current weather and time shader. Suppo
     local TimeEmoji = TimeOfDay[CurrentTimeName].Emoji
     local WeatherEmoji = Weather[CurrentWeatherName].Emoji
 
-    DebugNotif(WeatherEmoji .. " " .. TimeEmoji .. " Shader set to " .. CurrentWeatherName .. " " .. CurrentTimeName)
+    Notify(WeatherEmoji .. " " .. TimeEmoji .. " Shader set to " .. CurrentWeatherName .. " " .. CurrentTimeName)
 end)
