@@ -4,145 +4,157 @@ local RunService = GetService("RunService")
 local AntiFlingActive = false
 local AntiflingConn
 local AntiflingPlayerConn
+
 local MaxLinearVelocity = 100
 local MaxAngularVelocity = 100
-local PlayerConns = {}
-local Tracked = {}
-local OrigCan = {}
-local Signals = {}
 
-local function ClearPart(Part)
-    Tracked[Part] = nil
-    OrigCan[Part] = nil
+local PlayerConnections = {}
+local CharacterParts = {}
+local OriginalCanCollide = {}
 
-    if Signals[Part] then
-        Signals[Part]:Disconnect()
-        Signals[Part] = nil
+local function Disconnect(Connection)
+    if Connection then
+        Connection:Disconnect()
     end
 end
 
 local function ClampVelocity(Part)
-    if not (
-        Part
-        and typeof(Part) == "Instance"
-        and Part:IsA("BasePart")
-        and Part.Parent
-    ) then
+    if not Part or not Part.Parent then
         return
     end
 
     local LinearVelocity = Part.AssemblyLinearVelocity
-    local AngularVelocity = Part.AssemblyAngularVelocity
+    local LinearMagnitude = LinearVelocity.Magnitude
 
-    if LinearVelocity.Magnitude > MaxLinearVelocity then
-        Part.AssemblyLinearVelocity =
-            LinearVelocity.Unit * MaxLinearVelocity
+    if LinearMagnitude > MaxLinearVelocity then
+        if LinearMagnitude > 0 then
+            Part.AssemblyLinearVelocity =
+                LinearVelocity * (MaxLinearVelocity / LinearMagnitude)
+        else
+            Part.AssemblyLinearVelocity = Vector3.zero
+        end
     end
 
-    if AngularVelocity.Magnitude > MaxAngularVelocity then
-        Part.AssemblyAngularVelocity =
-            AngularVelocity.Unit * MaxAngularVelocity
+    local AngularVelocity = Part.AssemblyAngularVelocity
+    local AngularMagnitude = AngularVelocity.Magnitude
+
+    if AngularMagnitude > MaxAngularVelocity then
+        if AngularMagnitude > 0 then
+            Part.AssemblyAngularVelocity =
+                AngularVelocity * (MaxAngularVelocity / AngularMagnitude)
+        else
+            Part.AssemblyAngularVelocity = Vector3.zero
+        end
     end
 end
 
-local function Apply(Part)
-    if not (
-        Part
-        and typeof(Part) == "Instance"
-        and Part:IsA("BasePart")
-    ) or Tracked[Part] then
+local function TrackPart(Part)
+    if not Part:IsA("BasePart") or CharacterParts[Part] then
         return
     end
 
-    Tracked[Part] = true
-
-    if OrigCan[Part] == nil then
-        OrigCan[Part] = Part.CanCollide
-    end
-
-    Signals[Part] = Part:GetPropertyChangedSignal("CanCollide"):Connect(function()
-        if Tracked[Part] and Part.CanCollide then
-            Part.CanCollide = false
-        end
-    end)
+    CharacterParts[Part] = true
+    OriginalCanCollide[Part] = Part.CanCollide
 
     if Part.CanCollide then
         Part.CanCollide = false
     end
 end
 
-local function SeedCharacter(Character)
+local function UntrackPart(Part)
+    CharacterParts[Part] = nil
+    OriginalCanCollide[Part] = nil
+end
+
+local function SetupCharacter(Character)
     if not Character then
         return
     end
 
-    for _, Descendant in ipairs(Character:GetDescendants()) do
-        if Descendant:IsA("BasePart") then
-            Apply(Descendant)
+    for _, Instance in ipairs(Character:GetDescendants()) do
+        if Instance:IsA("BasePart") then
+            TrackPart(Instance)
         end
     end
 
-    local AddedConn = Character.DescendantAdded:Connect(function(Instance)
-        if Instance:IsA("BasePart") then
-            Apply(Instance)
+    local AddedConnection = Character.DescendantAdded:Connect(function(Instance)
+        if AntiFlingActive and Instance:IsA("BasePart") then
+            TrackPart(Instance)
         end
     end)
 
-    local RemovingConn = Character.DescendantRemoving:Connect(function(Instance)
+    local RemovingConnection = Character.DescendantRemoving:Connect(function(Instance)
         if Instance:IsA("BasePart") then
-            ClearPart(Instance)
+            UntrackPart(Instance)
         end
     end)
 
-    PlayerConns[Character] = {
-        AddedConn,
-        RemovingConn
+    PlayerConnections[Character] = {
+        AddedConnection,
+        RemovingConnection
     }
 end
 
 local function CleanupCharacter(Character)
-    if not Character then
-        return
-    end
+    local Connections = PlayerConnections[Character]
 
-    if PlayerConns[Character] then
-        for _, Connection in ipairs(PlayerConns[Character]) do
-            Connection:Disconnect()
+    if Connections then
+        for _, Connection in ipairs(Connections) do
+            Disconnect(Connection)
         end
 
-        PlayerConns[Character] = nil
+        PlayerConnections[Character] = nil
     end
 
-    for _, Descendant in ipairs(Character:GetDescendants()) do
-        if Tracked[Descendant] then
-            ClearPart(Descendant)
+    for Part in pairs(CharacterParts) do
+        if Part:IsDescendantOf(Character) then
+            UntrackPart(Part)
         end
     end
 end
 
-local function HookPlayer(Player)
+local function SetupPlayer(Player)
     if Player == Plr then
         return
     end
 
     if Player.Character then
-        SeedCharacter(Player.Character)
+        SetupCharacter(Player.Character)
     end
 
-    local CharacterAddedConn = Player.CharacterAdded:Connect(function(Character)
+    local CharacterAddedConnection = Player.CharacterAdded:Connect(function(Character)
         if AntiFlingActive then
-            SeedCharacter(Character)
+            SetupCharacter(Character)
         end
     end)
 
-    local CharacterRemovingConn = Player.CharacterRemoving:Connect(function(Character)
+    local CharacterRemovingConnection = Player.CharacterRemoving:Connect(function(Character)
         CleanupCharacter(Character)
     end)
 
-    PlayerConns[Player] = {
-        CharacterAddedConn,
-        CharacterRemovingConn
+    PlayerConnections[Player] = {
+        CharacterAddedConnection,
+        CharacterRemovingConnection
     }
+end
+
+local function CleanupAll()
+    for Object, Connections in pairs(PlayerConnections) do
+        for _, Connection in ipairs(Connections) do
+            Disconnect(Connection)
+        end
+
+        PlayerConnections[Object] = nil
+    end
+
+    for Part, OriginalCanCollideValue in pairs(OriginalCanCollide) do
+        if Part.Parent then
+            Part.CanCollide = OriginalCanCollideValue
+        end
+    end
+
+    table.clear(CharacterParts)
+    table.clear(OriginalCanCollide)
 end
 
 local function Antifling()
@@ -153,45 +165,27 @@ local function Antifling()
 
     AntiFlingActive = true
 
-    Tracked = {}
-    OrigCan = {}
-    Signals = {}
-
     for _, Player in ipairs(Players:GetPlayers()) do
-        HookPlayer(Player)
+        SetupPlayer(Player)
     end
 
     AntiflingPlayerConn = Players.PlayerAdded:Connect(function(Player)
         if AntiFlingActive then
-            HookPlayer(Player)
+            SetupPlayer(Player)
         end
     end)
 
     AntiflingConn = RunService.PreSimulation:Connect(function()
-        local Quota = 256
-        local Key = nil
-
-        while Quota > 0 do
-            Key = next(Tracked, Key)
-
-            if not Key then
-                break
-            end
-
-            if typeof(Key) == "Instance"
-                and Key:IsA("BasePart")
-                and Key.Parent then
-
-                if Key.CanCollide then
-                    Key.CanCollide = false
+        for Part in pairs(CharacterParts) do
+            if Part.Parent then
+                if Part.CanCollide then
+                    Part.CanCollide = false
                 end
 
-                ClampVelocity(Key)
+                ClampVelocity(Part)
             else
-                ClearPart(Key)
+                UntrackPart(Part)
             end
-
-            Quota -= 1
         end
 
         local Character = Plr.Character
@@ -216,41 +210,13 @@ local function Unantifling()
 
     AntiFlingActive = false
 
-    if AntiflingConn then
-        AntiflingConn:Disconnect()
-        AntiflingConn = nil
-    end
+    Disconnect(AntiflingConn)
+    Disconnect(AntiflingPlayerConn)
 
-    if AntiflingPlayerConn then
-        AntiflingPlayerConn:Disconnect()
-        AntiflingPlayerConn = nil
-    end
+    AntiflingConn = nil
+    AntiflingPlayerConn = nil
 
-    for Object, Connections in pairs(PlayerConns) do
-        for _, Connection in ipairs(Connections) do
-            Connection:Disconnect()
-        end
-
-        PlayerConns[Object] = nil
-    end
-
-    for Part in pairs(Tracked) do
-        if typeof(Part) == "Instance"
-            and Part:IsA("BasePart")
-            and Part.Parent
-            and OrigCan[Part] ~= nil then
-
-            Part.CanCollide = OrigCan[Part]
-        end
-    end
-
-    for _, Connection in pairs(Signals) do
-        Connection:Disconnect()
-    end
-
-    Tracked = {}
-    OrigCan = {}
-    Signals = {}
+    CleanupAll()
 
     Notify("AntiFling: Disabled")
 end
