@@ -4,6 +4,8 @@ local RunService = GetService("RunService")
 local AntiFlingActive = false
 local AntiflingConn
 local AntiflingPlayerConn
+local MaxLinearVelocity = 100
+local MaxAngularVelocity = 100
 local PlayerConns = {}
 local Tracked = {}
 local OrigCan = {}
@@ -16,6 +18,30 @@ local function ClearPart(Part)
     if Signals[Part] then
         Signals[Part]:Disconnect()
         Signals[Part] = nil
+    end
+end
+
+local function ClampVelocity(Part)
+    if not (
+        Part
+        and typeof(Part) == "Instance"
+        and Part:IsA("BasePart")
+        and Part.Parent
+    ) then
+        return
+    end
+
+    local LinearVelocity = Part.AssemblyLinearVelocity
+    local AngularVelocity = Part.AssemblyAngularVelocity
+
+    if LinearVelocity.Magnitude > MaxLinearVelocity then
+        Part.AssemblyLinearVelocity =
+            LinearVelocity.Unit * MaxLinearVelocity
+    end
+
+    if AngularVelocity.Magnitude > MaxAngularVelocity then
+        Part.AssemblyAngularVelocity =
+            AngularVelocity.Unit * MaxAngularVelocity
     end
 end
 
@@ -159,11 +185,23 @@ local function Antifling()
                 if Key.CanCollide then
                     Key.CanCollide = false
                 end
+
+                ClampVelocity(Key)
             else
                 ClearPart(Key)
             end
 
             Quota -= 1
+        end
+
+        local Character = Plr.Character
+
+        if Character then
+            local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and RootPart:IsA("BasePart") then
+                ClampVelocity(RootPart)
+            end
         end
     end)
 
