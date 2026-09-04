@@ -154,7 +154,7 @@ if not IsFolder("CmdPlus/Assets") then
     MakeFolder("CmdPlus/Assets")
 end
 
-local MainURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Stable/Source/"
+local MainURL = "https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Source/"
 local CmdsURL = MainURL .. "Commands/"
 local AssetsURL = MainURL .. "Assets/"
 
