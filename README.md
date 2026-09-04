@@ -1,7 +1,13 @@
 # CmdPlus
 
-```lua
-loadstring(game:HttpGet("https://justsomeguest.pages.dev/scripts/cmdplus"))()
+### Main Loader
+```luau
+loadstring(game:HttpGet("https://rbxscriptz.pages.dev/scripts/cmdplus"))()
+```
+
+### Alternative Loader
+```luau
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Source/Main.luau")
 ```
 
 ## Features
@@ -61,7 +67,7 @@ Register your command:
 
 ```lua
 Cmd.new({"hello", "hi"}, "Sends a hello notification.", "hello", function(Args)
-    DebugNotif("Hello!")
+    Notify("Hello!")
 end)
 ```
 
