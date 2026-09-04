@@ -634,39 +634,6 @@ TweenService:Create(UI.CmdBtn, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.E
 
 Dragify(UI.CmdBtn)
 
-UserInputService.InputBegan:Connect(function(Input, GameProcessed)
-    if GameProcessed then return end
-    if Input.KeyCode == Enum.KeyCode.Semicolon then
-        if CmdbarOpen then
-            CloseCmdbar()
-        else
-            OpenCmdbar()
-        end
-    end
-end)
-
-local BtnNormalSize = UDim2.new(0, 38, 0, 38)
-local BtnHoverSize = UDim2.new(0, 44, 0, 44)
-local BtnTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
-local function AnimateBtnHover()
-    TweenService:Create(UI.CmdBtn, BtnTweenInfo, { Size = BtnHoverSize }):Play()
-end
-
-local function AnimateBtnNormal()
-    TweenService:Create(UI.CmdBtn, BtnTweenInfo, { Size = BtnNormalSize }):Play()
-end
-
-UI.CmdBtn.MouseEnter:Connect(function()
-    if not BtnDragging then
-        AnimateBtnHover()
-    end
-end)
-
-UI.CmdBtn.MouseLeave:Connect(function()
-    AnimateBtnNormal()
-end)
-
 local CmdbarOpen = false
 local CmdbarTweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
@@ -733,6 +700,39 @@ local function RunCmdbarInput()
         Notify('"' .. (Args[1] or Text) .. '" isn\'t a valid command.')
     end
 end
+
+local BtnNormalSize = UDim2.new(0, 38, 0, 38)
+local BtnHoverSize = UDim2.new(0, 44, 0, 44)
+local BtnTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local function AnimateBtnHover()
+    TweenService:Create(UI.CmdBtn, BtnTweenInfo, { Size = BtnHoverSize }):Play()
+end
+
+local function AnimateBtnNormal()
+    TweenService:Create(UI.CmdBtn, BtnTweenInfo, { Size = BtnNormalSize }):Play()
+end
+
+UI.CmdBtn.MouseEnter:Connect(function()
+    if not BtnDragging then
+        AnimateBtnHover()
+    end
+end)
+
+UI.CmdBtn.MouseLeave:Connect(function()
+    AnimateBtnNormal()
+end)
+
+UserInputService.InputBegan:Connect(function(Input, GameProcessed)
+    if GameProcessed then return end
+    if Input.KeyCode == Enum.KeyCode.Semicolon then
+        if CmdbarOpen then
+            CloseCmdbar()
+        else
+            OpenCmdbar()
+        end
+    end
+end)
 
 UI.CmdBtn.MouseButton1Click:Connect(function()
     AnimateBtnHover()
