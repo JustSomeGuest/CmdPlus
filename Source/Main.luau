@@ -603,6 +603,7 @@ UI.CmdbarPadding.Parent = UI.Cmdbar
 
 local Camera = Workspace.CurrentCamera
 local BtnSize = 38
+local BtnPadding = 12
 
 UI.CmdBtn = Instance.new("ImageButton")
 UI.CmdBtn.BackgroundColor3 = Color3.fromRGB(19, 19, 22)
@@ -637,11 +638,22 @@ UI.CmdBtn.Visible = true
 TweenService:Create(UI.CmdBtn, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
     Position = UDim2.fromOffset(
         math.floor(Camera.ViewportSize.X / 2 - BtnSize / 2),
-        4
+        BtnPadding
     )
 }):Play()
 
 Dragify(UI.CmdBtn)
+
+UserInputService.InputBegan:Connect(function(Input, GameProcessed)
+    if GameProcessed then return end
+    if Input.KeyCode == Enum.KeyCode.Semicolon then
+        if CmdbarOpen then
+            CloseCmdbar()
+        else
+            OpenCmdbar()
+        end
+    end
+end)
 
 local BtnNormalSize = UDim2.new(0, 38, 0, 38)
 local BtnHoverSize = UDim2.new(0, 44, 0, 44)
