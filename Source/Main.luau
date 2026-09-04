@@ -72,17 +72,7 @@ end)
 
 local NotifsSuccess, Notifs = pcall(function()
     local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Main/Source/Notify.luau"))()
-    Lib.Settings = {
-        Theme = {
-            Accent = Color3.fromRGB(255, 255, 255),
-            Secondary = Color3.fromRGB(0, 0, 0),
-            Text = Color3.fromRGB(255, 255, 255),
-        },
-        Fonts = {
-            Title = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-            Description = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
-        }
-    }
+    Lib:SetTheme("Minimal")
     return Lib
 end)
 
