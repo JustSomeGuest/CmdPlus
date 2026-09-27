@@ -1,11 +1,12 @@
 local Players = GetService("Players")
+local RunService = GetService("RunService")
 
 local AntiFlingActive = false
+local AntiflingConn
 local AntiflingPlayerConn
 
 local PlayerConnections = {}
 local CharacterParts = {}
-local OriginalCanCollide = {}
 
 local function Disconnect(Connection)
     if Connection then
@@ -19,18 +20,14 @@ local function TrackPart(Part)
     end
 
     CharacterParts[Part] = true
-    OriginalCanCollide[Part] = Part.CanCollide
-
-    Part.CanCollide = false
 end
 
 local function UntrackPart(Part)
     CharacterParts[Part] = nil
-    OriginalCanCollide[Part] = nil
 end
 
 local function SetupCharacter(Character)
-    if not Character then
+    if not Character or Character == Plr.Character then
         return
     end
 
@@ -119,6 +116,20 @@ local function Antifling()
         end
     end)
 
+    AntiflingConn = RunService.Heartbeat:Connect(function()
+        if not AntiFlingActive then
+            return
+        end
+
+        for Part in pairs(CharacterParts) do
+            if Part.Parent then
+                Part.CanCollide = false
+            else
+                UntrackPart(Part)
+            end
+        end
+    end)
+
     Notify("AntiFling: Enabled")
 end
 
@@ -130,7 +141,10 @@ local function Unantifling()
 
     AntiFlingActive = false
 
+    Disconnect(AntiflingConn)
     Disconnect(AntiflingPlayerConn)
+
+    AntiflingConn = nil
     AntiflingPlayerConn = nil
 
     for Object, Connections in pairs(PlayerConnections) do
@@ -141,14 +155,7 @@ local function Unantifling()
         PlayerConnections[Object] = nil
     end
 
-    for Part, OriginalCanCollideValue in pairs(OriginalCanCollide) do
-        if Part.Parent then
-            Part.CanCollide = OriginalCanCollideValue
-        end
-    end
-
     table.clear(CharacterParts)
-    table.clear(OriginalCanCollide)
 
     Notify("AntiFling: Disabled")
 end
