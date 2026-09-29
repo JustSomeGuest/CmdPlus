@@ -1,13 +1,17 @@
 # CmdPlus
 
-### Main Loader
+## Loader
+
+### Main
+
 ```luau
 loadstring(game:HttpGet("https://rbxscriptz.pages.dev/scripts/cmdplus"))()
 ```
 
-### Alternative Loader
+### Alternative
+
 ```luau
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Source/Main.luau")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Source/Init.lua")
 ```
 
 ## Features
