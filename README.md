@@ -11,7 +11,7 @@ loadstring(game:HttpGet("https://rbxscriptz.pages.dev/scripts/cmdplus"))()
 ### Alternative
 
 ```luau
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Source/Init.lua")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/CmdPlus/Main/Source/Init.luau"))()
 ```
 
 ## Features
