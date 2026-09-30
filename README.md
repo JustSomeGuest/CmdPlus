@@ -89,16 +89,6 @@ or
 
 ## License
 
-**© 2026 JustSomeGuest. All Rights Reserved.**
-
-CmdPlus and all associated source code are proprietary software protected by copyright law.
-
-You may **not**:
-
-- Copy or redistribute this project.
-- Modify or create derivative works.
-- Re-upload the source code, modified or unmodified.
-- Claim ownership of this project or any part of it.
-- Use any portion of the source code in another project without explicit written permission from the author.
+MIT
 
 Made with ❤️ by **JustSomeGuest**.
