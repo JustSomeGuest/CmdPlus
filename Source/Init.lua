@@ -71,7 +71,7 @@ CmdPlusUI:GetPropertyChangedSignal("Enabled"):Connect(function()
 end)
 
 local NotifsSuccess, Notifs = pcall(function()
-    local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Main/Source/Notify.luau"))()
+    local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustSomeGuest/VoidUI/Main/Source/Notify.lua"))()
     Lib:SetTheme("Minimal")
     return Lib
 end)
@@ -273,11 +273,11 @@ local function SetGlobalPrefix(NewPrefix)
 end
 
 local function GetGlobalPrefix()
-    if not IsFile("CmdPlus/Prefix.luau") then
+    if not IsFile("CmdPlus/Prefix.lua") then
         return Prefix
     end
 
-    local Success, Content = pcall(ReadFile, "CmdPlus/Prefix.luau")
+    local Success, Content = pcall(ReadFile, "CmdPlus/Prefix.lua")
 
     if Success and type(Content) == "string" then
         Content = Content:gsub("%s+", "")
@@ -448,7 +448,7 @@ end
 
 local function LoadCoreCmds()
     for _, CmdFile in ipairs(BuiltInCmds) do
-        LoadCmd(CmdsURL .. CmdFile .. ".luau")
+        LoadCmd(CmdsURL .. CmdFile .. ".lua")
     end
 end
 
@@ -482,18 +482,18 @@ local function LoadUserCmds()
 end
 
 local function CreateAutoExec()
-    if not IsFile("CmdPlus/Autoexecute.luau") then
-        WriteFile("CmdPlus/Autoexecute.luau", [[return {
+    if not IsFile("CmdPlus/Autoexecute.lua") then
+        WriteFile("CmdPlus/Autoexecute.lua", [[return {
 }]])
     end
 end
 
 local function LoadAutoExec()
-    if not IsFile("CmdPlus/Autoexecute.luau") then
+    if not IsFile("CmdPlus/Autoexecute.lua") then
         return
     end
 
-    local Success, Content = pcall(ReadFile, "CmdPlus/Autoexecute.luau")
+    local Success, Content = pcall(ReadFile, "CmdPlus/Autoexecute.lua")
 
     if not Success or not Content then
         warn("[CmdPlus] Failed to read autoexecute config")
@@ -546,11 +546,11 @@ local function LoadAutoExec()
 end
 
 local function LoadPrefix()
-    if not IsFile("CmdPlus/Prefix.luau") then
+    if not IsFile("CmdPlus/Prefix.lua") then
         return
     end
 
-    local Success, Content = pcall(ReadFile, "CmdPlus/Prefix.luau")
+    local Success, Content = pcall(ReadFile, "CmdPlus/Prefix.lua")
 
     if Success and Content then
         local NewPrefix = Content:gsub("%s+", "")
@@ -566,10 +566,6 @@ LoadUserCmds()
 CreateAutoExec()
 LoadPrefix()
 LoadAutoExec()
-
-pcall(function()
-    loadstring(game:HttpGet(MainURL .. "Tags.luau"))()
-end)
 
 local UI = {}
 
